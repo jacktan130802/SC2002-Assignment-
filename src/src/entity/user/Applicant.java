@@ -3,6 +3,8 @@ package entity.user;
 import entity.btoProject.BTOProject;
 import entity.enquiry.Enquiry;
 
+import java.util.Scanner;
+
 public class Applicant extends User { 
     private BTOProject appliedProject;
     private String applicationStatus;
