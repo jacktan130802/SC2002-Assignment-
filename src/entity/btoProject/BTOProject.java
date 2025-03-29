@@ -1,7 +1,7 @@
 package entity.btoProject;
 
 import java.time.LocalDate;
-
+import entity.user.Manager;
 import enums.FlatType;
 
 public class BTOProject {
