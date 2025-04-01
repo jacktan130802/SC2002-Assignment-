@@ -68,6 +68,7 @@ public class Applicant extends User {
         Scanner sc = new Scanner(System.in);
         System.out.print("Enter ID of enquiry you want to view: ");
         int enqId = sc.nextInt();
+        sc.close();
 
         boolean found = false;
         for (Enquiry e : enquiries) {
