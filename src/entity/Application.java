@@ -6,6 +6,7 @@ import enums.FlatType;
 import entity.roles.Applicant;
 import java.io.Serializable;
 
+
 public class Application implements Serializable {
     private Applicant applicant;
     private BTOProject project;
