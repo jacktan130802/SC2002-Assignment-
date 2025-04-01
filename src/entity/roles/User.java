@@ -12,7 +12,8 @@ public abstract class User{
     protected MaritalStatus maritalStatus;
 
     // constructor
-    public User(String NRIC, String password, int age, MaritalStatus maritalStatus) {
+    public User(String name, String NRIC, String password, int age, MaritalStatus maritalStatus) {
+        this.name = name;
         this.NRIC = NRIC;
         this.password = password;
         this.age = age;

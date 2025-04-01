@@ -13,8 +13,8 @@ import java.util.List;
 public class HDBManager extends User {
     private List<BTOProject> createdProjects = new ArrayList<>();
 
-    public HDBManager(String NRIC, String password, int age, MaritalStatus maritalStatus) {
-        super(NRIC, password, age, maritalStatus);
+    public HDBManager(String name, String NRIC, String password, int age, MaritalStatus maritalStatus) {
+        super(name, NRIC, password, age, maritalStatus);
     }
 
     public boolean canCreateProject(BTOProject newProject) {

@@ -16,8 +16,8 @@ public class Applicant extends User {
     private Application application;
     private List<Enquiry> enquiries = new ArrayList<>();
 
-    public Applicant(String NRIC, String password, int age, MaritalStatus maritalStatus) {
-        super(NRIC, password, age, maritalStatus);
+    public Applicant(String name, String NRIC, String password, int age, MaritalStatus maritalStatus) {
+        super(name, NRIC, password, age, maritalStatus);
     }
 
     public String getNRIC() {

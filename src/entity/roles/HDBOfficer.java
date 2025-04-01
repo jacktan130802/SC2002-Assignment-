@@ -12,8 +12,8 @@ public class HDBOfficer extends Applicant {
     private List<BTOProject> registeredProjects = new ArrayList<>();
     private List<BTOProject> approvedProjects = new ArrayList<>();
 
-    public HDBOfficer(String NRIC, String password, int age, MaritalStatus maritalStatus) {
-        super(NRIC, password, age, maritalStatus);
+    public HDBOfficer(String name, String NRIC, String password, int age, MaritalStatus maritalStatus) {
+        super(name, NRIC, password, age, maritalStatus);
     }
 
     public boolean registerToProject(BTOProject project) {

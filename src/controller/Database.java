@@ -88,14 +88,15 @@ public class Database {
             while ((line = reader.readLine()) != null) {
                 String[] tokens = line.split(",");
                 String nric = tokens[1];
+                String name = tokens[0];
                 int age = Integer.parseInt(tokens[2]);
                 MaritalStatus status = MaritalStatus.valueOf(tokens[3].toUpperCase());
                 String pwd = tokens[4];
 
                 switch (role) {
-                    case "Applicant" -> users.put(nric, new Applicant(nric, pwd, age, status));
-                    case "Officer" -> users.put(nric, new HDBOfficer(nric, pwd, age, status));
-                    case "Manager" -> users.put(nric, new HDBManager(nric, pwd, age, status));
+                    case "Applicant" -> users.put(nric, new Applicant(name, nric, pwd, age, status));
+                    case "Officer" -> users.put(nric, new HDBOfficer(name, nric, pwd, age, status));
+                    case "Manager" -> users.put(nric, new HDBManager(name, nric, pwd, age, status));
                 }
             }
         } catch (IOException e) {
