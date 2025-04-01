@@ -18,6 +18,7 @@ public class BTOProject {
     private HDBManager managerInCharge;
     private boolean visibility;
     private int maxOfficerSlots;
+    private int officerSlot;
 
     private List<HDBOfficer> registeredOfficers = new ArrayList<>();
     private List<HDBOfficer> approvedOfficers = new ArrayList<>();
@@ -75,9 +76,22 @@ public class BTOProject {
         return managerInCharge;
     }
 
+    public int getOfficerSlot() {
+        return officerSlot;
+    }
+
     public boolean isVisible() {
         return visibility;
     }
+
+    public List<String> getRegisteredOfficersNRICs() {
+        List<String> officerNRICs = new ArrayList<>();
+        for (HDBOfficer officer : registeredOfficers) {
+            officerNRICs.add(officer.getNRIC());
+        }
+        return officerNRICs;
+    }
+
 
     // setters 
     public void setVisibility(boolean visibility) {
