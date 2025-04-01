@@ -5,6 +5,7 @@ import enums.MaritalStatus;
 
 public abstract class User{
     // all attributes access level = protected, so subclasses can inherit
+    protected String name;
     protected String NRIC;
     protected String password;
     protected int age;
@@ -19,6 +20,10 @@ public abstract class User{
     }
 
     // getters
+    public String getName() {
+        return name;
+    }
+
     public String getNRIC() {
         return NRIC;
     }
@@ -26,11 +31,14 @@ public abstract class User{
     public int getAge() {
         return age;
     }
-    
+
     public MaritalStatus getMaritalStatus() {
         return maritalStatus;
     }
-    
+
+    public String getPassword() {
+        return password;
+    }
 
     // setting the new password
     public void changePassword(String newPassword) 
