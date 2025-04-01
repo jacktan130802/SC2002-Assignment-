@@ -4,7 +4,6 @@ import entity.Application;
 import entity.btoProject.BTOProject;
 import entity.enquiry.Enquiry;
 import enums.ApplicationStatus;
-
 import enums.MaritalStatus;
 
 import java.util.*;
