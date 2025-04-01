@@ -38,6 +38,7 @@ public class BTOProject {
         this.visibility = false; // default
     }
 
+    // getters
     public String getProjectName() {
         return projectName;
     }
@@ -78,9 +79,27 @@ public class BTOProject {
         return visibility;
     }
 
+    // setters 
     public void setVisibility(boolean visibility) {
         this.visibility = visibility;
     }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+    
+    public void setNeighborhood(String neighborhood) {
+        this.neighborhood = neighborhood;
+    }
+    
+    public void setTwoRoomUnits(int twoRoomUnits) {
+        this.twoRoomUnits = twoRoomUnits;
+    }
+    
+    public void setThreeRoomUnits(int threeRoomUnits) {
+        this.threeRoomUnits = threeRoomUnits;
+    }
+    
 
     public boolean isWithinApplicationPeriod(LocalDate date) {
         return !(date.isBefore(openingDate) || date.isAfter(closingDate));
