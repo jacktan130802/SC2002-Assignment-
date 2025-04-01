@@ -74,13 +74,6 @@ public class Login {
     }
 
 
-    //Todo: displayWelcomeMessage
-    void displayWelcomeMessage() {
-        System.out.println("Welcome to BTO System! \nPlease Login");
-    }
-
-
-
 
     // in mvc standard, the data should be stored in the model
     public ArrayList<String> getData() {
