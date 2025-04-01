@@ -20,7 +20,7 @@ public class Main {
         userData = login.getData();
     }
 
-    private void runUntilQuit(){
+    private void runUntilQuit(){ // ToDo: displayWelcomeMessage??
         System.out.println("Getting Data...");
         System.out.printf("Hello, %s, %s!\n", userData.get(0), userData.get(5));
 

@@ -31,14 +31,14 @@ public class Login {
             System.out.println("Enter Password:");
             password = sc.nextLine();
             System.out.println("Entered User ID: " + userID + ", Entered Password: " + password); // Debug statement
-            checkDatabase(userID, password);
+            verifyAccount(userID, password);
             if (userData.isEmpty())
                 System.out.println("Invalid User ID or Password!");
         } while (userData.isEmpty());
     }
 
     // in mvc standard, the checking should be stored in the controller
-    private void checkDatabase(String userID, String password) {
+    private void verifyAccount(String userID, String password) {
         File file = new File("src/user_data/ApplicantList.csv");
         if (!file.exists()) {
             System.out.println("ApplicantList.csv file not found at: " + file.getAbsolutePath());
@@ -72,6 +72,15 @@ public class Login {
             e.printStackTrace();
         }
     }
+
+
+    //Todo: displayWelcomeMessage
+    void displayWelcomeMessage() {
+        System.out.println("Welcome to BTO System! \nPlease Login");
+    }
+
+
+
 
     // in mvc standard, the data should be stored in the model
     public ArrayList<String> getData() {
