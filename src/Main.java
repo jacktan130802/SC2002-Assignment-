@@ -174,6 +174,15 @@ public class Main {
                         regCtrl.approveOfficer(p, o);
                     }
                 }
+
+
+                /*
+                 * 
+                 * else if 
+                 */
+
+
+
             } else break;
         }
     }

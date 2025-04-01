@@ -136,6 +136,5 @@ public class Applicant extends User {
 
     public void displayMenu() {
         System.out.println("--- Applicant Menu ---");
-        System.out.println("1. View Projects\n2. Apply for BTO\n3. View Application\n4. Submit/View/Edit/Delete Enquiries\n5. Withdraw Application");
     }
 }

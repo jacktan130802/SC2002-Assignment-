@@ -122,6 +122,5 @@ public class HDBOfficer extends Applicant {
     @Override
     public void displayMenu() {
         System.out.println("--- HDB Officer Menu ---");
-        System.out.println("1. View Projects\n2. Apply for BTO\n3. View Application\n4. Submit/View/Edit/Delete Enquiries\n5. Register to Handle Project\n6. View Assigned Projects\n7. Book Flat for Applicant\n8. Reply to Enquiry\n9. Generate Receipt\n10. View Registration Status\n11. View Flat Availability\n12. Withdraw Application");
-    }
+   }
 }

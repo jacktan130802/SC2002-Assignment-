@@ -144,6 +144,5 @@ public class HDBManager extends User {
     @Override
     public void displayMenu() {
         System.out.println("--- HDB Manager Menu ---");
-        System.out.println("1. Create Project\n2. Edit/Delete Project\n3. Toggle Project Visibility\n4. Approve Officer Registration\n5. Approve/Reject Applications\n6. View & Reply Enquiries\n7. Generate Report");
     }
 }
