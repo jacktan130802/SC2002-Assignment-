@@ -1,4 +1,4 @@
-package entity.user;
+package entity.roles;
 
 
 import enums.MaritalStatus;
@@ -18,6 +18,11 @@ public abstract class User{
         this.maritalStatus = maritalStatus;
     }
 
+    // getters
+    public String getNRIC() {
+        return NRIC;
+    }
+    
     // setting the new password
     public void changePassword(String newPassword) 
     {

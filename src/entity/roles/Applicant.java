@@ -1,11 +1,11 @@
 package entity.roles;
 
+import entity.Application;
 import entity.btoProject.BTOProject;
 import entity.enquiry.Enquiry;
 import enums.ApplicationStatus;
 import enums.FlatType;
 import enums.MaritalStatus;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -15,24 +15,47 @@ public class Applicant extends User {
 
     private Application application;
     private List<Enquiry> enquiries = new ArrayList<>();
-    private int maxEnqId = 0;
-    private ApplicationStatus applicationStatus;
-    private FlatType flatType;
 
     public Applicant(String NRIC, String password, int age, MaritalStatus maritalStatus) {
         super(NRIC, password, age, maritalStatus);
     }
 
+    public String getNRIC() {
+        return super.getNRIC();
+    }
+
     public void projectView(BTOProject p) {
-        // Stub for future feature
+        System.out.println("Project: " + p.getProjectName());
+        System.out.println("Location: " + p.getNeighborhood());
+        System.out.println("2-Room Units: " + p.getTwoRoomUnits());
+        System.out.println("3-Room Units: " + p.getThreeRoomUnits());
     }
 
-    public void projectApply(BTOProject p) {
-        // Stub for future feature
+    public void projectApply(BTOProject p, FlatType type) {
+        if (application != null) {
+            System.out.println("You have already applied to a project.");
+            return;
+        }
+        if (maritalStatus == MaritalStatus.SINGLE && type == FlatType.THREE_ROOM) {
+            System.out.println("Single applicants cannot apply for 3-Room flats.");
+            return;
+        }
+        application = new Application(this, p, type);
+        System.out.println("Application submitted for project: " + p.getProjectName());
     }
 
-    public void projectWithdraw(BTOProject p) {
-        // Stub for future feature
+    public void projectWithdraw() {
+        if (application == null) {
+            System.out.println("No application to withdraw.");
+            return;
+        }
+        if (application.getStatus() == ApplicationStatus.BOOKED) {
+            application.setStatus(ApplicationStatus.UNSUCCESSFUL);
+            System.out.println("Booking withdrawn. Status set to UNSUCCESSFUL.");
+        } else {
+            application.setStatus(ApplicationStatus.UNSUCCESSFUL);
+            System.out.println("Application withdrawn successfully.");
+        }
     }
 
     public void enquirySubmit(String message, BTOProject project) {
@@ -109,4 +132,4 @@ public class Applicant extends User {
         System.out.println("--- Applicant Menu ---");
         System.out.println("1. View Projects\n2. Apply for BTO\n3. View Application\n4. Submit/View/Edit/Delete Enquiries\n5. Withdraw Application");
     }
-} 
+}
