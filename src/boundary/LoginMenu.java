@@ -11,4 +11,13 @@ public class LoginMenu {
         String pwd = sc.nextLine();
         return new String[]{nric, pwd};
     }
+
+    public String[] promptChangePassword() {
+        System.out.print("Enter current password: ");
+        String oldPwd = sc.nextLine();
+        System.out.print("Enter new password: ");
+        String newPwd = sc.nextLine();
+        return new String[]{oldPwd, newPwd};
+    }
+    
 }
