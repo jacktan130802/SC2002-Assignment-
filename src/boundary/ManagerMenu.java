@@ -1,7 +1,7 @@
 package boundary;
 import java.util.*;
 
-class ManagerMenu {
+public class ManagerMenu {
     private Scanner sc = new Scanner(System.in);
 
     public int showManagerOptions() {

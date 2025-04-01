@@ -4,7 +4,7 @@ import java.util.*;
 import enums.FlatType;
 import enums.MaritalStatus;
 
-class BTOMenu {
+public class BTOMenu {
     private Scanner sc = new Scanner(System.in);
 
     public int showApplicantOptions() {

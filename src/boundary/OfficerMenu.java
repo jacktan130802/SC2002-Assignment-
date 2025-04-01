@@ -2,7 +2,7 @@ package boundary;
 
 import java.util.*;
 
-class OfficerMenu {
+public class OfficerMenu {
     private Scanner sc = new Scanner(System.in);
 
     public int showOfficerOptions() {

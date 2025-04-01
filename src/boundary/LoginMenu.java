@@ -1,7 +1,7 @@
 package boundary;
 import java.util.*;
 
-class LoginMenu {
+public class LoginMenu {
     private Scanner sc = new Scanner(System.in);
 
     public String[] displayLoginPrompt() {
