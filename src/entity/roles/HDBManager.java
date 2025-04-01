@@ -8,7 +8,6 @@ import enums.MaritalStatus;
 import enums.FlatType;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class HDBManager extends User {
