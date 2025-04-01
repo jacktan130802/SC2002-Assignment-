@@ -22,7 +22,16 @@ public abstract class User{
     public String getNRIC() {
         return NRIC;
     }
+
+    public int getAge() {
+        return age;
+    }
     
+    public MaritalStatus getMaritalStatus() {
+        return maritalStatus;
+    }
+    
+
     // setting the new password
     public void changePassword(String newPassword) 
     {
