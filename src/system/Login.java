@@ -6,6 +6,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
 
+// Example in userData
+
+/**
+ *
+ * UserData: (Applicant)
+ *
+ * [John, S1234567A, 35, Single, password, Applicant]
+ *
+ */
+
+
 public class Login {
     String userID;
     String password;
@@ -26,6 +37,7 @@ public class Login {
         } while (userData.isEmpty());
     }
 
+    // in mvc standard, the checking should be stored in the controller
     private void checkDatabase(String userID, String password) {
         File file = new File("src/user_data/ApplicantList.csv");
         if (!file.exists()) {
@@ -47,7 +59,7 @@ public class Login {
                 } else if (row.length == 5) {
                     System.out.println("Checking user: " + row[1] + " with password: " + row[4]); // Debug statement
                     if (row[1].equals(userID) && row[4].equals(password)) {
-                        Collections.addAll(userData, row); // adding basic details into userData
+                        Collections.addAll(userData, row); // adding all basic details into userData
                         userData.add(userTypes[type]); // adding type
                         System.out.println("User found: " + userData); // Debug statement
                         break; // Exit loop once user is found
@@ -61,6 +73,7 @@ public class Login {
         }
     }
 
+    // in mvc standard, the data should be stored in the model
     public ArrayList<String> getData() {
         return userData;
     }
