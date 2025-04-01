@@ -105,10 +105,26 @@ public class Database {
     }
 
     private static void saveUsers(Map<String, User> users) {
-        saveToCSV(users, APPLICANT_CSV, "Applicant");
-        saveToCSV(users, OFFICER_CSV, "Officer");
-        saveToCSV(users, MANAGER_CSV, "Manager");
+        Map<String, User> applicants = new HashMap<>();
+        Map<String, User> officers = new HashMap<>();
+        Map<String, User> managers = new HashMap<>();
+    
+        for (Map.Entry<String, User> entry : users.entrySet()) {
+            User user = entry.getValue();
+            if (user instanceof Applicant && !(user instanceof HDBOfficer)) {
+                applicants.put(entry.getKey(), user);
+            } else if (user instanceof HDBOfficer && !(user instanceof HDBManager)) {
+                officers.put(entry.getKey(), user);
+            } else if (user instanceof HDBManager) {
+                managers.put(entry.getKey(), user);
+            }
+        }
+    
+        saveToCSV(applicants, APPLICANT_CSV, "Applicant");
+        saveToCSV(officers, OFFICER_CSV, "Officer");
+        saveToCSV(managers, MANAGER_CSV, "Manager");
     }
+    
 
     private static void saveToCSV(Map<String, User> users, String filepath, String role) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath))) {

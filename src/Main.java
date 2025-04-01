@@ -73,6 +73,7 @@ public class Main {
                 String[] pwds = loginMenu.promptChangePassword();
                 if (!user.authenticate(pwds[0])) {
                     System.out.println("Incorrect current password.\n");
+                    continue;
                 } else {
                     user.changePassword(pwds[1]);
                     System.out.println("Password changed successfully.\n");
