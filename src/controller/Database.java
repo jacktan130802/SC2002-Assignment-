@@ -11,10 +11,13 @@ import java.util.*;
 
 public class Database {
 
-    private static final String APPLICANT_CSV = "src/data/ApplicantList.csv";
-    private static final String OFFICER_CSV = "src/data/OfficerList.csv";
-    private static final String MANAGER_CSV = "src/data/ManagerList.csv";
-    private static final String PROJECT_CSV = "src/data/ProjectList.csv";
+    private static final String BASE_PATH = System.getProperty("user.dir") + File.separator + "src" + File.separator + "data" + File.separator;
+
+    private static final String APPLICANT_CSV = BASE_PATH + "ApplicantList.csv";
+    private static final String OFFICER_CSV = BASE_PATH + "OfficerList.csv";
+    private static final String MANAGER_CSV = BASE_PATH + "ManagerList.csv";
+    private static final String PROJECT_CSV = BASE_PATH + "ProjectList.csv";
+    
 
     private static Map<String, User> users = new HashMap<>();
     private static List<BTOProject> projects = new ArrayList<>();
