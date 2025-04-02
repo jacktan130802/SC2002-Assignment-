@@ -13,7 +13,6 @@ public class Main {
     public static void main(String[] args) {
         // Load data
         Database.loadAll();
-
         // Controllers
         LoginAuthController loginCtrl = new LoginAuthController(Database.getUsers());
         ApplicationController appCtrl = new ApplicationController();
