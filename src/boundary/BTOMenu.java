@@ -8,7 +8,7 @@ public class BTOMenu {
     private Scanner sc = new Scanner(System.in);
 
     public int showApplicantOptions() {
-        System.out.println("1. View Projects\n2. Apply for BTO\n3. View Application\n4. Submit/View/Edit/Delete Enquiries\n5. Withdraw Application");
+        System.out.println("1. View BTO Projects\n2. Apply for BTO Projects\n3. View Application\n4. Submit/View/Edit/Delete Enquiries\n5. Withdraw Application");
         System.out.print("Choose option: ");
         return sc.nextInt();
     }

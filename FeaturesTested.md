@@ -2,7 +2,7 @@ This document outlines the key features tested in the system, the test cases exe
 
 # Features 
 
-## Test Case 4: CPassword Change Functionality 
+## Test Case 4: Password Change Functionality 
 User can change their password
 ![Password Change](images/PasswordChangeFunctionality.png)
 
@@ -24,5 +24,13 @@ Users can only view the projects and flat types based on the project's visibilit
 
 
 
-![Password Change](images/VisibilityOfProject(Married).png)
-![Password Change](images/VisibilityOfProject(Single).png)
+![VisibilityOfProject(Married)](images/VisibilityOfProject(Married).png)
+![VisibilityOfProject(Single)](images/VisibilityOfProject(Single).png)
+
+# Test case 6: Project Application 
+- only tested for applicant so far (John)
+- tested only whether the John can apply the projects he is eligible for, but whether or not the project has been really applied (via checking of application status) needs to be further verified 
+
+
+![ProjectApplication1](images/ProjectApplication1.png)
+![ProjectApplication2](images/ProjectApplication2.png)

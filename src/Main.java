@@ -108,14 +108,53 @@ public class Main {
                 System.out.println();
                 
 
-            } else if (opt == 2) {
+            }
+            else if (opt == 2) {
                 String name = menu.promptProjectName();
-                FlatType type = menu.chooseFlatType(user.getMaritalStatus());
                 BTOProject p = projectCtrl.getProjectByName(name);
-                if (p != null && appCtrl.apply(user, p, type))
-                    System.out.println("Applied.");
-                else System.out.println("Failed to apply.");
-            } else if (opt == 3) {
+            
+                if (p == null) {
+                    System.out.println("Project not found.");
+                    continue;
+                }
+            
+                if (!p.isVisible()) {
+                    System.out.println("You are not allowed to apply: Project is not visible.");
+                    continue;
+                }
+            
+                boolean isSingle = user.getMaritalStatus().toString().equalsIgnoreCase("SINGLE");
+                boolean isMarried = user.getMaritalStatus().toString().equalsIgnoreCase("MARRIED");
+                int age = user.getAge();
+            
+                if (isSingle && age >= 35) {
+                    if (!p.hasTwoRoom()) {
+                        System.out.println("No available 2-Room flats in this project.");
+                        continue;
+                    }
+                    if (appCtrl.apply(user, p, FlatType.TWO_ROOM)) {
+                        System.out.println("Successfully applied for 2-Room flat.");
+                    } else {
+                        System.out.println("Application failed.");
+                    }
+                } else if (isMarried && age >= 21) {
+                    FlatType type = menu.chooseFlatType(user.getMaritalStatus());
+            
+                    if (type == FlatType.TWO_ROOM && !p.hasTwoRoom()) {
+                        System.out.println("No 2-Room flats available.");
+                    } else if (type == FlatType.THREE_ROOM && !p.hasThreeRoom()) {
+                        System.out.println("No 3-Room flats available.");
+                    } else if (appCtrl.apply(user, p, type)) {
+                        System.out.println("Successfully applied for " + type + " flat.");
+                    } else {
+                        System.out.println("Application failed.");
+                    }
+                } else {
+                    System.out.println("You are not eligible to apply for any flats in this project.");
+                }
+            }
+            
+            else if (opt == 3) {
                 Application app = user.getApplication();
                 if (app == null) System.out.println("No application found.");
                 else System.out.println("Status: " + app.getStatus());
