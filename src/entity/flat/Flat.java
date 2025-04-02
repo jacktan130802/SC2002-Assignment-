@@ -11,13 +11,12 @@ public class Flat {
     private double price;
 
     public Flat(BTOProject project, String flatType, boolean availabilityStatus, int unitsTotal, double price){
-        this.projectName = project.projectName;
-        this.neighbourhood = project.neighborhood;
+        this.projectName = project.getProjectName();
+        this.neighborhood = project.getNeighborhood();
         this.availabilityStatus = availabilityStatus;
         this.price = price;
     }
 
-    }
 
     
 }
