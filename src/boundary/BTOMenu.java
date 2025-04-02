@@ -1,13 +1,15 @@
 package boundary;
 
-import java.util.*;
+import entity.roles.User;
 import enums.FlatType;
 import enums.MaritalStatus;
+import java.util.*;
 
 public class BTOMenu {
     private Scanner sc = new Scanner(System.in);
 
-    public int showApplicantOptions() {
+    public int showApplicantOptions(User user) {
+        user.displayMenu();
         System.out.println("1. View BTO Projects\n2. Apply for BTO Projects\n3. View Application\n4. Submit/View/Edit/Delete Enquiries\n5. Withdraw Application");
         System.out.print("Choose option: ");
         return sc.nextInt();
