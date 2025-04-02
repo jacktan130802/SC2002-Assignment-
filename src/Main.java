@@ -247,6 +247,7 @@ public class Main {
                             System.out.println("Enquiry deleted.");
                         }
             
+                        
                     } else {
                         break;
                     }
