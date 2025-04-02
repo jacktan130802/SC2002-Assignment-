@@ -155,11 +155,25 @@ public class Main {
             
             else if (opt == 3) {
                 Application app = user.getApplication();
-                if (app == null) System.out.println("No application found.");
-                else System.out.println("Status: " + app.getStatus());
+                if (app == null) {
+                    System.out.println("No application found.");
+                    System.out.println("");
+                } else {
+                    System.out.println("===== Application =====");
+                    String projectName = app.getProject().getProjectName();
+                    System.out.println("Project Name: " + projectName);
+                    System.out.println("Flat Type: " + app.getFlatType());
+                    System.out.println("Status: " + app.getStatus());
+                    System.out.println("");
+                }
             } 
-
+            
             else if (opt == 4) {
+                appCtrl.withdraw(user);
+                System.out.println("Withdrawn.");
+            } 
+            
+            else if (opt == 5) {
                 while (true) {
                     System.out.println("--- Enquiry Menu ---");
                     System.out.println("1. Submit New Enquiry");
@@ -172,7 +186,6 @@ public class Main {
                     sc.nextLine(); // clear buffer
             
                     if (choice == 1) {
-                        // Submit
                         String msg = menu.promptEnquiryMessage();
                         String projectName = menu.promptProjectName();
                         BTOProject proj = projectCtrl.getProjectByName(projectName);
@@ -185,7 +198,6 @@ public class Main {
                         }
             
                     } else if (choice == 2) {
-                        // View
                         List<Enquiry> list = user.getEnquiries();
                         if (list.isEmpty()) {
                             System.out.println("No enquiries found.");
@@ -198,7 +210,6 @@ public class Main {
                         }
             
                     } else if (choice == 3) {
-                        // Edit
                         List<Enquiry> list = user.getEnquiries();
                         if (list.isEmpty()) {
                             System.out.println("No enquiries to edit.");
@@ -220,7 +231,6 @@ public class Main {
                         }
             
                     } else if (choice == 4) {
-                        // Delete
                         List<Enquiry> list = user.getEnquiries();
                         if (list.isEmpty()) {
                             System.out.println("No enquiries to delete.");
