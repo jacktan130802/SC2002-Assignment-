@@ -87,7 +87,27 @@ public class Main {
         while (true) {
             int opt = menu.showApplicantOptions();
             if (opt == 1) {
-                projectCtrl.getVisibleProjectsFor(user).forEach(p -> System.out.println(p.getProjectName()));
+                List<BTOProject> viewable = projectCtrl.getVisibleProjectsFor(user);
+
+                System.out.println("Visible Projects (" + viewable.size() + "):");
+                for (BTOProject p : viewable) {
+                    System.out.println("- " + p.getProjectName());
+                
+                    if (user.getMaritalStatus().toString().equalsIgnoreCase("SINGLE") && user.getAge() >= 35) {
+                        System.out.println("  Eligible Flat Type: 2-Room (" + p.getTwoRoomUnits() + " units left)");
+                    } else if (user.getMaritalStatus().toString().equalsIgnoreCase("MARRIED") && user.getAge() >= 21) {
+                        if (p.hasTwoRoom())
+                            System.out.println("  2-Room: " + p.getTwoRoomUnits() + " units");
+                        if (p.hasThreeRoom())
+                            System.out.println("  3-Room: " + p.getThreeRoomUnits() + " units");
+                    } else {
+                        System.out.println("  [Not eligible for any flat type]");
+                    }
+                }
+
+                System.out.println();
+                
+
             } else if (opt == 2) {
                 String name = menu.promptProjectName();
                 FlatType type = menu.chooseFlatType(user.getMaritalStatus());

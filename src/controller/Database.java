@@ -45,40 +45,68 @@ public class Database {
 
     public static void loadProjects(List<BTOProject> projects, Map<String, User> users) {
         try (BufferedReader reader = new BufferedReader(new FileReader(PROJECT_CSV))) {
-            String line = reader.readLine();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yy");
+            String header = reader.readLine();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yyyy");
 
+            String line;
             while ((line = reader.readLine()) != null) {
-                String[] tokens = line.split(",");
-                String projectName = tokens[0];
-                String neighborhood = tokens[1];
-                int num1 = Integer.parseInt(tokens[3]);
-                double price1 = Double.parseDouble(tokens[4]);
-                int num2 = Integer.parseInt(tokens[6]);
-                double price2 = Double.parseDouble(tokens[7]);
-                LocalDate open = LocalDate.parse(tokens[8], formatter);
-                LocalDate close = LocalDate.parse(tokens[9], formatter);
-                String managerNRIC = tokens[10];
-                int officerSlot = Integer.parseInt(tokens[11]);
-                String officerNRICs = tokens.length > 12 ? tokens[12] : "";
+                List<String> tokens = parseCSVLine(line);
+
+                String projectName = tokens.get(0);
+                String neighborhood = tokens.get(1);
+                int num1 = Integer.parseInt(tokens.get(3));
+                double price1 = Double.parseDouble(tokens.get(4));
+                int num2 = Integer.parseInt(tokens.get(6));
+                double price2 = Double.parseDouble(tokens.get(7));
+
+                LocalDate open = LocalDate.parse(tokens.get(8), formatter);
+                LocalDate close = LocalDate.parse(tokens.get(9), formatter);
+
+                String managerNRIC = tokens.get(10);
+                int officerSlot = Integer.parseInt(tokens.get(11));
+                String officerNRICs = tokens.size() > 12 ? tokens.get(12).replace("\"", "").trim() : "";
+                boolean isVisible = tokens.size() > 13 && tokens.get(13).trim().equalsIgnoreCase("true");
 
                 HDBManager manager = (HDBManager) users.get(managerNRIC);
                 BTOProject project = new BTOProject(projectName, neighborhood, num1, price1, num2, price2, open, close, manager, officerSlot);
+                project.setVisibility(isVisible);
+                
 
-                if (!officerNRICs.trim().isEmpty()) {
-                    String[] officerArray = officerNRICs.split(";");
+                if (!officerNRICs.isEmpty()) {
+                    String[] officerArray = officerNRICs.split(",");
                     for (String officerNRIC : officerArray) {
+                        officerNRIC = officerNRIC.trim();
                         if (users.containsKey(officerNRIC) && users.get(officerNRIC) instanceof HDBOfficer officer) {
                             project.registerOfficer(officer);
                             project.approveOfficer(officer);
                         }
                     }
                 }
+
                 projects.add(project);
             }
         } catch (IOException e) {
             System.out.println("Failed to load project list: " + e.getMessage());
         }
+    }
+
+    private static List<String> parseCSVLine(String line) {
+        List<String> tokens = new ArrayList<>();
+        boolean inQuotes = false;
+        StringBuilder sb = new StringBuilder();
+
+        for (char c : line.toCharArray()) {
+            if (c == '"') {
+                inQuotes = !inQuotes;
+            } else if (c == ',' && !inQuotes) {
+                tokens.add(sb.toString().trim());
+                sb.setLength(0);
+            } else {
+                sb.append(c);
+            }
+        }
+        tokens.add(sb.toString().trim());
+        return tokens;
     }
 
     private static void readCSV(Map<String, User> users, String filepath, String role) {
@@ -108,7 +136,7 @@ public class Database {
         Map<String, User> applicants = new HashMap<>();
         Map<String, User> officers = new HashMap<>();
         Map<String, User> managers = new HashMap<>();
-    
+
         for (Map.Entry<String, User> entry : users.entrySet()) {
             User user = entry.getValue();
             if (user instanceof Applicant && !(user instanceof HDBOfficer)) {
@@ -119,24 +147,18 @@ public class Database {
                 managers.put(entry.getKey(), user);
             }
         }
-    
+
         saveToCSV(applicants, APPLICANT_CSV, "Applicant");
         saveToCSV(officers, OFFICER_CSV, "Officer");
         saveToCSV(managers, MANAGER_CSV, "Manager");
     }
-    
 
     private static void saveToCSV(Map<String, User> users, String filepath, String role) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath))) {
             writer.write("Name,NRIC,Age,Marital Status,Password\n");
             for (User user : users.values()) {
-                if (role.equals("Applicant") && user instanceof Applicant applicant) {
-                    writer.write(String.format("%s,%s,%d,%s,%s\n", applicant.getName(), applicant.getNRIC(), applicant.getAge(), applicant.getMaritalStatus(), applicant.getPassword()));
-                } else if (role.equals("Officer") && user instanceof HDBOfficer officer) {
-                    writer.write(String.format("%s,%s,%d,%s,%s\n", officer.getName(), officer.getNRIC(), officer.getAge(), officer.getMaritalStatus(), officer.getPassword()));
-                } else if (role.equals("Manager") && user instanceof HDBManager manager) {
-                    writer.write(String.format("%s,%s,%d,%s,%s\n", manager.getName(), manager.getNRIC(), manager.getAge(), manager.getMaritalStatus(), manager.getPassword()));
-                }
+                writer.write(String.format("%s,%s,%d,%s,%s\n",
+                        user.getName(), user.getNRIC(), user.getAge(), user.getMaritalStatus(), user.getPassword()));
             }
         } catch (IOException e) {
             System.out.println("Error saving " + role + ": " + e.getMessage());
@@ -145,18 +167,22 @@ public class Database {
 
     private static void saveProjects(List<BTOProject> projects) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(PROJECT_CSV))) {
-            writer.write("Project Name,Neighborhood,Type 1,Number of units for Type 1,Selling price for Type 1,Type 2,Number of units for Type 2,Selling price for Type 2,Application opening date,Application closing date,Manager,Officer Slot,Officer\n");
+            writer.write("Project Name,Neighborhood,Type 1,Number of units for Type 1,Selling price for Type 1,Type 2,Number of units for Type 2,Selling price for Type 2,Application opening date,Application closing date,Manager,Officer Slot,Officer,Visibility\n");
+            writer.write("Project Name,Neighborhood,Type 1,Number of units for Type 1,Selling price for Type 1,Type 2,Number of units for Type 2,Selling price for Type 2,Application opening date,Application closing date,Manager,Officer Slot,Officer,Visibility\n");
+
             for (BTOProject project : projects) {
                 String officers = String.join(";", project.getRegisteredOfficersNRICs());
-                writer.write(String.format("%s,%s,2-Room,%d,%.2f,3-Room,%d,%.2f,%s,%s,%s,%d,%s\n",
-                        project.getProjectName(),
-                        project.getNeighborhood(),
-                        project.getTwoRoomUnits(), project.getPriceTwoRoom(),
-                        project.getThreeRoomUnits(), project.getPriceThreeRoom(),
-                        project.getOpeningDate(), project.getClosingDate(),
-                        project.getManagerInCharge().getNRIC(),
-                        project.getOfficerSlot(), officers));
+                writer.write(String.format("%s,%s,2-Room,%d,%.2f,3-Room,%d,%.2f,%s,%s,%s,%d,%s,%b\n",
+                    project.getProjectName(),
+                    project.getNeighborhood(),
+                    project.getTwoRoomUnits(), project.getPriceTwoRoom(),
+                    project.getThreeRoomUnits(), project.getPriceThreeRoom(),
+                    project.getOpeningDate(), project.getClosingDate(),
+                    project.getManagerInCharge().getNRIC(),
+                    project.getOfficerSlot(), officers,
+                    project.isVisible()));
             }
+
         } catch (IOException e) {
             System.out.println("Error saving projects: " + e.getMessage());
         }
