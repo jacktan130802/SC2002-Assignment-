@@ -1,11 +1,10 @@
+import boundary.*;
 import controller.*;
 import entity.*;
 import entity.btoProject.BTOProject;
 import entity.enquiry.Enquiry;
 import entity.roles.*;
-import boundary.*;
 import enums.*;
-
 import java.time.LocalDate;
 import java.util.*;
 
@@ -84,7 +83,7 @@ public class Main {
 
     private static void runApplicantFlow(Applicant user, ApplicationController appCtrl, BTOProjectController projectCtrl, EnquiryController enqCtrl, BTOMenu menu, Scanner sc) {
         while (true) {
-            int opt = menu.showApplicantOptions();
+            int opt = menu.showApplicantOptions(user);
             if (opt == 1) {
                 List<BTOProject> viewable = projectCtrl.getVisibleProjectsFor(user);
 
@@ -155,8 +154,18 @@ public class Main {
             
             else if (opt == 3) {
                 Application app = user.getApplication();
-                if (app == null) System.out.println("No application found.");
-                else System.out.println("Status: " + app.getStatus());
+                if (app == null) {
+                    System.out.println("No application found.");
+                    System.out.println("");
+                } 
+                 else {
+                    System.out.println("===== Application =====");
+                    String projectName = app.getProject().getProjectName();
+                    System.out.println("Project Name: " + projectName);
+                    System.out.println("Flat Type: " + app.getFlatType());
+                    System.out.println("Status: " + app.getStatus());
+                    System.out.println("");
+                }
             } else if (opt == 4) {
                 appCtrl.withdraw(user);
                 System.out.println("Withdrawn.");
