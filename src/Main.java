@@ -157,16 +157,103 @@ public class Main {
                 Application app = user.getApplication();
                 if (app == null) System.out.println("No application found.");
                 else System.out.println("Status: " + app.getStatus());
-            } else if (opt == 4) {
-                appCtrl.withdraw(user);
-                System.out.println("Withdrawn.");
-            } else if (opt == 5) {
+            } 
+
+            else if (opt == 4) {
+                while (true) {
+                    System.out.println("--- Enquiry Menu ---");
+                    System.out.println("1. Submit New Enquiry");
+                    System.out.println("2. View My Enquiries");
+                    System.out.println("3. Edit Enquiry");
+                    System.out.println("4. Delete Enquiry");
+                    System.out.println("5. Back");
+                    System.out.print("Choose option: ");
+                    int choice = sc.nextInt();
+                    sc.nextLine(); // clear buffer
+            
+                    if (choice == 1) {
+                        // Submit
+                        String msg = menu.promptEnquiryMessage();
+                        String projectName = menu.promptProjectName();
+                        BTOProject proj = projectCtrl.getProjectByName(projectName);
+            
+                        if (proj != null) {
+                            enqCtrl.submitEnquiry(user, proj, msg);
+                            System.out.println("Enquiry submitted.");
+                        } else {
+                            System.out.println("Project not found.");
+                        }
+            
+                    } else if (choice == 2) {
+                        // View
+                        List<Enquiry> list = user.getEnquiries();
+                        if (list.isEmpty()) {
+                            System.out.println("No enquiries found.");
+                        } else {
+                            for (int i = 0; i < list.size(); i++) {
+                                Enquiry e = list.get(i);
+                                System.out.printf("[%d] Project: %s | Message: %s | Replied: %s\n",
+                                    i + 1, e.getProject().getProjectName(), e.getMessage(), e.isReplied() ? "Yes" : "No");
+                            }
+                        }
+            
+                    } else if (choice == 3) {
+                        // Edit
+                        List<Enquiry> list = user.getEnquiries();
+                        if (list.isEmpty()) {
+                            System.out.println("No enquiries to edit.");
+                            continue;
+                        }
+                        System.out.print("Enter enquiry number to edit: ");
+                        int index = sc.nextInt() - 1;
+                        sc.nextLine();
+            
+                        if (index < 0 || index >= list.size()) {
+                            System.out.println("Invalid index.");
+                        } else if (list.get(index).isReplied()) {
+                            System.out.println("Cannot edit a replied enquiry.");
+                        } else {
+                            System.out.print("Enter new message: ");
+                            String newMsg = sc.nextLine();
+                            enqCtrl.editEnquiry(list.get(index), newMsg);
+                            System.out.println("Enquiry updated.");
+                        }
+            
+                    } else if (choice == 4) {
+                        // Delete
+                        List<Enquiry> list = user.getEnquiries();
+                        if (list.isEmpty()) {
+                            System.out.println("No enquiries to delete.");
+                            continue;
+                        }
+                        System.out.print("Enter enquiry number to delete: ");
+                        int index = sc.nextInt() - 1;
+                        sc.nextLine();
+            
+                        if (index < 0 || index >= list.size()) {
+                            System.out.println("Invalid index.");
+                        } else if (list.get(index).isReplied()) {
+                            System.out.println("Cannot delete a replied enquiry.");
+                        } else {
+                            enqCtrl.deleteEnquiry(user, list.get(index));
+                            System.out.println("Enquiry deleted.");
+                        }
+            
+                    } else {
+                        break;
+                    }
+                }
+            }
+            else if (opt == 5) {
                 System.out.print("Enter enquiry message: ");
                 String msg = sc.nextLine();
                 String name = menu.promptProjectName();
                 BTOProject p = projectCtrl.getProjectByName(name);
                 if (p != null) enqCtrl.submitEnquiry(user, p, msg);
-            } else break;
+            } 
+            
+
+
         }
     }
 

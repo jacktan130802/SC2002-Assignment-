@@ -1,11 +1,10 @@
 package controller;
 
-
 import entity.btoProject.BTOProject;
 import entity.enquiry.Enquiry;
-import entity.roles.*;
+import entity.roles.Applicant;
 
-import java.util.*;
+import java.util.List;
 
 public class EnquiryController {
     public void submitEnquiry(Applicant applicant, BTOProject project, String message) {
@@ -19,5 +18,14 @@ public class EnquiryController {
 
     public void viewEnquiries(List<Enquiry> list) {
         list.forEach(Enquiry::view);
+    }
+
+    // Add these:
+    public void editEnquiry(Enquiry enquiry, String newMessage) {
+        enquiry.setMessage(newMessage);
+    }
+
+    public void deleteEnquiry(Applicant applicant, Enquiry enquiry) {
+        applicant.getEnquiries().remove(enquiry);
     }
 }

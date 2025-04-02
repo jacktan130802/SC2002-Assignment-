@@ -29,4 +29,11 @@ public class BTOMenu {
         System.out.print("Enter Project Name: ");
         return sc.nextLine();
     }
+
+    public String promptEnquiryMessage() {
+        sc.nextLine(); // Clear buffer
+        System.out.print("Enter enquiry message: ");
+        return sc.nextLine();
+    }
+    
 }
