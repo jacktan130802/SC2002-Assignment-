@@ -184,15 +184,21 @@ public class Main {
                         String msg = menu.promptEnquiryMessage();
                         String projectName = menu.promptProjectName();
                         BTOProject proj = projectCtrl.getProjectByName(projectName);
-            
-                        if (proj != null) {
+                    
+                        // Only allow enquiry if project is in user's eligible list
+                        List<BTOProject> allowedProjects = projectCtrl.getVisibleProjectsFor(user);
+                        boolean canEnquire = proj != null && allowedProjects.contains(proj);
+                    
+                        if (canEnquire) {
                             enqCtrl.submitEnquiry(user, proj, msg);
                             System.out.println("Enquiry submitted.");
-                        } else {
+                        } else if (proj == null) {
                             System.out.println("Project not found.");
+                        } else {
+                            System.out.println("You are not eligible to enquire about this project.");
                         }
-            
-                    } else if (choice == 2) {
+                    }
+                    else if (choice == 2) {
                         List<Enquiry> list = user.getEnquiries();
                         if (list.isEmpty()) {
                             System.out.println("No enquiries found.");
