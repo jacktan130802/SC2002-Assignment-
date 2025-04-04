@@ -166,12 +166,9 @@ public class Main {
                     System.out.println("Status: " + app.getStatus());
                     System.out.println("");
                 }
-            } else if (opt == 4) {
-                appCtrl.withdraw(user);
-                System.out.println("Withdrawn.");
             } 
             
-            else if (opt == 5) {
+            else if (opt == 4) {
                 while (true) {
                     System.out.println("--- Enquiry Menu ---");
                     System.out.println("1. Submit New Enquiry");
@@ -254,15 +251,9 @@ public class Main {
                 }
             }
             else if (opt == 5) {
-                System.out.print("Enter enquiry message: ");
-                String msg = sc.nextLine();
-                String name = menu.promptProjectName();
-                BTOProject p = projectCtrl.getProjectByName(name);
-                if (p != null) enqCtrl.submitEnquiry(user, p, msg);
+                appCtrl.withdraw(user);
+                System.out.println("Withdrawn.");
             } 
-            
-
-
         }
     }
 
