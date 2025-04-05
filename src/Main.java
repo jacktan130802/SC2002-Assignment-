@@ -136,18 +136,31 @@ public class Main {
                         System.out.println("Application failed.");
                     }
                 } else if (isMarried && age >= 21) {
-                    FlatType type = menu.chooseFlatType(user.getMaritalStatus());
-            
-                    if (type == FlatType.TWO_ROOM && !p.hasTwoRoom()) {
-                        System.out.println("No 2-Room flats available.");
-                    } else if (type == FlatType.THREE_ROOM && !p.hasThreeRoom()) {
-                        System.out.println("No 3-Room flats available.");
-                    } else if (appCtrl.apply(user, p, type)) {
+                    if (!p.hasTwoRoom() && !p.hasThreeRoom()) {
+                        System.out.println("No flats available in this project.");
+                        continue;
+                    }
+                
+                    FlatType type = null;
+                    while (type == null) {
+                        type = menu.chooseFlatType(user.getMaritalStatus());
+                
+                        if (type == FlatType.TWO_ROOM && !p.hasTwoRoom()) {
+                            System.out.println("No 2-Room flats available. Please choose another type.");
+                            type = null; // reset to loop again
+                        } else if (type == FlatType.THREE_ROOM && !p.hasThreeRoom()) {
+                            System.out.println("No 3-Room flats available. Please choose another type.");
+                            type = null;
+                        }
+                    }
+                
+                    if (appCtrl.apply(user, p, type)) {
                         System.out.println("Successfully applied for " + type + " flat.");
                     } else {
                         System.out.println("Application failed.");
                     }
-                } else {
+                }
+                 else {
                     System.out.println("You are not eligible to apply for any flats in this project.");
                 }
             }
@@ -180,19 +193,21 @@ public class Main {
                     int choice = sc.nextInt();
                     sc.nextLine(); // clear buffer
             
-                    if (choice == 1) {
+                    if (choice == 1) { // Submit New Enquiry
                         String msg = menu.promptEnquiryMessage();
                         String projectName = menu.promptProjectName();
                         BTOProject proj = projectCtrl.getProjectByName(projectName);
-            
+                    
                         if (proj != null) {
                             enqCtrl.submitEnquiry(user, proj, msg);
                             System.out.println("Enquiry submitted.");
+                            Database.saveAll(); // Save immediately
                         } else {
                             System.out.println("Project not found.");
                         }
-            
-                    } else if (choice == 2) {
+                    }
+
+                    else if (choice == 2) {
                         List<Enquiry> list = user.getEnquiries();
                         if (list.isEmpty()) {
                             System.out.println("No enquiries found.");
@@ -204,7 +219,9 @@ public class Main {
                             }
                         }
             
-                    } else if (choice == 3) {
+                    }
+                    
+                     else if (choice == 3) { // Edit Enquiry
                         List<Enquiry> list = user.getEnquiries();
                         if (list.isEmpty()) {
                             System.out.println("No enquiries to edit.");
@@ -213,7 +230,7 @@ public class Main {
                         System.out.print("Enter enquiry number to edit: ");
                         int index = sc.nextInt() - 1;
                         sc.nextLine();
-            
+                    
                         if (index < 0 || index >= list.size()) {
                             System.out.println("Invalid index.");
                         } else if (list.get(index).isReplied()) {
@@ -223,9 +240,10 @@ public class Main {
                             String newMsg = sc.nextLine();
                             enqCtrl.editEnquiry(list.get(index), newMsg);
                             System.out.println("Enquiry updated.");
+                            Database.saveAll(); // Save immediately
                         }
-            
-                    } else if (choice == 4) {
+                    
+                    } else if (choice == 4) { // Delete Enquiry
                         List<Enquiry> list = user.getEnquiries();
                         if (list.isEmpty()) {
                             System.out.println("No enquiries to delete.");
@@ -234,7 +252,7 @@ public class Main {
                         System.out.print("Enter enquiry number to delete: ");
                         int index = sc.nextInt() - 1;
                         sc.nextLine();
-            
+                    
                         if (index < 0 || index >= list.size()) {
                             System.out.println("Invalid index.");
                         } else if (list.get(index).isReplied()) {
@@ -242,10 +260,10 @@ public class Main {
                         } else {
                             enqCtrl.deleteEnquiry(user, list.get(index));
                             System.out.println("Enquiry deleted.");
+                            Database.saveAll(); // Save immediately
                         }
-            
-                        
-                    } else {
+                    }
+                    else {
                         break;
                     }
                 }

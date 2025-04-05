@@ -12,12 +12,23 @@ public class Application implements Serializable {
     private BTOProject project;
     private ApplicationStatus status;
     private FlatType flatType;
+    private int applicationId;
+    private static int nextId = 1;
+
+    public int getApplicationId() {
+    return applicationId;
+}
+
+public void setApplicationId(int id) {
+    this.applicationId = id;
+}
 
     public Application(Applicant applicant, BTOProject project, FlatType flatType) {
         this.applicant = applicant;
         this.project = project;
         this.flatType = flatType;
         this.status = ApplicationStatus.PENDING;
+        this.applicationId = nextId++;
     }
 
     public void setStatus(ApplicationStatus status) {

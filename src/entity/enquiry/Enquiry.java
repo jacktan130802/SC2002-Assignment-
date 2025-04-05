@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 public class Enquiry implements Serializable {
     private static int idCounter = 1;
-    private final int enquiryID;
+    private int enquiryID;
     private final Applicant applicant;
     private final BTOProject project;
     private String message;
@@ -51,6 +51,16 @@ public class Enquiry implements Serializable {
     public void setReply(String reply) {
         this.reply = reply;
     }
+
+    public void setEnquiryID(int id) {
+        this.enquiryID = id;
+    
+        // Prevent future ID clashes
+        if (id >= idCounter) {
+            idCounter = id + 1;
+        }
+    }
+    
 
     public void view() {
         System.out.println("--- Enquiry Details ---");

@@ -6,6 +6,7 @@ import entity.enquiry.Enquiry;
 import enums.ApplicationStatus;
 import enums.FlatType;
 import enums.MaritalStatus;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -15,6 +16,10 @@ public class Applicant extends User {
 
     private Application application;
     private List<Enquiry> enquiries = new ArrayList<>();
+
+    // For persistence tracking
+    private int applicationId = -1;
+    private List<Integer> enquiryIds = new ArrayList<>();
 
     public Applicant(String name, String NRIC, String password, int age, MaritalStatus maritalStatus) {
         super(name, NRIC, password, age, maritalStatus);
@@ -132,9 +137,25 @@ public class Applicant extends User {
     public boolean hasAppliedTo(BTOProject project) {
         return application != null && application.getProject().equals(project);
     }
-    
 
     public void displayMenu() {
         System.out.println("--- Applicant Menu ---");
+    }
+
+    // Persistence helpers
+    public int getApplicationId() {
+        return applicationId;
+    }
+
+    public void setApplicationId(int applicationId) {
+        this.applicationId = applicationId;
+    }
+
+    public List<Integer> getEnquiryIds() {
+        return enquiryIds;
+    }
+
+    public void setEnquiryIds(List<Integer> enquiryIds) {
+        this.enquiryIds = enquiryIds;
     }
 }
