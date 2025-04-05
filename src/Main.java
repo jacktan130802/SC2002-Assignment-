@@ -136,18 +136,31 @@ public class Main {
                         System.out.println("Application failed.");
                     }
                 } else if (isMarried && age >= 21) {
-                    FlatType type = menu.chooseFlatType(user.getMaritalStatus());
-            
-                    if (type == FlatType.TWO_ROOM && !p.hasTwoRoom()) {
-                        System.out.println("No 2-Room flats available.");
-                    } else if (type == FlatType.THREE_ROOM && !p.hasThreeRoom()) {
-                        System.out.println("No 3-Room flats available.");
-                    } else if (appCtrl.apply(user, p, type)) {
+                    if (!p.hasTwoRoom() && !p.hasThreeRoom()) {
+                        System.out.println("No flats available in this project.");
+                        continue;
+                    }
+                
+                    FlatType type = null;
+                    while (type == null) {
+                        type = menu.chooseFlatType(user.getMaritalStatus());
+                
+                        if (type == FlatType.TWO_ROOM && !p.hasTwoRoom()) {
+                            System.out.println("No 2-Room flats available. Please choose another type.");
+                            type = null; // reset to loop again
+                        } else if (type == FlatType.THREE_ROOM && !p.hasThreeRoom()) {
+                            System.out.println("No 3-Room flats available. Please choose another type.");
+                            type = null;
+                        }
+                    }
+                
+                    if (appCtrl.apply(user, p, type)) {
                         System.out.println("Successfully applied for " + type + " flat.");
                     } else {
                         System.out.println("Application failed.");
                     }
-                } else {
+                }
+                 else {
                     System.out.println("You are not eligible to apply for any flats in this project.");
                 }
             }
