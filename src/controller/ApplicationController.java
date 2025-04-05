@@ -22,6 +22,8 @@ public class ApplicationController {
         // Create a new application
         Application app = new Application(applicant, project, type);
         applicant.setApplication(app);
+
+        controller.Database.saveAll();
         System.out.println("Application submitted successfully.");
         return true;
     }

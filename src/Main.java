@@ -180,24 +180,20 @@ public class Main {
                     int choice = sc.nextInt();
                     sc.nextLine(); // clear buffer
             
-                    if (choice == 1) {
+                    if (choice == 1) { // Submit New Enquiry
                         String msg = menu.promptEnquiryMessage();
                         String projectName = menu.promptProjectName();
                         BTOProject proj = projectCtrl.getProjectByName(projectName);
                     
-                        // Only allow enquiry if project is in user's eligible list
-                        List<BTOProject> allowedProjects = projectCtrl.getVisibleProjectsFor(user);
-                        boolean canEnquire = proj != null && allowedProjects.contains(proj);
-                    
-                        if (canEnquire) {
+                        if (proj != null) {
                             enqCtrl.submitEnquiry(user, proj, msg);
                             System.out.println("Enquiry submitted.");
-                        } else if (proj == null) {
-                            System.out.println("Project not found.");
+                            Database.saveAll(); // Save immediately
                         } else {
-                            System.out.println("You are not eligible to enquire about this project.");
+                            System.out.println("Project not found.");
                         }
                     }
+
                     else if (choice == 2) {
                         List<Enquiry> list = user.getEnquiries();
                         if (list.isEmpty()) {
@@ -210,7 +206,9 @@ public class Main {
                             }
                         }
             
-                    } else if (choice == 3) {
+                    }
+                    
+                     else if (choice == 3) { // Edit Enquiry
                         List<Enquiry> list = user.getEnquiries();
                         if (list.isEmpty()) {
                             System.out.println("No enquiries to edit.");
@@ -219,7 +217,7 @@ public class Main {
                         System.out.print("Enter enquiry number to edit: ");
                         int index = sc.nextInt() - 1;
                         sc.nextLine();
-            
+                    
                         if (index < 0 || index >= list.size()) {
                             System.out.println("Invalid index.");
                         } else if (list.get(index).isReplied()) {
@@ -229,9 +227,10 @@ public class Main {
                             String newMsg = sc.nextLine();
                             enqCtrl.editEnquiry(list.get(index), newMsg);
                             System.out.println("Enquiry updated.");
+                            Database.saveAll(); // Save immediately
                         }
-            
-                    } else if (choice == 4) {
+                    
+                    } else if (choice == 4) { // Delete Enquiry
                         List<Enquiry> list = user.getEnquiries();
                         if (list.isEmpty()) {
                             System.out.println("No enquiries to delete.");
@@ -240,7 +239,7 @@ public class Main {
                         System.out.print("Enter enquiry number to delete: ");
                         int index = sc.nextInt() - 1;
                         sc.nextLine();
-            
+                    
                         if (index < 0 || index >= list.size()) {
                             System.out.println("Invalid index.");
                         } else if (list.get(index).isReplied()) {
@@ -248,10 +247,10 @@ public class Main {
                         } else {
                             enqCtrl.deleteEnquiry(user, list.get(index));
                             System.out.println("Enquiry deleted.");
+                            Database.saveAll(); // Save immediately
                         }
-            
-                        
-                    } else {
+                    }
+                    else {
                         break;
                     }
                 }
