@@ -84,7 +84,7 @@ public class Main {
     private static void runApplicantFlow(Applicant user, ApplicationController appCtrl, BTOProjectController projectCtrl, EnquiryController enqCtrl, BTOMenu menu, Scanner sc) {
         while (true) {
             int opt = menu.showApplicantOptions(user);
-            if (opt == 1) {
+            if (opt == 1) { // View BTO Projects
                 List<BTOProject> viewable = projectCtrl.getVisibleProjectsFor(user);
 
                 System.out.println("Visible Projects (" + viewable.size() + "):");
@@ -107,7 +107,7 @@ public class Main {
                 
 
             }
-            else if (opt == 2) {
+            else if (opt == 2) { // Apply for BTO Projects
                 String name = menu.promptProjectName();
                 BTOProject p = projectCtrl.getProjectByName(name);
             
@@ -165,7 +165,7 @@ public class Main {
                 }
             }
             
-            else if (opt == 3) {
+            else if (opt == 3) { // View Application
                 Application app = user.getApplication();
                 if (app == null) {
                     System.out.println("No application found.");
@@ -181,7 +181,7 @@ public class Main {
                 }
             } 
             
-            else if (opt == 4) {
+            else if (opt == 4) { // Enquiry
                 while (true) {
                     System.out.println("--- Enquiry Menu ---");
                     System.out.println("1. Submit New Enquiry");
@@ -207,7 +207,7 @@ public class Main {
                         }
                     }
 
-                    else if (choice == 2) {
+                    else if (choice == 2) { // View Enquuiry
                         List<Enquiry> list = user.getEnquiries();
                         if (list.isEmpty()) {
                             System.out.println("No enquiries found.");
@@ -268,7 +268,7 @@ public class Main {
                     }
                 }
             }
-            else if (opt == 5) {
+            else if (opt == 5) { // Withdraw Application
                 appCtrl.withdraw(user);
                 System.out.println("Withdrawn.");
             } 

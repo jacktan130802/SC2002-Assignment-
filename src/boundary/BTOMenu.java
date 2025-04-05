@@ -27,7 +27,6 @@ public class BTOMenu {
     }
 
     public String promptProjectName() {
-        sc.nextLine();
         System.out.print("Enter Project Name: ");
         return sc.nextLine();
     }
