@@ -12,7 +12,9 @@ public class BTOMenu {
         user.displayMenu();
         System.out.println("1. View BTO Projects\n2. Apply for BTO Projects\n3. View Application\n4. Submit/View/Edit/Delete Enquiries\n5. Withdraw Application");
         System.out.print("Choose option: ");
-        return sc.nextInt();
+        int opt = sc.nextInt();
+        sc.nextLine(); // FIX: consume the leftover newline
+        return opt;
     }
 
     public FlatType chooseFlatType(MaritalStatus status) {
@@ -32,7 +34,6 @@ public class BTOMenu {
     }
 
     public String promptEnquiryMessage() {
-        sc.nextLine(); // Clear buffer
         System.out.print("Enter enquiry message: ");
         return sc.nextLine();
     }
