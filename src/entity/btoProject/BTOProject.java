@@ -91,7 +91,14 @@ public class BTOProject {
         }
         return officerNRICs;
     }
-
+    public List<String> getApprovedOfficersNRICs() {
+        List<String> nrics = new ArrayList<>();
+        for (HDBOfficer officer : approvedOfficers) {
+            nrics.add(officer.getNRIC());
+        }
+        return nrics;
+    }
+    
 
     // setters 
     public void setVisibility(boolean visibility) {
@@ -128,13 +135,19 @@ public class BTOProject {
     }
 
     public boolean registerOfficer(HDBOfficer officer) {
-        if (!registeredOfficers.contains(officer)) {
-            registeredOfficers.add(officer);
-            return true;
+        System.out.println("Attempting to register officer: " + officer.getNRIC());
+        System.out.println("Current registered count: " + registeredOfficers.size() + "/" + officerSlot);
+        
+    
+        if (registeredOfficers.contains(officer)) {
+            System.out.println("Officer already registered (duplicate NRIC).");
+            return false;
         }
-        return false;
+    
+        registeredOfficers.add(officer);
+        return true;
     }
-
+    
     public boolean approveOfficer(HDBOfficer officer) {
         if (registeredOfficers.contains(officer) && !approvedOfficers.contains(officer)) {
             if (approvedOfficers.size() < maxOfficerSlots) {

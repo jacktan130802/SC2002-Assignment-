@@ -1,19 +1,36 @@
 package entity.roles;
 
 import entity.Application;
-import entity.btoProject.BTOProject;
+import entity.btoProject.*;
 import entity.enquiry.Enquiry;
 import enums.ApplicationStatus;
 import enums.MaritalStatus;
-
+import enums.OfficerRegistrationStatus;
 import java.util.*;
+import controller.Database;
 
 public class HDBOfficer extends Applicant {
-    private List<BTOProject> registeredProjects = new ArrayList<>();
-    private List<BTOProject> approvedProjects = new ArrayList<>();
+    private List<RegisteredProject> registeredProjects = new ArrayList<>();
+    private List<ApprovedProject> approvedProjects = new ArrayList<>();
 
     public HDBOfficer(String name, String NRIC, String password, int age, MaritalStatus maritalStatus) {
         super(name, NRIC, password, age, maritalStatus);
+    }
+
+    public List<ApprovedProject> getApprovedProjects() {
+        return approvedProjects;
+    }
+
+    public List<RegisteredProject> getRegisteredProjects() {
+        return registeredProjects;
+    }
+
+    public List<BTOProject> getRegisteredProjectNamesOnly() {
+        List<BTOProject> projects = new ArrayList<>();
+        for (RegisteredProject rp : registeredProjects) {
+            projects.add(rp.getProject());
+        }
+        return projects;
     }
 
     public boolean registerToProject(BTOProject project) {
@@ -25,13 +42,32 @@ public class HDBOfficer extends Applicant {
             System.out.println("Cannot register for overlapping project timeline.");
             return false;
         }
+        for (RegisteredProject rp : registeredProjects) {
+            if (rp.getProject().equals(project)) {
+                System.out.println("Already registered for this project.");
+                return false;
+            }
+        }
         boolean success = project.registerOfficer(this);
-        if (success) registeredProjects.add(project);
-        return success;
+        System.out.println("in registerToProject");
+        if (success) 
+        {
+            RegisteredProject newRP = new RegisteredProject(UUID.randomUUID().toString(), project, this, OfficerRegistrationStatus.PENDING);
+            registeredProjects.add(newRP);
+            Database.getRegisteredMap().put(newRP.getId(), newRP);  // <== ADD THIS LINE
+
+            return success;
+        }
+        else
+        {
+            System.out.println("Fail to register");
+            return false;
+        }
     }
 
     public boolean isRegisteredForOverlappingProject(BTOProject newProject) {
-        for (BTOProject p : approvedProjects) {
+        for (ApprovedProject ap : approvedProjects) {
+            BTOProject p = ap.getProject();
             if (p.isWithinApplicationPeriod(newProject.getOpeningDate()) ||
                 p.isWithinApplicationPeriod(newProject.getClosingDate())) {
                 return true;
@@ -41,26 +77,37 @@ public class HDBOfficer extends Applicant {
     }
 
     public void approveForProject(BTOProject project) {
-        if (project.approveOfficer(this)) {
-            approvedProjects.add(project);
-            System.out.println("Officer approved for project: " + project.getProjectName());
-        } else {
-            System.out.println("Approval failed. Either not registered or max slots reached.");
+        for (RegisteredProject rp : registeredProjects) {
+            if (rp.getProject().equals(project)) {
+                if (project.approveOfficer(this)) {
+                    rp.setStatus(OfficerRegistrationStatus.APPROVED);
+                    approvedProjects.add(new ApprovedProject(UUID.randomUUID().toString(), project, this));
+                    System.out.println("Officer approved for project: " + project.getProjectName());
+                } else {
+                    rp.setStatus(OfficerRegistrationStatus.REJECTED);
+                    System.out.println("Approval failed. Either not registered or max slots reached.");
+                }
+                return;
+            }
         }
+        System.out.println("You are not registered for this project.");
     }
 
     public boolean isHandlingProject(BTOProject p) {
-        return approvedProjects.contains(p);
+        for (ApprovedProject ap : approvedProjects) {
+            if (ap.getProject().equals(p)) return true;
+        }
+        return false;
     }
 
     public void viewRegistrationStatus(BTOProject project) {
-        if (project.getApprovedOfficers().contains(this)) {
-            System.out.println("You are an approved officer for this project.");
-        } else if (project.getRegisteredOfficers().contains(this)) {
-            System.out.println("Your registration is pending approval.");
-        } else {
-            System.out.println("You have not registered for this project.");
+        for (RegisteredProject rp : registeredProjects) {
+            if (rp.getProject().equals(project)) {
+                System.out.println("Registration Status for " + project.getProjectName() + ": " + rp.getStatus());
+                return;
+            }
         }
+        System.out.println("You have not registered for this project.");
     }
 
     public void viewFlatAvailability(BTOProject project) {
@@ -122,5 +169,5 @@ public class HDBOfficer extends Applicant {
     @Override
     public void displayMenu() {
         System.out.println("--- HDB Officer Menu ---");
-   }
+    }
 }
