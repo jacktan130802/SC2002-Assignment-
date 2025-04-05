@@ -2,12 +2,15 @@
 package controller;
 
 import entity.Application;
+import entity.btoProject.ApprovedProject;
 import entity.btoProject.BTOProject;
+import entity.btoProject.RegisteredProject;
 import entity.enquiry.Enquiry;
 import entity.roles.*;
 import enums.ApplicationStatus;
 import enums.FlatType;
 import enums.MaritalStatus;
+import enums.OfficerRegistrationStatus;
 
 import java.io.*;
 import java.time.LocalDate;
@@ -26,8 +29,20 @@ public class Database {
     private static final String SAVED_ENQUIRY_CSV = BASE_PATH + "SavedEnquiryList.csv";
     private static final String SAVED_APPLICATION_CSV = BASE_PATH + "SavedApplicationList.csv";
 
+    private static final String SAVED_OFFICER_CSV = BASE_PATH + "SavedOfficerList.csv";
+    private static final String SAVED_REGISTERED_CSV = BASE_PATH + "SavedRegisteredProjectList.csv";
+    private static final String SAVED_APPROVED_CSV = BASE_PATH + "SavedApprovedProjectList.csv";
+
+    private static Map<String, RegisteredProject> registeredMap = new HashMap<>();
+    public static Map<String, RegisteredProject> getRegisteredMap() {
+        return registeredMap;
+    }
+    
+    private static Map<String, ApprovedProject> approvedMap = new HashMap<>();
+
     private static Map<String, User> users = new HashMap<>();
     private static List<BTOProject> projects = new ArrayList<>();
+    
 
     private static Map<Integer, Enquiry> enquiryMap = new HashMap<>();
     private static Map<Integer, Application> applicationMap = new HashMap<>();
@@ -41,6 +56,13 @@ public class Database {
             loadSavedEnquiries();
             loadSavedApplicants();
         }
+
+        if (new File(SAVED_OFFICER_CSV).exists()) {
+        loadSavedRegisteredProjects();
+        loadSavedApprovedProjects();
+        loadSavedOfficers(); // Link IDs to projects via map
+        }
+
 
         for (User u : users.values()) {
             if (u instanceof Applicant a) {
@@ -65,6 +87,10 @@ public class Database {
         saveSavedApplications();
         saveSavedEnquiries();
         saveSavedApplicants();
+        saveSavedOfficers();
+        saveSavedRegisteredProjects();
+        saveSavedApprovedProjects();
+
     }
 
     private static void saveUsers(Map<String, User> users) {
@@ -104,7 +130,7 @@ public class Database {
             writer.write("Project Name,Neighborhood,Type 1,Number of units for Type 1,Selling price for Type 1,Type 2,Number of units for Type 2,Selling price for Type 2,Application opening date,Application closing date,Manager,Officer Slot,Officer,Visibility\n");
     
             for (BTOProject project : projects) {
-                String officers = String.join(";", project.getRegisteredOfficersNRICs());
+                String officers = String.join(";", project.getApprovedOfficersNRICs());
     
                 // Get manager name safely (handle null case)
                 String managerName = (project.getManagerInCharge() != null)
@@ -381,4 +407,110 @@ public class Database {
         for (BTOProject p : projects) if (p.getProjectName().equals(name)) return p;
         return null;
     }
+
+    private static void loadSavedOfficers() {
+    try (BufferedReader reader = new BufferedReader(new FileReader(SAVED_OFFICER_CSV))) {
+        reader.readLine();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String[] t = line.split(",", -1);
+            String nric = t[1];
+            if (!(users.get(nric) instanceof HDBOfficer o)) continue;
+
+            if (!t[7].isBlank()) {
+                for (String id : t[7].split(";")) {
+                    RegisteredProject rp = registeredMap.get(id.trim());
+                    if (rp != null) o.getRegisteredProjects().add(rp);
+                }
+            }
+            if (!t[8].isBlank()) {
+                for (String id : t[8].split(";")) {
+                    ApprovedProject ap = approvedMap.get(id.trim());
+                    if (ap != null) o.getApprovedProjects().add(ap);
+                }
+            }
+        }
+    } catch (IOException e) {
+        System.out.println("Error loading officers: " + e.getMessage());
+    }
+}
+
+private static void loadSavedRegisteredProjects() {
+    try (BufferedReader reader = new BufferedReader(new FileReader(SAVED_REGISTERED_CSV))) {
+        reader.readLine();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String[] t = line.split(",", -1);
+            String id = t[0], proj = t[1], nric = t[2], status = t[3];
+
+            if (users.get(nric) instanceof HDBOfficer o && getProjectByName(proj) != null) {
+                RegisteredProject rp = new RegisteredProject(id, getProjectByName(proj), o, OfficerRegistrationStatus.valueOf(status));
+                registeredMap.put(id, rp);
+            }
+        }
+    } catch (IOException e) {
+        System.out.println("Error loading registered projects: " + e.getMessage());
+    }
+}
+
+private static void loadSavedApprovedProjects() {
+    try (BufferedReader reader = new BufferedReader(new FileReader(SAVED_APPROVED_CSV))) {
+        reader.readLine();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String[] t = line.split(",", -1);
+            String id = t[0], proj = t[1], nric = t[2];
+
+            if (users.get(nric) instanceof HDBOfficer o && getProjectByName(proj) != null) {
+                ApprovedProject ap = new ApprovedProject(id, getProjectByName(proj), o);
+                approvedMap.put(id, ap);
+            }
+        }
+    } catch (IOException e) {
+        System.out.println("Error loading approved projects: " + e.getMessage());
+    }
+}
+
+private static void saveSavedOfficers() {
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_OFFICER_CSV))) {
+        writer.write("Name,NRIC,Age,Marital Status,Password,ApplicationID,EnquiryIDs,RegisteredProjectIDs,ApprovedProjectIDs\n");
+        for (User u : users.values()) {
+            if (u instanceof HDBOfficer o) {
+                String appId = o.getApplication() != null ? String.valueOf(o.getApplication().getApplicationId()) : "";
+                String enqIds = o.getEnquiries().isEmpty() ? "" : o.getEnquiries().stream().map(e -> String.valueOf(e.getEnquiryID())).reduce((a, b) -> a + ";" + b).orElse("");
+                String regIds = o.getRegisteredProjects().isEmpty() ? "" : o.getRegisteredProjects().stream().map(rp -> rp.getId()).reduce((a, b) -> a + ";" + b).orElse("");
+                String apprIds = o.getApprovedProjects().isEmpty() ? "" : o.getApprovedProjects().stream().map(ap -> ap.getId()).reduce((a, b) -> a + ";" + b).orElse("");
+
+                writer.write(String.format("%s,%s,%d,%s,%s,%s,%s,%s,%s\n",
+                    o.getName(), o.getNRIC(), o.getAge(), o.getMaritalStatus(), o.getPassword(), appId, enqIds, regIds, apprIds));
+            }
+        }
+    } catch (IOException e) {
+        System.out.println("Error saving officers: " + e.getMessage());
+    }
+}
+
+
+private static void saveSavedRegisteredProjects() {
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_REGISTERED_CSV))) {
+        writer.write("RegisteredProjectID,ProjectName,OfficerNRIC,Status\n");
+        for (RegisteredProject rp : registeredMap.values()) {
+            writer.write(String.format("%s,%s,%s,%s\n", rp.getId(), rp.getProject().getProjectName(), rp.getOfficer().getNRIC(), rp.getStatus()));
+        }
+    } catch (IOException e) {
+        System.out.println("Error saving registered projects: " + e.getMessage());
+    }
+}
+
+private static void saveSavedApprovedProjects() {
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_APPROVED_CSV))) {
+        writer.write("ApprovedProjectID,ProjectName,OfficerNRIC\n");
+        for (ApprovedProject ap : approvedMap.values()) {
+            writer.write(String.format("%s,%s,%s\n", ap.getId(), ap.getProject().getProjectName(), ap.getOfficer().getNRIC()));
+        }
+    } catch (IOException e) {
+        System.out.println("Error saving approved projects: " + e.getMessage());
+    }
+}
+
 }

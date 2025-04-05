@@ -1,0 +1,4 @@
+Name,NRIC,Age,Marital Status,Password,ApplicationID,EnquiryIDs,RegisteredProjectIDs,ApprovedProjectIDs
+Emily,S6543210I,28,SINGLE,password,,,,
+David,T1234567J,29,MARRIED,password,,,aae7045b-8137-4db3-9888-029ada28972e,
+Daniel,T2109876H,36,SINGLE,password,,,,
