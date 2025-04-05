@@ -17,10 +17,6 @@ public class NRICValidator {
             }
         }
 
-        char lastChar = nric.charAt(8);
-        if (!Character.isUpperCase(lastChar)) {
-            return false;
-        }
 
         return true;
     }
