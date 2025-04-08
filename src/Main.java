@@ -37,6 +37,7 @@ public class Main {
         BTOMenu btoMenu = new BTOMenu();
         OfficerMenu officerMenu = new OfficerMenu();
         ManagerMenu managerMenu = new ManagerMenu();
+        LogoutMenu logoutMenu = new LogoutMenu();
 
         Scanner sc = new Scanner(System.in);
 
@@ -69,11 +70,11 @@ public class Main {
                 mainMenu.displayMainMenu(currentUser);
 
                 if (currentUser instanceof Applicant && !(currentUser instanceof HDBOfficer)) {
-                    runApplicantFlow((Applicant) currentUser, appCtrl, projectCtrl, enquiryCtrl, btoMenu, sc);
+                    runApplicantFlow((Applicant) currentUser, appCtrl, projectCtrl, enquiryCtrl, btoMenu, logoutMenu, sc);
                 } else if (currentUser instanceof HDBOfficer) {
-                    runOfficerFlow((HDBOfficer) currentUser, projectCtrl, enquiryCtrl, receiptCtrl, officerMenu, sc, appCtrl);
+                    runOfficerFlow((HDBOfficer) currentUser, projectCtrl, enquiryCtrl, receiptCtrl, officerMenu, logoutMenu, sc, appCtrl);
                 } else if (currentUser instanceof HDBManager) {
-                    runManagerFlow((HDBManager) currentUser, managerMenu, appCtrl, enquiryCtrl, regCtrl, sc);
+                    runManagerFlow((HDBManager) currentUser, managerMenu,logoutMenu, appCtrl, enquiryCtrl, regCtrl, sc);
                 }
             } else if (opt == 2) {
                 System.out.print("Enter NRIC (E.g S1234567D): ");
@@ -113,7 +114,7 @@ public class Main {
      * @param sc         The scanner for user input.
      */
 
-    private static void runApplicantFlow(Applicant user, ApplicationController appCtrl, BTOProjectController projectCtrl, EnquiryController enqCtrl, BTOMenu menu, Scanner sc) {
+    private static void runApplicantFlow(Applicant user, ApplicationController appCtrl, BTOProjectController projectCtrl, EnquiryController enqCtrl, BTOMenu menu, LogoutMenu logoutMenu, Scanner sc) {
         while (true) {
             int opt = menu.showApplicantOptions(user);
             if (opt == 1) { // View BTO Projects
@@ -304,12 +305,19 @@ public class Main {
                 appCtrl.withdraw(user);
                 System.out.println("Withdrawn.");
             }
+            else if (opt == 6){ // Logout
+                logoutMenu.displayLogoutMenu(user);
+                break;
+            }
+            else{
+                System.out.println("Invalid option");
+            }
         }
     }
 
 
 
-    private static void runOfficerFlow(HDBOfficer user, BTOProjectController projCtrl, EnquiryController enqCtrl, ReceiptController receiptCtrl, OfficerMenu menu, Scanner sc, ApplicationController appCtrl) {
+    private static void runOfficerFlow(HDBOfficer user, BTOProjectController projCtrl, EnquiryController enqCtrl, ReceiptController receiptCtrl, OfficerMenu menu, LogoutMenu logoutMenu, Scanner sc, ApplicationController appCtrl) {
         // --- Debug: Print projects applied for and registered to handle ---
 
 
@@ -596,14 +604,19 @@ public class Main {
                 if (p != null) {
                     user.viewFlatAvailability(p);
                 }
-            } else {
+            }
+            else if (opt == 13){ // Logout
+                logoutMenu.displayLogoutMenu(user);
                 break;
+            } 
+            else{
+                System.out.println("Invalid option");
             }
         }
     }
 
 
-    private static void runManagerFlow(HDBManager mgr, ManagerMenu menu, ApplicationController appCtrl, EnquiryController enqCtrl, OfficerRegistrationController regCtrl, Scanner sc) {
+    private static void runManagerFlow(HDBManager mgr, ManagerMenu menu, LogoutMenu logoutMenu,ApplicationController appCtrl, EnquiryController enqCtrl, OfficerRegistrationController regCtrl, Scanner sc) {
         while (true) {
             int opt = menu.showManagerOptions();
             if (opt == 1) {
@@ -644,7 +657,14 @@ public class Main {
 
 
 
-            } else break;
+            }
+            else if (opt == 8){ // Logout
+                logoutMenu.displayLogoutMenu(mgr);
+                break;
+            } 
+            else{
+                System.out.println("Invalid option");
+            }
         }
     }
 }
