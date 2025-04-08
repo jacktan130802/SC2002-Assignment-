@@ -649,7 +649,6 @@ public class Main {
                     }
                 }
 
-
                 /*
                  *
                  * else if
@@ -658,6 +657,20 @@ public class Main {
 
 
             }
+            // else if (opt == 6) { // View & Reply to Enquiry //not done yet
+            //     for (BTOProject p : mgr.getVisibleProjectsFor(mgr)) {
+            //         if (mgr.isHandlingProject(p)) {
+            //             for (Enquiry e : user.getEnquiries()) {
+            //                 if (e.getProject().equals(p)) {
+            //                     e.view();
+            //                     String reply = menu.promptEnquiryReply();
+            //                     enqCtrl.replyToEnquiry(e, reply);
+            //                     Database.saveAll();
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
             else if (opt == 8){ // Logout
                 logoutMenu.displayLogoutMenu(mgr);
                 break;
