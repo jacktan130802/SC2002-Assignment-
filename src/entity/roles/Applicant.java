@@ -6,7 +6,6 @@ import entity.enquiry.Enquiry;
 import enums.ApplicationStatus;
 import enums.FlatType;
 import enums.MaritalStatus;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -61,6 +60,13 @@ public class Applicant extends User {
             application.setStatus(ApplicationStatus.UNSUCCESSFUL);
             System.out.println("Application withdrawn successfully.");
         }
+    }
+
+    public void requestWithdrawal() {
+        if (this.application == null) {
+            System.out.println("No application to withdraw.");
+        }
+        this.application.setWithdrawalRequested(true);
     }
 
     public void enquirySubmit(String message, BTOProject project) {

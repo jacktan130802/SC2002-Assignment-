@@ -7,10 +7,9 @@ import entity.btoProject.RegisteredProject;
 import entity.enquiry.Enquiry;
 import entity.roles.*;
 import enums.*;
-import utility.NRICValidator;
-
 import java.time.LocalDate;
 import java.util.*;
+import utility.NRICValidator;
 
 /**
  * Main class for the BTO Management System.
@@ -302,8 +301,8 @@ public class Main {
                 }
             }
             else if (opt == 5) { // Withdraw Application
-                appCtrl.withdraw(user);
-                System.out.println("Withdrawn.");
+                appCtrl.requestWithdrawal(user);
+                
             }
             else if (opt == 6){ // Logout
                 logoutMenu.displayLogoutMenu(user);
@@ -619,7 +618,7 @@ public class Main {
     private static void runManagerFlow(HDBManager mgr, ManagerMenu menu, LogoutMenu logoutMenu,ApplicationController appCtrl, EnquiryController enqCtrl, OfficerRegistrationController regCtrl, Scanner sc) {
         while (true) {
             int opt = menu.showManagerOptions();
-            if (opt == 1) {
+            if (opt == 1) { // Create Project
                 String name = menu.promptProjectName();
                 String hood = menu.promptNeighborhood();
                 int two = menu.promptUnitCount("2-Room");
@@ -628,11 +627,13 @@ public class Main {
                 LocalDate close = LocalDate.parse(menu.promptDate("Closing"));
                 BTOProject p = new BTOProject(name, hood, two, 350000, three, 450000, open, close, mgr, 10);
                 mgr.createProject(p);
-            } else if (opt == 2) {
+
+            } else if (opt == 2) { // Edit/ Delete Project
                 String name = menu.promptProjectName();
                 BTOProject p = mgr.getCreatedProjects().stream().filter(proj -> proj.getProjectName().equals(name)).findFirst().orElse(null);
                 if (p != null) mgr.toggleProjectVisibility(p, !p.isVisible());
-            } else if (opt == 3) {
+
+            } else if (opt == 3) { // Toggle Project Visibility
                 for (User u : Database.getUsers().values()) {
                     if (u instanceof Applicant app && app.getApplication() != null) {
                         BTOProject p = app.getApplication().getProject();
@@ -642,7 +643,7 @@ public class Main {
                         }
                     }
                 }
-            } else if (opt == 4) {
+            } else if (opt == 4) { // Approve Officer Registration
                 for (BTOProject p : mgr.getCreatedProjects()) {
                     for (HDBOfficer o : p.getRegisteredOfficers()) {
                         regCtrl.approveOfficer(p, o);
@@ -656,7 +657,24 @@ public class Main {
 
 
 
-            }
+            } else if (opt == 5) { // Approve/Reject Applications or Withdrawals
+                System.out.println("1. Approve/Reject Applications");
+                System.out.println("2. Approve Withdrawal Requests"); // New option
+                int subOpt = sc.nextInt();
+                
+                if (subOpt == 1) {
+                    //Choose Applications to Approve/ Reject
+
+
+                } else if (subOpt == 2) {
+                    appCtrl.processWithdrawalRequests();
+                    
+                } else {
+                    System.out.println("Invalid Option");
+
+                }
+
+            }   
             // else if (opt == 6) { // View & Reply to Enquiry //not done yet
             //     for (BTOProject p : mgr.getVisibleProjectsFor(mgr)) {
             //         if (mgr.isHandlingProject(p)) {
