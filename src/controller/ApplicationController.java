@@ -38,6 +38,7 @@ public class ApplicationController {
         }
         app.setStatus(ApplicationStatus.UNSUCCESSFUL);
         applicant.setApplication(null);
+        controller.Database.saveAll();
         System.out.println("Application withdrawn successfully.");
     }
 
@@ -47,6 +48,7 @@ public class ApplicationController {
             throw new IllegalStateException("No application found.");
         }
         app.setWithdrawalRequested(true); // Flag the application
+        controller.Database.saveAll();
         System.out.println("Withdrawal requested. Awaiting approval.");
     }
 
