@@ -1,9 +1,9 @@
 package entity;
 
 import entity.btoProject.BTOProject;
+import entity.roles.Applicant;
 import enums.ApplicationStatus;
 import enums.FlatType;
-import entity.roles.Applicant;
 import java.io.Serializable;
 
 
@@ -14,6 +14,7 @@ public class Application implements Serializable {
     private FlatType flatType;
     private int applicationId;
     private static int nextId = 1;
+    private boolean withdrawalRequested;
 
     public int getApplicationId() {
     return applicationId;
@@ -35,6 +36,10 @@ public void setApplicationId(int id) {
         this.status = status;
     }
 
+    public void setWithdrawalRequested(boolean value) {
+        this.withdrawalRequested = value;
+    }
+
     public ApplicationStatus getStatus() {
         return status;
     }
@@ -49,5 +54,9 @@ public void setApplicationId(int id) {
 
     public Applicant getApplicant() {
         return applicant;
+    }
+
+    public boolean isWithdrawalRequested() { 
+        return withdrawalRequested; 
     }
 }
