@@ -9,6 +9,14 @@ import entity.roles.*;
 import enums.*;
 import java.time.LocalDate;
 import java.util.*;
+import utility.NRICValidator;
+
+/**
+ * Main class for the BTO Management System.
+ * This class serves as the entry point for the application.
+ */
+
+
 
 public class Main {
     public static void main(String[] args) {
@@ -28,6 +36,7 @@ public class Main {
         BTOMenu btoMenu = new BTOMenu();
         OfficerMenu officerMenu = new OfficerMenu();
         ManagerMenu managerMenu = new ManagerMenu();
+        LogoutMenu logoutMenu = new LogoutMenu();
 
         Scanner sc = new Scanner(System.in);
 
@@ -48,6 +57,10 @@ public class Main {
 
             if (opt == 1) {
                 String[] login = loginMenu.displayLoginPrompt();
+                if (!NRICValidator.isValidNRIC(login[0])) {
+                    System.out.println("Invalid NRIC format.\n");
+                    continue;
+                }
                 User currentUser = loginCtrl.verifyLogin(login[0], login[1]);
                 if (currentUser == null) {
                     System.out.println("Invalid credentials.\n");
@@ -56,15 +69,19 @@ public class Main {
                 mainMenu.displayMainMenu(currentUser);
 
                 if (currentUser instanceof Applicant && !(currentUser instanceof HDBOfficer)) {
-                    runApplicantFlow((Applicant) currentUser, appCtrl, projectCtrl, enquiryCtrl, btoMenu, sc);
+                    runApplicantFlow((Applicant) currentUser, appCtrl, projectCtrl, enquiryCtrl, btoMenu, logoutMenu, sc);
                 } else if (currentUser instanceof HDBOfficer) {
-                    runOfficerFlow((HDBOfficer) currentUser, projectCtrl, enquiryCtrl, receiptCtrl, officerMenu, sc, appCtrl);
+                    runOfficerFlow((HDBOfficer) currentUser, projectCtrl, enquiryCtrl, receiptCtrl, officerMenu, logoutMenu, sc, appCtrl);
                 } else if (currentUser instanceof HDBManager) {
-                    runManagerFlow((HDBManager) currentUser, managerMenu, appCtrl, enquiryCtrl, regCtrl, sc);
+                    runManagerFlow((HDBManager) currentUser, managerMenu,logoutMenu, appCtrl, enquiryCtrl, regCtrl, sc);
                 }
             } else if (opt == 2) {
-                System.out.print("Enter NRIC: ");
+                System.out.print("Enter NRIC (E.g S1234567D): ");
                 String nric = sc.nextLine();
+                if (!NRICValidator.isValidNRIC(nric)) {
+                    System.out.println("Invalid NRIC format.\n");
+                    continue;
+                }
                 User user = Database.getUsers().get(nric);
                 if (user == null) {
                     System.out.println("User not found.\n");
@@ -83,7 +100,20 @@ public class Main {
         }
     }
 
-    private static void runApplicantFlow(Applicant user, ApplicationController appCtrl, BTOProjectController projectCtrl, EnquiryController enqCtrl, BTOMenu menu, Scanner sc) {
+
+
+    /**
+     * Run the applicant flow for the given user.
+     *
+     * @param user       The applicant user.
+     * @param appCtrl    The application controller.
+     * @param projectCtrl The project controller.
+     * @param enqCtrl    The enquiry controller.
+     * @param menu       The menu for the applicant.
+     * @param sc         The scanner for user input.
+     */
+
+    private static void runApplicantFlow(Applicant user, ApplicationController appCtrl, BTOProjectController projectCtrl, EnquiryController enqCtrl, BTOMenu menu, LogoutMenu logoutMenu, Scanner sc) {
         while (true) {
             int opt = menu.showApplicantOptions(user);
             if (opt == 1) { // View BTO Projects
@@ -92,7 +122,7 @@ public class Main {
                 System.out.println("Visible Projects (" + viewable.size() + "):");
                 for (BTOProject p : viewable) {
                     System.out.println("- " + p.getProjectName());
-                
+
                     if (user.getMaritalStatus().toString().equalsIgnoreCase("SINGLE") && user.getAge() >= 35) {
                         System.out.println("  Eligible Flat Type: 2-Room (" + p.getTwoRoomUnits() + " units left)");
                     } else if (user.getMaritalStatus().toString().equalsIgnoreCase("MARRIED") && user.getAge() >= 21) {
@@ -106,27 +136,27 @@ public class Main {
                 }
 
                 System.out.println();
-                
+
 
             }
             else if (opt == 2) { // Apply for BTO Projects
                 String name = menu.promptProjectName();
                 BTOProject p = projectCtrl.getProjectByName(name);
-            
+
                 if (p == null) {
                     System.out.println("Project not found.");
                     continue;
                 }
-            
+
                 if (!p.isVisible()) {
                     System.out.println("You are not allowed to apply: Project is not visible.");
                     continue;
                 }
-            
+
                 boolean isSingle = user.getMaritalStatus().toString().equalsIgnoreCase("SINGLE");
                 boolean isMarried = user.getMaritalStatus().toString().equalsIgnoreCase("MARRIED");
                 int age = user.getAge();
-            
+
                 if (isSingle && age >= 35) {
                     if (!p.hasTwoRoom()) {
                         System.out.println("No available 2-Room flats in this project.");
@@ -142,11 +172,11 @@ public class Main {
                         System.out.println("No flats available in this project.");
                         continue;
                     }
-                
+
                     FlatType type = null;
                     while (type == null) {
                         type = menu.chooseFlatType(user.getMaritalStatus());
-                
+
                         if (type == FlatType.TWO_ROOM && !p.hasTwoRoom()) {
                             System.out.println("No 2-Room flats available. Please choose another type.");
                             type = null; // reset to loop again
@@ -155,7 +185,7 @@ public class Main {
                             type = null;
                         }
                     }
-                
+
                     if (appCtrl.apply(user, p, type)) {
                         System.out.println("Successfully applied for " + type + " flat.");
                     } else {
@@ -166,13 +196,13 @@ public class Main {
                     System.out.println("You are not eligible to apply for any flats in this project.");
                 }
             }
-            
+
             else if (opt == 3) { // View Application
                 Application app = user.getApplication();
                 if (app == null) {
                     System.out.println("No application found.");
                     System.out.println("");
-                } 
+                }
                  else {
                     System.out.println("===== Application =====");
                     String projectName = app.getProject().getProjectName();
@@ -181,8 +211,8 @@ public class Main {
                     System.out.println("Status: " + app.getStatus());
                     System.out.println("");
                 }
-            } 
-            
+            }
+
             else if (opt == 4) { // Enquiry
                 while (true) {
                     System.out.println("--- Enquiry Menu ---");
@@ -194,12 +224,12 @@ public class Main {
                     System.out.print("Choose option: ");
                     int choice = sc.nextInt();
                     sc.nextLine(); // clear buffer
-            
+
                     if (choice == 1) { // Submit New Enquiry
                         String msg = menu.promptEnquiryMessage();
                         String projectName = menu.promptProjectName();
                         BTOProject proj = projectCtrl.getProjectByName(projectName);
-                    
+
                         if (proj != null) {
                             enqCtrl.submitEnquiry(user, proj, msg);
                             System.out.println("Enquiry submitted.");
@@ -220,9 +250,9 @@ public class Main {
                                     i + 1, e.getProject().getProjectName(), e.getMessage(), e.isReplied() ? "Yes" : "No");
                             }
                         }
-            
+
                     }
-                    
+
                      else if (choice == 3) { // Edit Enquiry
                         List<Enquiry> list = user.getEnquiries();
                         if (list.isEmpty()) {
@@ -232,7 +262,7 @@ public class Main {
                         System.out.print("Enter enquiry number to edit: ");
                         int index = sc.nextInt() - 1;
                         sc.nextLine();
-                    
+
                         if (index < 0 || index >= list.size()) {
                             System.out.println("Invalid index.");
                         } else if (list.get(index).isReplied()) {
@@ -244,7 +274,7 @@ public class Main {
                             System.out.println("Enquiry updated.");
                             Database.saveAll(); // Save immediately
                         }
-                    
+
                     } else if (choice == 4) { // Delete Enquiry
                         List<Enquiry> list = user.getEnquiries();
                         if (list.isEmpty()) {
@@ -254,7 +284,7 @@ public class Main {
                         System.out.print("Enter enquiry number to delete: ");
                         int index = sc.nextInt() - 1;
                         sc.nextLine();
-                    
+
                         if (index < 0 || index >= list.size()) {
                             System.out.println("Invalid index.");
                         } else if (list.get(index).isReplied()) {
@@ -271,26 +301,35 @@ public class Main {
                 }
             }
             else if (opt == 5) { // Withdraw Application
-                appCtrl.withdraw(user);
-                System.out.println("Withdrawn.");
-            } 
+                appCtrl.requestWithdrawal(user);
+                
+            }
+            else if (opt == 6){ // Logout
+                logoutMenu.displayLogoutMenu(user);
+                break;
+            }
+            else{
+                System.out.println("Invalid option");
+            }
         }
     }
 
-    private static void runOfficerFlow(HDBOfficer user, BTOProjectController projCtrl, EnquiryController enqCtrl, ReceiptController receiptCtrl, OfficerMenu menu, Scanner sc, ApplicationController appCtrl) {
+
+
+    private static void runOfficerFlow(HDBOfficer user, BTOProjectController projCtrl, EnquiryController enqCtrl, ReceiptController receiptCtrl, OfficerMenu menu, LogoutMenu logoutMenu, Scanner sc, ApplicationController appCtrl) {
         // --- Debug: Print projects applied for and registered to handle ---
-        
-    
+
+
         while (true) {
             System.out.println("\n=== Officer Overview ===");
-    
+
         // Application as Applicant
         if (user.getApplication() != null) {
             System.out.println("Project applied for as Applicant: " + user.getApplication().getProject().getProjectName());
         } else {
             System.out.println("Project applied for as Applicant: 0");
         }
-    
+
         // Registered Projects
         List<BTOProject> registeredProjects = user.getRegisteredProjectNamesOnly();
         if (!registeredProjects.isEmpty()) {
@@ -313,7 +352,7 @@ public class Main {
             System.out.println("Projects approved to Handle as an Officer: 0");
         }
 
-    
+
         System.out.println("===============================\n");
             int opt = menu.showOfficerOptions();
                         if (opt == 1) {
@@ -322,7 +361,7 @@ public class Main {
                 System.out.println("Visible Projects (" + viewable.size() + "):");
                 for (BTOProject p : viewable) {
                     System.out.println("- " + p.getProjectName());
-                
+
                     if (user.getMaritalStatus().toString().equalsIgnoreCase("SINGLE") && user.getAge() >= 35) {
                         System.out.println("  Eligible Flat Type: 2-Room (" + p.getTwoRoomUnits() + " units left)");
                     } else if (user.getMaritalStatus().toString().equalsIgnoreCase("MARRIED") && user.getAge() >= 21) {
@@ -336,27 +375,27 @@ public class Main {
                 }
 
                 System.out.println();
-                
+
 
             }
             else if (opt == 2) {
                 String name = menu.promptProjectName();
                 BTOProject p = projCtrl.getProjectByName(name);
-            
+
                 if (p == null) {
                     System.out.println("Project not found.");
                     continue;
                 }
-            
+
                 if (!p.isVisible()) {
                     System.out.println("You are not allowed to apply: Project is not visible.");
                     continue;
                 }
-            
+
                 boolean isSingle = user.getMaritalStatus().toString().equalsIgnoreCase("SINGLE");
                 boolean isMarried = user.getMaritalStatus().toString().equalsIgnoreCase("MARRIED");
                 int age = user.getAge();
-            
+
                 if (isSingle && age >= 35) {
                     if (!p.hasTwoRoom()) {
                         System.out.println("No available 2-Room flats in this project.");
@@ -372,11 +411,11 @@ public class Main {
                         System.out.println("No flats available in this project.");
                         continue;
                     }
-                
+
                     FlatType type = null;
                     while (type == null) {
                         type = menu.chooseFlatType(user.getMaritalStatus());
-                
+
                         if (type == FlatType.TWO_ROOM && !p.hasTwoRoom()) {
                             System.out.println("No 2-Room flats available. Please choose another type.");
                             type = null; // reset to loop again
@@ -385,7 +424,7 @@ public class Main {
                             type = null;
                         }
                     }
-                
+
                     if (appCtrl.apply(user, p, type)) {
                         System.out.println("Successfully applied for " + type + " flat.");
                     } else {
@@ -396,13 +435,13 @@ public class Main {
                     System.out.println("You are not eligible to apply for any flats in this project.");
                 }
             }
-            
+
             else if (opt == 3) {
                 Application app = user.getApplication();
                 if (app == null) {
                     System.out.println("No application found.");
                     System.out.println("");
-                } 
+                }
                  else {
                     System.out.println("===== Application =====");
                     String projectName = app.getProject().getProjectName();
@@ -411,8 +450,8 @@ public class Main {
                     System.out.println("Status: " + app.getStatus());
                     System.out.println("");
                 }
-            } 
-            
+            }
+
             else if (opt == 4) {
                 while (true) {
                     System.out.println("--- Enquiry Menu ---");
@@ -424,12 +463,12 @@ public class Main {
                     System.out.print("Choose option: ");
                     int choice = sc.nextInt();
                     sc.nextLine(); // clear buffer
-            
+
                     if (choice == 1) { // Submit New Enquiry
                         String msg = menu.promptEnquiryMessage();
                         String projectName = menu.promptProjectName();
                         BTOProject proj = projCtrl.getProjectByName(projectName);
-                    
+
                         if (proj != null) {
                             enqCtrl.submitEnquiry(user, proj, msg);
                             System.out.println("Enquiry submitted.");
@@ -450,9 +489,9 @@ public class Main {
                                     i + 1, e.getProject().getProjectName(), e.getMessage(), e.isReplied() ? "Yes" : "No");
                             }
                         }
-            
+
                     }
-                    
+
                      else if (choice == 3) { // Edit Enquiry
                         List<Enquiry> list = user.getEnquiries();
                         if (list.isEmpty()) {
@@ -462,7 +501,7 @@ public class Main {
                         System.out.print("Enter enquiry number to edit: ");
                         int index = sc.nextInt() - 1;
                         sc.nextLine();
-                    
+
                         if (index < 0 || index >= list.size()) {
                             System.out.println("Invalid index.");
                         } else if (list.get(index).isReplied()) {
@@ -474,7 +513,7 @@ public class Main {
                             System.out.println("Enquiry updated.");
                             Database.saveAll(); // Save immediately
                         }
-                    
+
                     } else if (choice == 4) { // Delete Enquiry
                         List<Enquiry> list = user.getEnquiries();
                         if (list.isEmpty()) {
@@ -484,7 +523,7 @@ public class Main {
                         System.out.print("Enter enquiry number to delete: ");
                         int index = sc.nextInt() - 1;
                         sc.nextLine();
-                    
+
                         if (index < 0 || index >= list.size()) {
                             System.out.println("Invalid index.");
                         } else if (list.get(index).isReplied()) {
@@ -503,11 +542,11 @@ public class Main {
             else if (opt == 5) {
                 appCtrl.withdraw(user);
                 System.out.println("Withdrawn.");
-            } 
-            
-            
-            
-            
+            }
+
+
+
+
             else if (opt == 6) { // Register to Handle Project
                 String projectName = menu.promptProjectName();
                 BTOProject p = projCtrl.getProjectByName(projectName);
@@ -517,7 +556,7 @@ public class Main {
                     System.out.println("Successfully registered to project. Pending approval.");
                     Database.saveAll();
                 }
-            } 
+            }
             else if (opt == 7) { // View Registration Status
                 for (RegisteredProject rp : user.getRegisteredProjects()) {
                     BTOProject p = rp.getProject();
@@ -564,17 +603,22 @@ public class Main {
                 if (p != null) {
                     user.viewFlatAvailability(p);
                 }
-            } else {
+            }
+            else if (opt == 13){ // Logout
+                logoutMenu.displayLogoutMenu(user);
                 break;
+            } 
+            else{
+                System.out.println("Invalid option");
             }
         }
     }
-    
 
-    private static void runManagerFlow(HDBManager mgr, ManagerMenu menu, ApplicationController appCtrl, EnquiryController enqCtrl, OfficerRegistrationController regCtrl, Scanner sc) {
+
+    private static void runManagerFlow(HDBManager mgr, ManagerMenu menu, LogoutMenu logoutMenu,ApplicationController appCtrl, EnquiryController enqCtrl, OfficerRegistrationController regCtrl, Scanner sc) {
         while (true) {
             int opt = menu.showManagerOptions();
-            if (opt == 1) {
+            if (opt == 1) { // Create Project
                 String name = menu.promptProjectName();
                 String hood = menu.promptNeighborhood();
                 int two = menu.promptUnitCount("2-Room");
@@ -583,11 +627,13 @@ public class Main {
                 LocalDate close = LocalDate.parse(menu.promptDate("Closing"));
                 BTOProject p = new BTOProject(name, hood, two, 350000, three, 450000, open, close, mgr, 10);
                 mgr.createProject(p);
-            } else if (opt == 2) {
+
+            } else if (opt == 2) { // Edit/ Delete Project
                 String name = menu.promptProjectName();
                 BTOProject p = mgr.getCreatedProjects().stream().filter(proj -> proj.getProjectName().equals(name)).findFirst().orElse(null);
                 if (p != null) mgr.toggleProjectVisibility(p, !p.isVisible());
-            } else if (opt == 3) {
+
+            } else if (opt == 3) { // Toggle Project Visibility
                 for (User u : Database.getUsers().values()) {
                     if (u instanceof Applicant app && app.getApplication() != null) {
                         BTOProject p = app.getApplication().getProject();
@@ -597,22 +643,59 @@ public class Main {
                         }
                     }
                 }
-            } else if (opt == 4) {
+            } else if (opt == 4) { // Approve Officer Registration
                 for (BTOProject p : mgr.getCreatedProjects()) {
                     for (HDBOfficer o : p.getRegisteredOfficers()) {
                         regCtrl.approveOfficer(p, o);
                     }
                 }
 
-
                 /*
-                 * 
-                 * else if 
+                 *
+                 * else if
                  */
 
 
 
-            } else break;
+            } else if (opt == 5) { // Approve/Reject Applications or Withdrawals
+                System.out.println("1. Approve/Reject Applications");
+                System.out.println("2. Approve Withdrawal Requests"); // New option
+                int subOpt = sc.nextInt();
+                
+                if (subOpt == 1) {
+                    appCtrl.reviewApplications();
+
+
+                } else if (subOpt == 2) {
+                    appCtrl.processWithdrawalRequests();
+                    
+                } else {
+                    System.out.println("Invalid Option");
+
+                }
+
+            }   
+            // else if (opt == 6) { // View & Reply to Enquiry //not done yet
+            //     for (BTOProject p : mgr.getVisibleProjectsFor(mgr)) {
+            //         if (mgr.isHandlingProject(p)) {
+            //             for (Enquiry e : user.getEnquiries()) {
+            //                 if (e.getProject().equals(p)) {
+            //                     e.view();
+            //                     String reply = menu.promptEnquiryReply();
+            //                     enqCtrl.replyToEnquiry(e, reply);
+            //                     Database.saveAll();
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
+            else if (opt == 8){ // Logout
+                logoutMenu.displayLogoutMenu(mgr);
+                break;
+            } 
+            else{
+                System.out.println("Invalid option");
+            }
         }
     }
 }

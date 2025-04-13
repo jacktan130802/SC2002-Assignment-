@@ -5,7 +5,7 @@ public class LoginMenu {
     private Scanner sc = new Scanner(System.in);
 
     public String[] displayLoginPrompt() {
-        System.out.print("Enter NRIC: ");
+        System.out.print("Enter NRIC (E.g S1234567D): ");
         String nric = sc.nextLine();
         System.out.print("Enter password: ");
         String pwd = sc.nextLine();

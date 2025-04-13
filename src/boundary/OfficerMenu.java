@@ -26,6 +26,7 @@ public class OfficerMenu {
         System.out.println("11. Generate Receipt");
         System.out.println("12. View Flat Availability");
         System.out.println("===============================");
+        System.out.println("13. Logout");
         System.out.print("Choose option: ");
         return sc.nextInt();
     }

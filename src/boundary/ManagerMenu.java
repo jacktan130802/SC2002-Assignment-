@@ -5,7 +5,7 @@ public class ManagerMenu {
     private Scanner sc = new Scanner(System.in);
 
     public int showManagerOptions() {
-        System.out.println("1. Create Project\n2. Edit/Delete Project\n3. Toggle Project Visibility\n4. Approve Officer Registration\n5. Approve/Reject Applications\n6. View & Reply Enquiries\n7. Generate Report");
+        System.out.println("1. Create Project\n2. Edit/Delete Project\n3. Toggle Project Visibility\n4. Approve Officer Registration\n5. Approve/Reject Applications/Withdrawals\n6. View & Reply Enquiries\n7. Generate Report\n8. Logout");
         System.out.print("Choose option: ");
         return sc.nextInt();
     }

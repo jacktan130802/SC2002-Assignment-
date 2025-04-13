@@ -1,3 +1,4 @@
 ApplicationID,ApplicantNRIC,ProjectName,FlatType,Status
 2,T7654321B,Acacia Breeze,THREE_ROOM,PENDING
-2,S1234567A,Maple View,TWO_ROOM,PENDING
+3,S9876543C,Acacia Breeze,TWO_ROOM,PENDING
+1,S1234567A,Acacia Breeze,TWO_ROOM,PENDING
