@@ -663,7 +663,7 @@ public class Main {
                 int subOpt = sc.nextInt();
                 
                 if (subOpt == 1) {
-                    //Choose Applications to Approve/ Reject
+                    appCtrl.reviewApplications();
 
 
                 } else if (subOpt == 2) {
