@@ -1,8 +1,11 @@
 package entity.btoProject;
 
-import entity.roles.HDBOfficer;
+
+
+
 import enums.FlatType;
 import entity.roles.HDBManager;
+import entity.roles.HDBOfficer;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -183,4 +186,5 @@ public void updateFlatCount(FlatType flatType) {
     public boolean hasThreeRoom() {
         return threeRoomUnits > 0;
     }
+
 }

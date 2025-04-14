@@ -540,8 +540,7 @@ public class Main {
                 }
             }
             else if (opt == 5) {
-                appCtrl.withdraw(user);
-                System.out.println("Withdrawn.");
+                appCtrl.requestWithdrawal(user);
             }
 
 
@@ -570,7 +569,47 @@ public class Main {
                         System.out.println("Handling: " + p.getProjectName());
                     }
                 }
-            } else if (opt == 9) { // Book flat for applicant
+
+
+            // CAN BE USED FOR MANAGER TO SEE ALL DETAILS OF ALL PROJECTS
+            
+            // } else if (opt == 9) { // View Project Details           
+            //     if (!(user instanceof HDBOfficer)) {
+            //         System.out.println("Access denied: Officer privileges required");
+            //         return;
+            //     }
+            
+            //     // Option 2A: If getProjects() returns List<BTOProject>
+            //     List<BTOProject> allProjects = Database.getProjects();
+                
+            //     System.out.println("\nAvailable Projects:");
+            //     allProjects.forEach(p -> System.out.println(p.getProjectName()));
+            
+            //     System.out.print("Enter project name: ");
+            //     String projectName = sc.nextLine();
+                
+            //     // Find project in list
+            //     Optional<BTOProject> project = allProjects.stream()
+            //         .filter(p -> p.getProjectName().equalsIgnoreCase(projectName))
+            //         .findFirst();
+                    
+            //     if (project.isPresent()) {
+            //         projCtrl.getFullProjectDetails(user, projectName);
+            //     } else {
+            //         System.out.println("Project not found");
+            //     }
+            
+            } else if (opt == 9) { // View Project Details
+                if (!(user instanceof HDBOfficer)) {
+                    System.out.println("Access denied: Officer privileges required");
+                    return;
+                }
+                projCtrl.viewOfficerProjectDetails((HDBOfficer)user);
+
+            
+            
+
+            } else if (opt == 10) { // Book flat for applicant
                 List<ApprovedProject> officerApprovedProjects = user.getApprovedProjects();
             
                 if (officerApprovedProjects.isEmpty()) {
@@ -626,7 +665,8 @@ public class Main {
                 }
             }
             
-            else if (opt == 10) { // Reply to Enquiry
+            } else if (opt == 11) { // Reply to Enquiry
+
                 for (BTOProject p : projCtrl.getVisibleProjectsFor(user)) {
                     if (user.isHandlingProject(p)) {
                         for (Enquiry e : user.getEnquiries()) {
@@ -639,18 +679,19 @@ public class Main {
                         }
                     }
                 }
-            } else if (opt == 11) { // Generate Receipt
+            } else if (opt == 12) { // Generate Receipt
                 String nric = menu.promptApplicantNRIC();
                 User u = Database.getUsers().get(nric);
                 if (u instanceof Applicant appUser) receiptCtrl.generateReceipt(appUser.getApplication());
-            }  else if (opt == 12) { // View Flat Availability
+
+            }  else if (opt == 13) { // View Flat Availability
                 String projectName = menu.promptProjectName();
                 BTOProject p = projCtrl.getProjectByName(projectName);
                 if (p != null) {
                     user.viewFlatAvailability(p);
                 }
             }
-            else if (opt == 13){ // Logout
+            else if (opt == 14){ // Logout
                 logoutMenu.displayLogoutMenu(user);
                 break;
             } 
