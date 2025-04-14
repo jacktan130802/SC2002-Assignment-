@@ -16,6 +16,22 @@ public class Application implements Serializable {
     private static int nextId = 1;
     private boolean withdrawalRequested;
 
+    private String receiptId;
+    private Receipt receipt;
+
+    public void setReceipt(Receipt r) {
+        this.receipt = r;
+        this.receiptId = r.getReceiptId();
+    }
+
+    public Receipt getReceipt() {
+        return receipt;
+    }
+
+    public String getReceiptId() {
+        return receiptId;
+    }
+
     public int getApplicationId() {
     return applicationId;
 }

@@ -571,16 +571,62 @@ public class Main {
                     }
                 }
             } else if (opt == 9) { // Book flat for applicant
-                String nric = menu.promptApplicantNRIC();
-                User u = Database.getUsers().get(nric);
-                if (u instanceof Applicant appUser) {
-                    Application app = appUser.getApplication();
-                    if (app != null && app.getStatus() == ApplicationStatus.SUCCESSFUL) {
-                        user.bookFlatForApplicant(app, app.getFlatType().toString());
-                        Database.saveAll();
+                List<ApprovedProject> officerApprovedProjects = user.getApprovedProjects();
+            
+                if (officerApprovedProjects.isEmpty()) {
+                    System.out.println("Officer is not approved to handle any projects.");
+                } else {
+                    List<Application> applicationsToBook = new ArrayList<>();
+            
+                    for (ApprovedProject ap : officerApprovedProjects) {
+                        BTOProject project = ap.getProject();
+                        for (User u : Database.getUsers().values()) {
+                            if (u instanceof Applicant a) {
+                                Application app = a.getApplication();
+                                if (app != null && app.getProject().equals(project) && app.getStatus() == ApplicationStatus.SUCCESSFUL) {
+                                    applicationsToBook.add(app);
+                                }
+                            }
+                        }
+                    }
+            
+                    if (applicationsToBook.isEmpty()) {
+                        System.out.println("No successful applications available for booking in your assigned projects.");
+                    } else {
+                        System.out.println("=== Successful Applications ===");
+                        for (int i = 0; i < applicationsToBook.size(); i++) {
+                            Application app = applicationsToBook.get(i);
+                            System.out.printf("[%d] NRIC: %s | Project: %s | Flat Type: %s\n",
+                                    i + 1, app.getApplicant().getNRIC(), app.getProject().getProjectName(), app.getFlatType());
+                        }
+            
+                        System.out.print("Select application to book flat for (1-" + applicationsToBook.size() + "): ");
+                        int choice = sc.nextInt();
+                        sc.nextLine(); // clear buffer
+            
+                        if (choice < 1 || choice > applicationsToBook.size()) {
+                            System.out.println("Invalid selection.");
+                        } else {
+                            Application selectedApp = applicationsToBook.get(choice - 1);
+                            BTOProject project = selectedApp.getProject();
+                            String flatType = selectedApp.getFlatType().toString();
+
+                            // Officer books the flat
+                            user.bookFlatForApplicant(selectedApp, flatType);
+
+                            // Update and save changes to project and application CSVs
+                            project.updateFlatCount(selectedApp.getFlatType());
+   
+                            Database.saveAll();
+                            Database.saveProjects(Database.getProjects());       // Save updated project list
+
+
+                        }
                     }
                 }
-            } else if (opt == 10) { // Reply to Enquiry
+            }
+            
+            else if (opt == 10) { // Reply to Enquiry
                 for (BTOProject p : projCtrl.getVisibleProjectsFor(user)) {
                     if (user.isHandlingProject(p)) {
                         for (Enquiry e : user.getEnquiries()) {
@@ -644,18 +690,60 @@ public class Main {
                     }
                 }
             } else if (opt == 4) { // Approve Officer Registration
-                for (BTOProject p : mgr.getCreatedProjects()) {
-                    for (HDBOfficer o : p.getRegisteredOfficers()) {
-                        regCtrl.approveOfficer(p, o);
+                    List<RegisteredProject> pendingList = Database.getRegisteredMap().values().stream()
+                        .filter(rp -> rp.getStatus() == OfficerRegistrationStatus.PENDING)
+                        .toList();
+
+                    if (pendingList.isEmpty()) {
+                        System.out.println("No officer registrations pending approval.");
+                    } else {
+                        System.out.println("Pending Officer Registrations:");
+                        for (int i = 0; i < pendingList.size(); i++) {
+                            RegisteredProject rp = pendingList.get(i);
+                            System.out.printf("[%d] Officer: %s (%s) | Project: %s\n",
+                                i + 1, rp.getOfficer().getName(), rp.getOfficer().getNRIC(), rp.getProject().getProjectName());
+                        }
+
+
+                        System.out.print("Select officer registration to review (1-" + pendingList.size() + "): ");
+                        int choice = sc.nextInt();
+                        sc.nextLine(); // consume newline
+
+
+                        if (choice < 1 || choice > pendingList.size()) {
+                            System.out.println("Invalid selection.");
+                        } else {
+                            RegisteredProject selected = pendingList.get(choice - 1);
+
+                            String decision = "";
+                            while (!(decision.equals("A") || decision.equals("R"))) {
+                                System.out.print("Approve this officer? (A = Approve / R = Reject): ");
+                                decision = sc.nextLine().trim().toUpperCase();
+                                if (!(decision.equals("A") || decision.equals("R"))) {
+                                    System.out.println("Invalid input. Please enter 'A' for Approve or 'R' for Reject.");
+                                }
+                            }
+
+                            if (decision.equals("A")) {
+                                selected.setStatus(OfficerRegistrationStatus.APPROVED);
+                                ApprovedProject ap = new ApprovedProject(UUID.randomUUID().toString(),
+                                    selected.getProject(), selected.getOfficer());
+
+                                selected.getOfficer().getApprovedProjects().add(ap);
+                                Database.getApprovedProjectMap().put(ap.getId(), ap);
+                                System.out.println("Officer approved.");
+                            } else {
+                                selected.setStatus(OfficerRegistrationStatus.REJECTED);
+                                System.out.println("Officer rejected.");
+                            }
+
+                            // Save immediately
+                            Database.saveSavedRegisteredProjects();
+                            Database.saveSavedApprovedProjects();
+                            Database.saveSavedOfficers();
+                        }
                     }
-                }
-
-                /*
-                 *
-                 * else if
-                 */
-
-
+                
 
             } else if (opt == 5) { // Approve/Reject Applications or Withdrawals
                 System.out.println("1. Approve/Reject Applications");
