@@ -1,4 +1,4 @@
 ApplicationID,ApplicantNRIC,ProjectName,FlatType,Status,ReceiptID
-1,T7654321B,Acacia Breeze,THREE_ROOM,BOOKED,
+1,T7654321B,Acacia Breeze,THREE_ROOM,BOOKED,f8ffeff3-3073-410f-8b68-10f41aeccc3c
 2,S1234567A,Maple View,TWO_ROOM,PENDING,
 3,T2345678D,Acacia Breeze,TWO_ROOM,SUCCESSFUL,

@@ -200,18 +200,29 @@ public class Main {
             else if (opt == 3) { // View Application
                 Application app = user.getApplication();
                 if (app == null) {
-                    System.out.println("No application found.");
-                    System.out.println("");
-                }
-                 else {
+                    System.out.println("No application found.\n");
+                } else {
                     System.out.println("===== Application =====");
-                    String projectName = app.getProject().getProjectName();
-                    System.out.println("Project Name: " + projectName);
+                    System.out.println("Project Name: " + app.getProject().getProjectName());
                     System.out.println("Flat Type: " + app.getFlatType());
                     System.out.println("Status: " + app.getStatus());
-                    System.out.println("");
+                    // Show receipt if application is BOOKED
+                    if (app.getStatus() == ApplicationStatus.BOOKED && app.getReceipt() != null) {
+                        System.out.println("\n--- Booking Receipt ---");
+                        Receipt r = app.getReceipt();
+                        System.out.println("Name: " + r.getApplicantName());
+                        System.out.println("NRIC: " + r.getNric());
+                        System.out.println("Age: " + r.getAge());
+                        System.out.println("Marital Status: " + r.getMaritalStatus());
+                        System.out.println("Flat Type: " + r.getFlatType());
+                        System.out.println("Project Name: " + r.getProjectName());
+                        System.out.println("Neighborhood: " + r.getNeighborhood());
+                    }
+            
+                    System.out.println();
                 }
             }
+            
 
             else if (opt == 4) { // Enquiry
                 while (true) {
@@ -653,13 +664,22 @@ public class Main {
                             // Officer books the flat
                             user.bookFlatForApplicant(selectedApp, flatType);
 
-                            // Update and save changes to project and application CSVs
+                            // Update flat count
                             project.updateFlatCount(selectedApp.getFlatType());
-   
+
+                            // Step 5: Generate and save receipt
+                            String receiptId = UUID.randomUUID().toString();
+                            Receipt receipt = new Receipt(receiptId, selectedApp);
+                            selectedApp.setReceiptId(receiptId);
+                            selectedApp.setReceipt(receipt);
+                            Database.getReceiptMap().put(receiptId, receipt);
+                            System.out.printf("Receipt generated. Applicant %s can now view their receipt via 'View Application'\n", selectedApp.getApplicant().getNRIC());
+                            // Save everything immediately
+                            Database.saveProjects(Database.getProjects());
+                            Database.saveSavedApplications();
+                            Database.saveSavedReceipts();
                             Database.saveAll();
-                            Database.saveProjects(Database.getProjects());       // Save updated project list
-
-
+                            
                         }
                     }
                 }
