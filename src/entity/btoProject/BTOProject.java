@@ -1,6 +1,7 @@
 package entity.btoProject;
 
 import entity.roles.HDBOfficer;
+import enums.FlatType;
 import entity.roles.HDBManager;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -162,13 +163,18 @@ public class BTOProject {
         return approvedOfficers.contains(officer);
     }
 
-    public void updateFlatCount(String flatType) {
-        if (flatType.equalsIgnoreCase("2-Room")) {
-            twoRoomUnits--;
-        } else if (flatType.equalsIgnoreCase("3-Room")) {
-            threeRoomUnits--;
-        }
+public void updateFlatCount(FlatType flatType) {
+    if (flatType == FlatType.TWO_ROOM) {
+        twoRoomUnits--;
+        System.out.println("[DEBUG] 2-Room units decremented. Remaining: " + twoRoomUnits);
+    } else if (flatType == FlatType.THREE_ROOM) {
+        threeRoomUnits--;
+        System.out.println("[DEBUG] 3-Room units decremented. Remaining: " + threeRoomUnits);
+    } else {
+        System.out.println("[DEBUG] Unknown flat type passed to updateFlatCount: " + flatType);
     }
+}
+
 
     public boolean hasTwoRoom() {
         return twoRoomUnits > 0;

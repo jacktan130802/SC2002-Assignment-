@@ -2,6 +2,7 @@
 package controller;
 
 import entity.Application;
+import entity.Receipt;
 import entity.btoProject.ApprovedProject;
 import entity.btoProject.BTOProject;
 import entity.btoProject.RegisteredProject;
@@ -32,6 +33,12 @@ public class Database {
     private static final String SAVED_OFFICER_CSV = BASE_PATH + "SavedOfficerList.csv";
     private static final String SAVED_REGISTERED_CSV = BASE_PATH + "SavedRegisteredProjectList.csv";
     private static final String SAVED_APPROVED_CSV = BASE_PATH + "SavedApprovedProjectList.csv";
+    private static final String SAVED_RECEIPT_CSV = BASE_PATH + "SavedReceiptList.csv";
+    private static Map<String, Receipt> receiptMap = new HashMap<>();
+
+    public static Map<String, Receipt> getReceiptMap() {
+        return receiptMap;
+    }
 
     private static Map<String, RegisteredProject> registeredMap = new HashMap<>();
     public static Map<String, RegisteredProject> getRegisteredMap() {
@@ -46,6 +53,9 @@ public class Database {
 
     private static Map<Integer, Enquiry> enquiryMap = new HashMap<>();
     private static Map<Integer, Application> applicationMap = new HashMap<>();
+    public static Map<String, ApprovedProject> getApprovedProjectMap() {
+        return approvedMap;
+    }
 
     public static void loadAll() {
         loadUsers(users);
@@ -125,7 +135,7 @@ public class Database {
             System.out.println("Error saving " + role + ": " + e.getMessage());
         }
     }
-    private static void saveProjects(List<BTOProject> projects) {
+    public static void saveProjects(List<BTOProject> projects) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(PROJECT_CSV))) {
             writer.write("Project Name,Neighborhood,Type 1,Number of units for Type 1,Selling price for Type 1,Type 2,Number of units for Type 2,Selling price for Type 2,Application opening date,Application closing date,Manager,Officer Slot,Officer,Visibility\n");
     
@@ -346,13 +356,14 @@ public class Database {
 
     private static void saveSavedApplications() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_APPLICATION_CSV))) {
-            writer.write("ApplicationID,ApplicantNRIC,ProjectName,FlatType,Status\n");
+            writer.write("ApplicationID,ApplicantNRIC,ProjectName,FlatType,Status,ReceiptID\n");
             for (User u : users.values()) {
                 if (u instanceof Applicant a && a.getApplication() != null) {
                     Application app = a.getApplication();
+                    String rid = app.getReceiptId() != null ? app.getReceiptId() : "";
                     writer.write(String.format("%d,%s,%s,%s,%s\n",
                         app.getApplicationId(), app.getApplicant().getNRIC(),
-                        app.getProject().getProjectName(), app.getFlatType(), app.getStatus()));
+                        app.getProject().getProjectName(), app.getFlatType(), app.getStatus(), rid));
                 }
             }
         } catch (IOException e) {
@@ -471,7 +482,7 @@ private static void loadSavedApprovedProjects() {
     }
 }
 
-private static void saveSavedOfficers() {
+public static void saveSavedOfficers() {
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_OFFICER_CSV))) {
         writer.write("Name,NRIC,Age,Marital Status,Password,ApplicationID,EnquiryIDs,RegisteredProjectIDs,ApprovedProjectIDs\n");
         for (User u : users.values()) {
@@ -491,7 +502,7 @@ private static void saveSavedOfficers() {
 }
 
 
-private static void saveSavedRegisteredProjects() {
+public static void saveSavedRegisteredProjects() {
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_REGISTERED_CSV))) {
         writer.write("RegisteredProjectID,ProjectName,OfficerNRIC,Status\n");
         for (RegisteredProject rp : registeredMap.values()) {
@@ -502,7 +513,7 @@ private static void saveSavedRegisteredProjects() {
     }
 }
 
-private static void saveSavedApprovedProjects() {
+public static void saveSavedApprovedProjects() {
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_APPROVED_CSV))) {
         writer.write("ApprovedProjectID,ProjectName,OfficerNRIC\n");
         for (ApprovedProject ap : approvedMap.values()) {
@@ -510,6 +521,36 @@ private static void saveSavedApprovedProjects() {
         }
     } catch (IOException e) {
         System.out.println("Error saving approved projects: " + e.getMessage());
+    }
+}
+
+public static void saveSavedReceipts() {
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_RECEIPT_CSV))) {
+        writer.write("ReceiptID,Name,NRIC,Age,MaritalStatus,FlatType,ProjectName,Neighborhood\n");
+        for (Receipt r : receiptMap.values()) {
+            writer.write(String.format("%s,%s,%s,%d,%s,%s,%s,%s\n",
+                r.getReceiptId(), r.getApplicantName(), r.getNric(), r.getAge(),
+                r.getMaritalStatus(), r.getFlatType(), r.getProjectName(), r.getNeighborhood()));
+        }
+    } catch (IOException e) {
+        System.out.println("Error saving receipts: " + e.getMessage());
+    }
+}
+
+public static void loadSavedReceipts() {
+    try (BufferedReader reader = new BufferedReader(new FileReader(SAVED_RECEIPT_CSV))) {
+        reader.readLine(); // Skip header
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String[] t = line.split(",");
+            String rid = t[0], name = t[1], nric = t[2], marital = t[4], flatType = t[5], proj = t[6], hood = t[7];
+            int age = Integer.parseInt(t[3]);
+
+            Receipt r = new Receipt(rid, name, nric, age, marital, flatType, proj, hood);
+            receiptMap.put(rid, r);
+        }
+    } catch (IOException e) {
+        System.out.println("Error loading receipts: " + e.getMessage());
     }
 }
 

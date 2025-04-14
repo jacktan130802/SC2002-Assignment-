@@ -98,15 +98,15 @@ public class ApplicationController {
             );
     }
 
-    private List<Application> getPendingApplications() {
-        return Database.getUsers().values().stream()
-            .filter(user -> user instanceof Applicant)  // Get only Applicants
-            .map(user -> (Applicant) user)             // Cast to Applicant
-            .map(Applicant::getApplication)            // Get their Application
-            .filter(Objects::nonNull)                  // Filter out null apps
-            .filter(app -> app.getStatus() == ApplicationStatus.PENDING)
-            .collect(Collectors.toList());
-    }
+private List<Application> getPendingApplications() {
+    return Database.getUsers().values().stream()
+        .filter(user -> user instanceof Applicant)
+        .map(user -> ((Applicant) user).getApplication())
+        .filter(Objects::nonNull)
+        .filter(app -> app.getStatus() == ApplicationStatus.PENDING)
+        .distinct() // ✅ Remove duplicates
+        .collect(Collectors.toList());
+}
 
     public void reviewApplications() {
         List<Application> pendingApps = getPendingApplications();

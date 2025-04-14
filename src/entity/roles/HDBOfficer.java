@@ -137,7 +137,6 @@ public class HDBOfficer extends Applicant {
         if (app.getStatus() == ApplicationStatus.SUCCESSFUL) {
             app.setStatus(ApplicationStatus.BOOKED);
             app.getApplicant().setApplication(app);
-            project.updateFlatCount(flatType);
             System.out.println("Flat successfully booked.");
         } else {
             System.out.println("Application is not in SUCCESSFUL status.");
