@@ -1,7 +1,7 @@
 package entity.btoProject;
 
-import entity.roles.HDBOfficer;
 import entity.roles.HDBManager;
+import entity.roles.HDBOfficer;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -177,4 +177,5 @@ public class BTOProject {
     public boolean hasThreeRoom() {
         return threeRoomUnits > 0;
     }
+
 }

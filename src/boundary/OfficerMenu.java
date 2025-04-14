@@ -1,8 +1,8 @@
 package boundary;
 
-import java.util.*;
 import enums.FlatType;
 import enums.MaritalStatus;
+import java.util.*;
 
 public class OfficerMenu {
     private Scanner sc = new Scanner(System.in);
@@ -21,12 +21,13 @@ public class OfficerMenu {
         System.out.println("6. Register to Handle Project");
         System.out.println("7. View Registration Status");
         System.out.println("8. View Assigned Projects");
-        System.out.println("9. Book Flat for Applicant");
-        System.out.println("10. Reply to Enquiry");
-        System.out.println("11. Generate Receipt");
-        System.out.println("12. View Flat Availability");
+        System.out.println("9. View Project Details");
+        System.out.println("10. Book Flat for Applicant");
+        System.out.println("11. Reply to Enquiry");
+        System.out.println("12. Generate Receipt");
+        System.out.println("13. View Flat Availability");
         System.out.println("===============================");
-        System.out.println("13. Logout");
+        System.out.println("14. Logout");
         System.out.print("Choose option: ");
         return sc.nextInt();
     }
