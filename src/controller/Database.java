@@ -61,6 +61,10 @@ public class Database {
         loadUsers(users);
         loadProjects(projects, users);
 
+        if (new File(SAVED_RECEIPT_CSV).exists()) {
+            loadSavedReceipts(); 
+        }
+
         if (new File(SAVED_APPLICANT_CSV).exists()) {
             loadSavedApplications();
             loadSavedEnquiries();
@@ -94,6 +98,7 @@ public class Database {
     public static void saveAll() {
         saveUsers(users);
         saveProjects(projects);
+        saveSavedReceipts();
         saveSavedApplications();
         saveSavedEnquiries();
         saveSavedApplicants();
@@ -341,11 +346,16 @@ public class Database {
                 String projectName = t[2];
                 FlatType type = FlatType.valueOf(t[3]);
                 ApplicationStatus status = ApplicationStatus.valueOf(t[4]);
+                String receiptId = t.length > 5 ? t[5] : "";
 
                 if (users.get(nric) instanceof Applicant a && getProjectByName(projectName) != null) {
                     Application app = new Application(a, getProjectByName(projectName), type);
                     app.setStatus(status);
                     app.setApplicationId(id);
+                    if (!receiptId.isBlank() && receiptMap.containsKey(receiptId)) {
+                        app.setReceiptId(receiptId);
+                        app.setReceipt(receiptMap.get(receiptId));
+                    }
                     applicationMap.put(id, app);
                 }
             }
@@ -354,14 +364,14 @@ public class Database {
         }
     }
 
-    private static void saveSavedApplications() {
+    public static void saveSavedApplications() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_APPLICATION_CSV))) {
             writer.write("ApplicationID,ApplicantNRIC,ProjectName,FlatType,Status,ReceiptID\n");
             for (User u : users.values()) {
                 if (u instanceof Applicant a && a.getApplication() != null) {
                     Application app = a.getApplication();
                     String rid = app.getReceiptId() != null ? app.getReceiptId() : "";
-                    writer.write(String.format("%d,%s,%s,%s,%s\n",
+                    writer.write(String.format("%d,%s,%s,%s,%s,%s\n",
                         app.getApplicationId(), app.getApplicant().getNRIC(),
                         app.getProject().getProjectName(), app.getFlatType(), app.getStatus(), rid));
                 }
