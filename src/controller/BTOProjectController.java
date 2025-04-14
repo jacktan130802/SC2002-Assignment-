@@ -3,7 +3,9 @@ package controller;
 
 import entity.btoProject.ApprovedProject;
 import entity.btoProject.BTOProject;
+import entity.btoProject.RegisteredProject;
 import entity.roles.*;
+import enums.OfficerRegistrationStatus;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -80,19 +82,21 @@ public class BTOProjectController {
             .stream()
             .map(ApprovedProject::getProject)
             .collect(Collectors.toList());
-
+    
         if (approvedProjects.isEmpty()) {
             System.out.println("You are not approved for any projects");
             return;
         }
-
-        // Display approved projects
+    
         System.out.println("\nYour Approved Projects:");
         for (int i = 0; i < approvedProjects.size(); i++) {
-            System.out.printf("%d. %s%n", i+1, approvedProjects.get(i).getProjectName());
+            BTOProject p = approvedProjects.get(i);
+            System.out.printf("%d. %s (Manager: %s)%n", 
+                i+1, 
+                p.getProjectName(), 
+                p.getManagerInCharge().getName());
         }
-
-        // Select project to view details
+    
         System.out.print("Select project to view (1-" + approvedProjects.size() + "): ");
         try {
             int choice = new Scanner(System.in).nextInt();
@@ -100,10 +104,7 @@ public class BTOProjectController {
                 System.out.println("Invalid selection");
                 return;
             }
-
-            BTOProject selected = approvedProjects.get(choice-1);
-            printProjectDetails(selected);
-            
+            printProjectDetails(approvedProjects.get(choice-1));
         } catch (InputMismatchException e) {
             System.out.println("Please enter a valid number");
         }
@@ -113,10 +114,28 @@ public class BTOProjectController {
         System.out.println("\n=== PROJECT DETAILS ===");
         System.out.println("Name: " + project.getProjectName());
         System.out.println("Location: " + project.getNeighborhood());
+        System.out.println("Manager: " + project.getManagerInCharge().getName());
+        
+        System.out.println("\nAssigned Officers:");
+        List<HDBOfficer> assignedOfficers = Database.getRegisteredMap().values().stream()
+            .filter(rp -> rp.getProject().equals(project))
+            .filter(rp -> rp.getStatus() == OfficerRegistrationStatus.APPROVED)
+            .map(RegisteredProject::getOfficer)
+            .collect(Collectors.toList());
+        
+        if (assignedOfficers.isEmpty()) {
+            System.out.println("No officers currently assigned");
+        } else {
+            assignedOfficers.forEach(officer -> 
+                System.out.println("- " + officer.getName() + " (" + officer.getNRIC() + ")"));
+        }
+        
+        System.out.println("\nUnit Availability:");
         System.out.println("2-Room Units: " + project.getTwoRoomUnits());
         System.out.println("3-Room Units: " + project.getThreeRoomUnits());
-        System.out.println("Opening Date: " + project.getOpeningDate());
-        System.out.println("Closing Date: " + project.getClosingDate());
+        System.out.println("\nApplication Period:");
+        System.out.println("Opens: " + project.getOpeningDate());
+        System.out.println("Closes: " + project.getClosingDate());
         System.out.println("=========================");
     }
 }
