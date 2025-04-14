@@ -1,11 +1,13 @@
 package controller;
 
 
+import entity.btoProject.ApprovedProject;
 import entity.btoProject.BTOProject;
+import entity.btoProject.RegisteredProject;
 import entity.roles.*;
-
-
+import enums.OfficerRegistrationStatus;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class BTOProjectController {
     private List<BTOProject> projects;
@@ -31,12 +33,109 @@ public class BTOProjectController {
     
         return viewable;
     }
-    
-    
 
     public BTOProject getProjectByName(String name) {
         return projects.stream()
                 .filter(p -> p.getProjectName().equalsIgnoreCase(name))
                 .findFirst().orElse(null);
+    }
+
+
+    //CAN BE USED FOR MANAGER
+    //
+    // public List<BTOProject> getAllProjects() {
+    //     return new ArrayList<>(Database.getProjects());
+    // }
+
+    // public static void getFullProjectDetails(User user, String projectname) {
+    //     BTOProject project = Database.getProjects().stream()
+    //     .filter(p -> p.getProjectName().equals(projectname))
+    //     .findFirst()
+    //     .orElse(null);
+        
+    //     if (project == null) {
+    //         System.out.println("Project not found");
+    //         return;
+    //     }
+        
+    //     if (!(user instanceof HDBOfficer)) {
+    //         System.out.println("Error: Only HDB officers can access full project details");
+    //         return;
+    //     }
+        
+    //     System.out.println("\n=== FULL PROJECT DETAILS ===");
+    //     System.out.println("Project Name: " + project.getProjectName());
+    //     System.out.println("Neighbourhood: " + project.getNeighborhood()  );
+    //     System.out.println("Number of 2-ROOM units: " + project.getTwoRoomUnits());
+    //     System.out.println("Number of 3-ROOM units: " + project.getThreeRoomUnits());
+    //     System.out.println("2-ROOM Price: $" + project.getPriceTwoRoom());
+    //     System.out.println("3-ROOM Price: $" + project.getPriceThreeRoom());
+    //     System.out.println("Application Open Date: " + project.getOpeningDate());
+    //     System.out.println("Applcation Closing Date: " + project.getClosingDate());
+    //     System.out.println("Manager: " + project.getManagerInCharge());
+    //     System.out.println("Officers: " + project.getOfficerSlot());
+    //     System.out.println("==========================\n");
+    // }
+
+    public void viewOfficerProjectDetails(HDBOfficer officer) {
+        List<BTOProject> approvedProjects = officer.getApprovedProjects()
+            .stream()
+            .map(ApprovedProject::getProject)
+            .collect(Collectors.toList());
+    
+        if (approvedProjects.isEmpty()) {
+            System.out.println("You are not approved for any projects");
+            return;
+        }
+    
+        System.out.println("\nYour Approved Projects:");
+        for (int i = 0; i < approvedProjects.size(); i++) {
+            BTOProject p = approvedProjects.get(i);
+            System.out.printf("%d. %s (Manager: %s)%n", 
+                i+1, 
+                p.getProjectName(), 
+                p.getManagerInCharge().getName());
+        }
+    
+        System.out.print("Select project to view (1-" + approvedProjects.size() + "): ");
+        try {
+            int choice = new Scanner(System.in).nextInt();
+            if (choice < 1 || choice > approvedProjects.size()) {
+                System.out.println("Invalid selection");
+                return;
+            }
+            printProjectDetails(approvedProjects.get(choice-1));
+        } catch (InputMismatchException e) {
+            System.out.println("Please enter a valid number");
+        }
+    }
+
+    private void printProjectDetails(BTOProject project) {
+        System.out.println("\n=== PROJECT DETAILS ===");
+        System.out.println("Name: " + project.getProjectName());
+        System.out.println("Location: " + project.getNeighborhood());
+        System.out.println("Manager: " + project.getManagerInCharge().getName());
+        
+        System.out.println("\nAssigned Officers:");
+        List<HDBOfficer> assignedOfficers = Database.getRegisteredMap().values().stream()
+            .filter(rp -> rp.getProject().equals(project))
+            .filter(rp -> rp.getStatus() == OfficerRegistrationStatus.APPROVED)
+            .map(RegisteredProject::getOfficer)
+            .collect(Collectors.toList());
+        
+        if (assignedOfficers.isEmpty()) {
+            System.out.println("No officers currently assigned");
+        } else {
+            assignedOfficers.forEach(officer -> 
+                System.out.println("- " + officer.getName() + " (" + officer.getNRIC() + ")"));
+        }
+        
+        System.out.println("\nUnit Availability:");
+        System.out.println("2-Room Units: " + project.getTwoRoomUnits());
+        System.out.println("3-Room Units: " + project.getThreeRoomUnits());
+        System.out.println("\nApplication Period:");
+        System.out.println("Opens: " + project.getOpeningDate());
+        System.out.println("Closes: " + project.getClosingDate());
+        System.out.println("=========================");
     }
 }
