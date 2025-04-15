@@ -735,25 +735,23 @@ public class Main {
                 BTOProject p = new BTOProject(name, hood, two, 350000, three, 450000, open, close, mgr, 10);
                 mgr.createProject(p);
 
-            } else if (opt == 2) { // Edit/ Delete Project
+            } else if (opt == 2) { // Edit/Delete Project
                 String name = menu.promptProjectName();
-                BTOProject p = mgr.getCreatedProjects().stream().filter(proj -> proj.getProjectName().equals(name)).findFirst().orElse(null);
-                if (p != null) mgr.toggleProjectVisibility(p, !p.isVisible());
-
-            } else if (opt == 3) { // Toggle Project Visibility
-                // Existing logic for approving applications
-                for (User u : Database.getUsers().values()) {
-                    if (u instanceof Applicant app && app.getApplication() != null) {
-                        BTOProject p = app.getApplication().getProject();
-                        if (p.getManagerInCharge().equals(mgr)) {
-                            appCtrl.updateStatus(app.getApplication(), ApplicationStatus.SUCCESSFUL);
-                            System.out.println("Approved: " + app.getNRIC());
-                        }
-                    }
+                BTOProject p = mgr.getCreatedProjects().stream()
+                        .filter(proj -> proj.getProjectName().equals(name))
+                        .findFirst()
+                        .orElse(null);
+                if (p != null) {
+                    boolean newVisibility = !p.isVisible();
+                    p.setVisibility(newVisibility);
+                    System.out.println("Project \"" + p.getProjectName() + "\" visibility toggled to: " + (newVisibility ? "ON" : "OFF"));
+                    Database.saveAll(); // Save changes to the database
+                } else {
+                    System.out.println("Project not found.");
                 }
-
-                // New logic for toggling project visibility
+            } else if (opt == 3) { // Toggle Project Visibility for All Projects
                 List<BTOProject> createdProjects = mgr.getCreatedProjects();
+
                 if (createdProjects.isEmpty()) {
                     System.out.println("You have not created any projects.");
                     return;
@@ -761,11 +759,11 @@ public class Main {
 
                 System.out.println("\nYour Created Projects:");
                 for (int i = 0; i < createdProjects.size(); i++) {
-                    BTOProject p = createdProjects.get(i);
+                    BTOProject project = createdProjects.get(i);
                     System.out.printf("%d. %s (Visibility: %s)%n",
                             i + 1,
-                            p.getProjectName(),
-                            p.isVisible() ? "ON" : "OFF");
+                            project.getProjectName(),
+                            project.isVisible() ? "ON" : "OFF");
                 }
 
                 System.out.print("Select a project to toggle visibility (1-" + createdProjects.size() + "): ");
@@ -778,12 +776,16 @@ public class Main {
 
                     BTOProject selectedProject = createdProjects.get(choice - 1);
                     boolean newVisibility = !selectedProject.isVisible();
-                    mgr.toggleProjectVisibility(selectedProject, newVisibility);
-                    System.out.println("Project visibility toggled successfully.");
+                    selectedProject.setVisibility(newVisibility);
+                    System.out.println("Visibility for project \"" + selectedProject.getProjectName() + "\" toggled to: " + (newVisibility ? "ON" : "OFF"));
+
+                    Database.saveAll(); // Save changes to the database
                 } catch (InputMismatchException e) {
                     System.out.println("Invalid input. Please enter a valid number.");
                     sc.nextLine(); // Clear invalid input
                 }
+
+
             } else if (opt == 4) { // Approve Officer Registration
                     List<RegisteredProject> pendingList = Database.getRegisteredMap().values().stream()
                         .filter(rp -> rp.getStatus() == OfficerRegistrationStatus.PENDING)
@@ -857,7 +859,11 @@ public class Main {
 
                 }
 
-            }   
+            }
+            else if (opt == 9) { // View All Projects with Filters
+                menu.displayProjectsWithFilters(mgr);
+            }
+
             // else if (opt == 6) { // View & Reply to Enquiry //not done yet
             //     for (BTOProject p : mgr.getVisibleProjectsFor(mgr)) {
             //         if (mgr.isHandlingProject(p)) {

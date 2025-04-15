@@ -1,5 +1,6 @@
 package entity.roles;
 
+import controller.Database;
 import entity.Application;
 import entity.btoProject.BTOProject;
 import entity.enquiry.Enquiry;
@@ -8,7 +9,9 @@ import enums.MaritalStatus;
 import enums.FlatType;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Scanner;
 
 public class HDBManager extends User {
     private List<BTOProject> createdProjects = new ArrayList<>();
@@ -65,15 +68,42 @@ public class HDBManager extends User {
         }
     }
 
-    public void toggleProjectVisibility(BTOProject project, boolean visibility) {
-        if (createdProjects.contains(project)) {
-            project.setVisibility(visibility);
-            System.out.println("Project visibility set to " + (visibility ? "ON" : "OFF"));
-        } else {
-            System.out.println("You are not the manager of this project.");
+    public void toggleProjectVisibilityForAllProjects(Scanner sc) {
+        List<BTOProject> allProjects = Database.getProjects(); // Retrieve all projects
+
+        if (allProjects.isEmpty()) {
+            System.out.println("No projects available.");
+            return;
+        }
+
+        System.out.println("\nAll Projects:");
+        for (int i = 0; i < allProjects.size(); i++) {
+            BTOProject project = allProjects.get(i);
+            System.out.printf("%d. %s (Visibility: %s)%n",
+                    i + 1,
+                    project.getProjectName(),
+                    project.isVisible() ? "ON" : "OFF");
+        }
+
+        System.out.print("Select a project to toggle visibility (1-" + allProjects.size() + "): ");
+        try {
+            int choice = sc.nextInt();
+            if (choice < 1 || choice > allProjects.size()) {
+                System.out.println("Invalid choice. Please select a valid project number.");
+                return;
+            }
+
+            BTOProject selectedProject = allProjects.get(choice - 1);
+            boolean newVisibility = !selectedProject.isVisible();
+            selectedProject.setVisibility(newVisibility);
+            System.out.println("Visibility for project \"" + selectedProject.getProjectName() + "\" toggled to: " + (newVisibility ? "ON" : "OFF"));
+
+            Database.saveAll(); // Save changes to the database
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a valid number.");
+            sc.nextLine(); // Clear invalid input
         }
     }
-
     public void approveOfficer(BTOProject project, HDBOfficer officer) {
         if (project.getManagerInCharge() != this) {
             System.out.println("You are not the manager of this project.");
