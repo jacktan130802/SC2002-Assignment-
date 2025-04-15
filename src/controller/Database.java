@@ -78,11 +78,6 @@ public class Database {
         }
 
 
-        for (User u : users.values()) {
-            if (u instanceof Applicant a) {
-                System.out.println("[DEBUG] Applicant " + a.getNRIC() + " has " + a.getEnquiries().size() + " enquiries loaded.");
-            }
-        }
         
     }
 
@@ -301,8 +296,6 @@ public class Database {
                             int eid = Integer.parseInt(id.trim());
                             if (enquiryMap.containsKey(eid)) {
                                 a.getEnquiries().add(enquiryMap.get(eid));
-                                System.out.println("Trying to add enquiry: " + eid + " to applicant: " + nric);
-                                System.out.println("[DEBUG] Total enquiries for applicant " + nric + ": " + a.getEnquiries().size());
 
                             }
                         } catch (NumberFormatException e) {
@@ -398,7 +391,6 @@ public class Database {
                     e.setReply(reply);
                     e.setEnquiryID(id);
                     enquiryMap.put(id, e);
-                    System.out.println("Loaded enquiry: " + id + " for " + nric);
                 }
             }
         } catch (IOException e) {
@@ -406,7 +398,7 @@ public class Database {
         }
     }
 
-    private static void saveSavedEnquiries() {
+    public static void saveSavedEnquiries() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_ENQUIRY_CSV))) {
             writer.write("EnquiryID,ApplicantNRIC,ProjectName,Message,Reply\n");
             for (User u : users.values()) {
