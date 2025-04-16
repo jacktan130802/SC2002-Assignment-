@@ -1,7 +1,6 @@
 import boundary.*;
 import controller.*;
 import entity.roles.*;
-
 import java.util.*;
 import utility.NRICValidator;
 
@@ -51,6 +50,11 @@ public class Main {
 
             if (opt == 1) {
                 String[] login = loginMenu.displayLoginPrompt();
+                if (login == null) {
+                    // Just go back to the main menu
+                    System.out.println(); 
+                    continue; 
+                }
                 if (!NRICValidator.isValidNRIC(login[0])) {
                     System.out.println("Invalid NRIC format.\n");
                     continue;
