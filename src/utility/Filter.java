@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 public class Filter {
 
+
     public static List<BTOProject> dynamicFilter(List<BTOProject> projects, String neighborhood, FlatType flatType, Double minPrice, Double maxPrice) {
         if (projects == null) {
             throw new IllegalArgumentException("Projects list cannot be null.");

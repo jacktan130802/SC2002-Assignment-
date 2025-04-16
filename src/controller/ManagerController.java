@@ -59,7 +59,7 @@ public class ManagerController {
 
                 // Prompt for filter criteria
                 System.out.print("Enter neighborhood to filter by (or leave blank for any): ");
-                sc.nextLine(); // Clear buffer
+                //sc.nextLine(); // Clear buffer
                 String neighborhood = sc.nextLine().trim();
 
                 System.out.print("Enter flat type to filter by (2 for 2-Room, 3 for 3-Room, or leave blank for any): ");
