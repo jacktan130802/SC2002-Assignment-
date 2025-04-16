@@ -15,7 +15,7 @@ public class Filter {
         }
 
         return projects.stream()
-                .filter(p -> (neighborhood == null || neighborhood.isEmpty() || p.getNeighborhood().equalsIgnoreCase(neighborhood)))
+                .filter(p -> neighborhood == null || neighborhood.isEmpty() || p.getNeighborhood().equalsIgnoreCase(neighborhood))
                 .filter(p -> {
                     if (flatType == null) {
                         return true; // No flat type filter
