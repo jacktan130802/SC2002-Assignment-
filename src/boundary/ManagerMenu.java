@@ -10,19 +10,19 @@ public class ManagerMenu {
     private Scanner sc = new Scanner(System.in);
 
     public int showManagerOptions() {
-        System.out.println("1. Create Project");
-        System.out.println("2. Edit/Delete Project");
-        System.out.println("3. Toggle Project Visibility");
-        System.out.println("4. Approve Officer Registration");
-        System.out.println("5. Approve/Reject Applications/Withdrawals");
-        System.out.println("6. View & Reply Enquiries");
-        System.out.println("7. Generate Report");
-        System.out.println("8. Logout");
-        System.out.println("9. View All Projects with Filters"); // New option
-        System.out.print("Choose option: ");
+        System.out.println("\n--- HDB Manager Menu ---");
+        System.out.println("1. View All Projects with Filters");
+        System.out.println("2. Create Project");
+        System.out.println("3. Edit/Delete Project");
+        System.out.println("4. Toggle Project Visibility");
+        System.out.println("5. Approve Officer Registration");
+        System.out.println("6. Approve/Reject Applications/Withdrawals");
+        System.out.println("7. View & Reply Enquiries");
+        System.out.println("8. Generate Report");
+        System.out.println("9. Logout");
+        System.out.print("Enter your choice: ");
         return sc.nextInt();
     }
-
 
     public String promptProjectName() {
         sc.nextLine();

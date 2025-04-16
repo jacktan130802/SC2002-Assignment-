@@ -158,12 +158,41 @@ public class HDBManager extends User {
         }
     }
 
-    public void toggleProjectVisibility(BTOProject project, boolean visibility) {
-        if (createdProjects.contains(project)) {
-            project.setVisibility(visibility);
-            System.out.println("Project visibility set to " + (visibility ? "ON" : "OFF"));
-        } else {
-            System.out.println("You are not the manager of this project.");
+    public void toggleProjectVisibility(Scanner sc) {
+        // Retrieve projects managed by the current manager
+        List<BTOProject> managedProjects = createdProjects;
+
+        if (managedProjects.isEmpty()) {
+            System.out.println("You are not managing any projects.");
+            return;
+        }
+
+        System.out.println("\nYour Managed Projects:");
+        for (int i = 0; i < managedProjects.size(); i++) {
+            BTOProject project = managedProjects.get(i);
+            System.out.printf("%d. %s (Visibility: %s)%n",
+                    i + 1,
+                    project.getProjectName(),
+                    project.isVisible() ? "ON" : "OFF");
+        }
+
+        System.out.print("Select a project to toggle visibility (1-" + managedProjects.size() + "): ");
+        try {
+            int choice = sc.nextInt();
+            if (choice < 1 || choice > managedProjects.size()) {
+                System.out.println("Invalid choice. Please select a valid project number.");
+                return;
+            }
+
+            BTOProject selectedProject = managedProjects.get(choice - 1);
+            boolean newVisibility = !selectedProject.isVisible();
+            selectedProject.setVisibility(newVisibility);
+            System.out.println("Visibility for project \"" + selectedProject.getProjectName() + "\" toggled to: " + (newVisibility ? "ON" : "OFF"));
+
+            Database.saveAll(); // Save changes to the database
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a valid number.");
+            sc.nextLine(); // Clear invalid input
         }
     }
 
