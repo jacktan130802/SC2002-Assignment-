@@ -1,12 +1,10 @@
 package entity;
 
-import entity.Application;
 import enums.FlatType;
 import java.io.Serializable;
 
 public class Receipt implements Serializable {
     private String receiptId;
-private Receipt receipt;
     
     private String applicantName;
     private String nric;
