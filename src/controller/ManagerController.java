@@ -24,7 +24,7 @@ import utility.Filter;
 
 public class ManagerController {
     public static void run(HDBManager mgr, ManagerMenu menu, LogoutMenu logoutMenu,ApplicationController appCtrl, EnquiryController enqCtrl, OfficerRegistrationController regCtrl, Scanner sc) {
-     while (true) {
+        while (true) {
             int opt = menu.showManagerOptions();
             if (opt == 1) { // Create Project
                 String name = menu.promptProjectName();
@@ -35,51 +35,86 @@ public class ManagerController {
                 LocalDate close = LocalDate.parse(menu.promptDate("Closing"));
                 BTOProject p = new BTOProject(name, hood, two, 350000, three, 450000, open, close, mgr, 10);
                 mgr.createProject(p);
+            } else if (opt == 2) { // Edit/Delete Project
+                List<BTOProject> managedProjects = mgr.getCreatedProjects(); // Retrieve all projects managed by the current manager
 
-            } else if (opt == 2) { // Edit/ Delete Project
-                String name = menu.promptProjectName();
-                BTOProject p = mgr.getCreatedProjects().stream().filter(proj -> proj.getProjectName().equals(name)).findFirst().orElse(null);
-                if (p != null) mgr.toggleProjectVisibility(p, !p.isVisible());
-
-            } else if (opt == 3) { // Toggle Project Visibility for Manager's Current Projects
-            List<BTOProject> currentProjects = mgr.getCurrentProjects(); // Retrieve current projects assigned to the manager
-
-            if (currentProjects.isEmpty()) {
-                System.out.println("You are not managing any projects currently.");
-                return;
-            }
-
-            System.out.println("\nYour Current Projects:");
-            for (int i = 0; i < currentProjects.size(); i++) {
-                BTOProject project = currentProjects.get(i);
-                System.out.printf("%d. %s (Visibility: %s)%n",
-                        i + 1,
-                        project.getProjectName(),
-                        project.isVisible() ? "ON" : "OFF");
-            }
-
-            System.out.print("Select a project to toggle visibility (1-" + currentProjects.size() + "): ");
-            try {
-                int choice = sc.nextInt();
-                sc.nextLine(); // Consume newline
-
-                if (choice < 1 || choice > currentProjects.size()) {
-                    System.out.println("Invalid selection.");
+                if (managedProjects.isEmpty()) {
+                    System.out.println("You are not managing any projects.");
                     return;
                 }
 
-                BTOProject selectedProject = currentProjects.get(choice - 1);
-                boolean newVisibility = !selectedProject.isVisible();
-                selectedProject.setVisibility(newVisibility);
-                System.out.println("Visibility for project \"" + selectedProject.getProjectName() + "\" toggled to: " + (newVisibility ? "ON" : "OFF"));
+                System.out.println("\nYour Managed Projects:");
+                for (int i = 0; i < managedProjects.size(); i++) {
+                    BTOProject project = managedProjects.get(i);
+                    System.out.printf("%d. %s (Visibility: %s)%n",
+                            i + 1,
+                            project.getProjectName(),
+                            project.isVisible() ? "ON" : "OFF");
+                }
 
-                Database.saveAll(); // Save changes to the database
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter a valid number.");
-                sc.nextLine(); // Clear invalid input
+                System.out.print("Select a project to toggle visibility (1-" + managedProjects.size() + "): ");
+                try {
+                    int choice = sc.nextInt();
+                    sc.nextLine(); // Consume newline
+
+                    if (choice < 1 || choice > managedProjects.size()) {
+                        System.out.println("Invalid selection.");
+                        return;
+                    }
+
+                    BTOProject selectedProject = managedProjects.get(choice - 1);
+                    boolean newVisibility = !selectedProject.isVisible();
+                    selectedProject.setVisibility(newVisibility);
+                    System.out.println("Visibility for project \"" + selectedProject.getProjectName() + "\" toggled to: " + (newVisibility ? "ON" : "OFF"));
+
+                    Database.saveAll(); // Save changes to the database
+                } catch (InputMismatchException e) {
+                    System.out.println("Invalid input. Please enter a valid number.");
+                    sc.nextLine(); // Clear invalid input
+                }
             }
-        
 
+            else if (opt == 3) { // Toggle Project Visibility for Manager's Current Projects
+                // Retrieve all projects from the database
+                List<BTOProject> allProjects = Database.getProjects();
+
+                // Use the filter to get projects managed by the current manager
+                List<BTOProject> managedProjects = Filter.filterByManager(allProjects, mgr);
+
+                if (managedProjects.isEmpty()) {
+                    System.out.println("You are not managing any projects.");
+                    return;
+                }
+
+                System.out.println("\nYour Managed Projects:");
+                for (int i = 0; i < managedProjects.size(); i++) {
+                    BTOProject project = managedProjects.get(i);
+                    System.out.printf("%d. %s (Visibility: %s)%n",
+                            i + 1,
+                            project.getProjectName(),
+                            project.isVisible() ? "ON" : "OFF");
+                }
+
+                System.out.print("Select a project to toggle visibility (1-" + managedProjects.size() + "): ");
+                try {
+                    int choice = sc.nextInt();
+                    sc.nextLine(); // Consume newline
+
+                    if (choice < 1 || choice > managedProjects.size()) {
+                        System.out.println("Invalid selection.");
+                        return;
+                    }
+
+                    BTOProject selectedProject = managedProjects.get(choice - 1);
+                    boolean newVisibility = !selectedProject.isVisible();
+                    selectedProject.setVisibility(newVisibility);
+                    System.out.println("Visibility for project \"" + selectedProject.getProjectName() + "\" toggled to: " + (newVisibility ? "ON" : "OFF"));
+
+                    Database.saveAll(); // Save changes to the database
+                } catch (InputMismatchException e) {
+                    System.out.println("Invalid input. Please enter a valid number.");
+                    sc.nextLine(); // Clear invalid input
+                }
             } else if (opt == 4) { // Approve Officer Registration
                     List<RegisteredProject> pendingList = Database.getRegisteredMap().values().stream()
                         .filter(rp -> rp.getStatus() == OfficerRegistrationStatus.PENDING)
