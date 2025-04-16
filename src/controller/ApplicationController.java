@@ -139,15 +139,18 @@ private List<Application> getPendingApplications() {
         System.out.println("Applicant not found.");
     }
 
-    // Helper: Approve/Reject logic
     private void processApplication(Application app) {
         System.out.print("Approve (A) or Reject (R)? ");
         String decision = sc.nextLine().toUpperCase();
-
+    
         switch (decision) {
             case "A":
-                approveApplication(app);
-                System.out.println("Approved: " + app.getApplicant().getNRIC());
+                if (canApproveApplication(app)) {
+                    approveApplication(app);
+                    System.out.println("Approved: " + app.getApplicant().getNRIC());
+                } else {
+                    System.out.println("Cannot approve - no available " + app.getFlatType() + " flats");
+                }
                 break;
             case "R":
                 rejectApplication(app);
@@ -157,8 +160,36 @@ private List<Application> getPendingApplications() {
                 System.out.println("Invalid choice.");
         }
     }
-
-    public void approveApplication(Application app) {
+    
+    private boolean canApproveApplication(Application app) {
+        BTOProject project = app.getProject();
+        FlatType flatType = app.getFlatType();
+        
+        switch (flatType) {
+            case TWO_ROOM:
+                return project.getTwoRoomUnits() > 0;
+            case THREE_ROOM:
+                return project.getThreeRoomUnits() > 0;
+            default:
+                return false;
+        }
+    }
+    
+    private void approveApplication(Application app) {
+        BTOProject project = app.getProject();
+        FlatType flatType = app.getFlatType();
+        
+        // Update available units
+        switch (flatType) {
+            case TWO_ROOM:
+                project.setTwoRoomUnits(project.getTwoRoomUnits() - 1);
+                break;
+            case THREE_ROOM:
+                project.setThreeRoomUnits(project.getThreeRoomUnits() - 1);
+                break;
+        }
+        
+        // Update application status
         app.setStatus(ApplicationStatus.SUCCESSFUL);
         controller.Database.saveAll();
     }
