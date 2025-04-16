@@ -18,9 +18,32 @@ import java.util.Scanner;
  */
 public class ApplicantController {
     public static void run(Applicant user, ApplicationController appCtrl, BTOProjectController projectCtrl, EnquiryController enqCtrl, ApplicantMenu menu, LogoutMenu logoutMenu, Scanner sc) {
-        while (true) {
+        while (true) {// View BTO Projects
             int opt = menu.showApplicantOptions(user);
-            if (opt == 1) { // View BTO Projects
+            if (opt == 1) {
+                List<BTOProject> viewable = projectCtrl.getVisibleProjectsFor(user);
+
+                System.out.println("Visible Projects (" + viewable.size() + "):");
+                for (BTOProject p : viewable) {
+                    System.out.println("- " + p.getProjectName());
+                
+                    if (user.getMaritalStatus().toString().equalsIgnoreCase("SINGLE") && user.getAge() >= 35) {
+                        System.out.println("  Eligible Flat Type: 2-Room (" + p.getTwoRoomUnits() + " units left)");
+                    } else if (user.getMaritalStatus().toString().equalsIgnoreCase("MARRIED") && user.getAge() >= 21) {
+                        if (p.hasTwoRoom())
+                            System.out.println("  2-Room: " + p.getTwoRoomUnits() + " units");
+                        if (p.hasThreeRoom())
+                            System.out.println("  3-Room: " + p.getThreeRoomUnits() + " units");
+                    } else {
+                        System.out.println("  [Not eligible for any flat type]");
+                    }
+                }
+
+                System.out.println();
+                
+
+            }
+            if (opt == 2) {  // view filtered projects
                 List<BTOProject> viewable = projectCtrl.getVisibleProjectsFor(user);
 
                 System.out.println("Visible Projects (" + viewable.size() + "):");
@@ -77,7 +100,8 @@ public class ApplicantController {
 
                         }
                     }
-                } else if (opt == 2) { // Apply for BTO Projects
+                }
+                } else if (opt == 3) { // Apply for BTO Projects
                     String name = menu.promptProjectName();
                     BTOProject p = projectCtrl.getProjectByName(name);
 
@@ -132,7 +156,7 @@ public class ApplicantController {
                     } else {
                         System.out.println("You are not eligible to apply for any flats in this project.");
                     }
-                } else if (opt == 3) { // View Application
+                } else if (opt == 4) { // View Application
                     Application app = user.getApplication();
                     if (app == null) {
                         System.out.println("No application found.\n");
@@ -156,7 +180,7 @@ public class ApplicantController {
 
                         System.out.println();
                     }
-                } else if (opt == 4) { // Enquiry
+                } else if (opt == 5) { // Enquiry
                     while (true) {
                         System.out.println("--- Enquiry Menu ---");
                         System.out.println("1. Submit New Enquiry");
@@ -242,10 +266,10 @@ public class ApplicantController {
                             break;
                         }
                     }
-                } else if (opt == 5) { // Withdraw Application
+                } else if (opt == 6) { // Withdraw Application
                     appCtrl.requestWithdrawal(user);
 
-                } else if (opt == 6) { // Logout
+                } else if (opt == 7) { // Logout
                     logoutMenu.displayLogoutMenu(user);
                     break;
                 } else {
@@ -255,4 +279,4 @@ public class ApplicantController {
 
         }
     }
-}
+

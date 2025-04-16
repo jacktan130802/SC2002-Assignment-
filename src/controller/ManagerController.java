@@ -365,7 +365,7 @@ public class ManagerController {
 
                         List<Application> filtered = new ArrayList<>(allBooked);
 
-                        if (choice == 0) return;
+                        if (choice == 0) continue;
 
                         switch (choice) {
                             case 1 -> {

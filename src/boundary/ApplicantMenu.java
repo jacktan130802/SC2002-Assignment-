@@ -10,7 +10,7 @@ public class ApplicantMenu {
 
     public int showApplicantOptions(User user) {
         user.displayMenu();
-        System.out.println("1. View BTO Projects\n2. Apply for BTO Projects\n3. View Application\n4. Submit/View/Edit/Delete Enquiries\n5. Withdraw Application\n6.Logout");
+        System.out.println("1. View BTO Projects\n2. View BTO Projects with filter\n3. Apply for BTO Projects\n4. View Application\n5. Submit/View/Edit/Delete Enquiries\n6. Withdraw Application\n7.Logout");
         System.out.print("Choose option: ");
         int opt = sc.nextInt();
         sc.nextLine(); // FIX: consume the leftover newline
