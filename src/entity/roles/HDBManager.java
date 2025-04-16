@@ -158,6 +158,15 @@ public class HDBManager extends User {
         }
     }
 
+    public void toggleProjectVisibility(BTOProject project, boolean visibility) {
+        if (createdProjects.contains(project)) {
+            project.setVisibility(visibility);
+            System.out.println("Project visibility set to " + (visibility ? "ON" : "OFF"));
+        } else {
+            System.out.println("You are not the manager of this project.");
+        }
+    }
+
     public void viewEnquiries(List<Enquiry> allEnquiries) {
         System.out.println("--- All Project Enquiries ---");
         for (Enquiry e : allEnquiries) {
