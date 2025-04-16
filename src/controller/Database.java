@@ -330,32 +330,44 @@ public class Database {
 
     private static void loadSavedApplications() {
         try (BufferedReader reader = new BufferedReader(new FileReader(SAVED_APPLICATION_CSV))) {
-            reader.readLine();
+            reader.readLine(); // Skip header
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] t = line.split(",");
-                int id = Integer.parseInt(t[0]);
-                String nric = t[1];
-                String projectName = t[2];
-                FlatType type = FlatType.valueOf(t[3]);
-                ApplicationStatus status = ApplicationStatus.valueOf(t[4]);
-                String receiptId = t.length > 5 ? t[5] : "";
-
-                if (users.get(nric) instanceof Applicant a && getProjectByName(projectName) != null) {
-                    Application app = new Application(a, getProjectByName(projectName), type);
-                    app.setStatus(status);
-                    app.setApplicationId(id);
-                    if (!receiptId.isBlank() && receiptMap.containsKey(receiptId)) {
-                        app.setReceiptId(receiptId);
-                        app.setReceipt(receiptMap.get(receiptId));
+                String[] t = line.split(",", -1); // -1 to preserve empty fields
+    
+                // Skip malformed or empty ID lines
+                if (t.length < 5 || t[0].isBlank()) {
+                    System.out.println("[WARN] Skipped malformed line: " + Arrays.toString(t));
+                    continue;
+                }
+    
+                try {
+                    int id = Integer.parseInt(t[0]);
+                    String nric = t[1];
+                    String projectName = t[2];
+                    FlatType type = FlatType.valueOf(t[3]);
+                    ApplicationStatus status = ApplicationStatus.valueOf(t[4]);
+                    String receiptId = t.length > 5 ? t[5] : "";
+    
+                    if (users.get(nric) instanceof Applicant a && getProjectByName(projectName) != null) {
+                        Application app = new Application(a, getProjectByName(projectName), type);
+                        app.setStatus(status);
+                        app.setApplicationId(id);
+                        if (!receiptId.isBlank() && receiptMap.containsKey(receiptId)) {
+                            app.setReceiptId(receiptId);
+                            app.setReceipt(receiptMap.get(receiptId));
+                        }
+                        applicationMap.put(id, app);
                     }
-                    applicationMap.put(id, app);
+                } catch (NumberFormatException e) {
+                    System.out.println("[ERROR] Invalid application ID: " + t[0]);
                 }
             }
         } catch (IOException e) {
             System.out.println("Error loading SavedApplicationList: " + e.getMessage());
         }
     }
+    
 
     public static void saveSavedApplications() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_APPLICATION_CSV))) {
