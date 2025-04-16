@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
-import java.util.UUID;
+
 
 
 import boundary.LogoutMenu;
 import boundary.ManagerMenu;
-import entity.btoProject.ApprovedProject;
+import entity.Application;
 import entity.btoProject.BTOProject;
 import entity.btoProject.RegisteredProject;
 import entity.enquiry.Enquiry;
@@ -18,7 +18,10 @@ import entity.roles.Applicant;
 import entity.roles.HDBManager;
 import entity.roles.User;
 import enums.ApplicationStatus;
+import enums.FlatType;
+import enums.MaritalStatus;
 import enums.OfficerRegistrationStatus;
+import utility.ReportFilter;
 import utility.Filter;
 
 
@@ -222,7 +225,153 @@ public class ManagerController {
                         Database.saveSavedEnquiries();
                     }
                 }
-            } else if (opt == 9) { // Logout
+            } 
+            else if (opt == 8)
+            {// Generate filtered report
+
+                    // CHECK ME//////////////////////////////////
+                    // filter report
+                    // whether can combine attribute 
+                    // like single/married and flat type 2 room / 3 room
+    
+                    // whether need to save 
+    
+                    // whether its for the project the manager is handling and whether the filter applies for which application status for the corresponding application from the applicants
+                    List<Application> allBooked = new ArrayList<>();
+                
+                    // Step 1: Get all booked applications
+                    for (User u : Database.getUsers().values()) {
+                        if (u instanceof Applicant a) {
+                            Application app = a.getApplication();
+                            if (app != null && app.getStatus() == ApplicationStatus.BOOKED) {
+                                allBooked.add(app);
+                            }
+                        }
+                    }
+                
+                    if (allBooked.isEmpty()) {
+                        System.out.println("No booked applications found.");
+                        return;
+                    }
+                
+                    // Step 2: Prompt filter option
+                    while (true) {
+                        System.out.println("=== Filter Options ===");
+                        System.out.println("1. Filter by Marital Status");
+                        System.out.println("2. Filter by Flat Type");
+                        System.out.println("3. Filter by Project Name");
+                        System.out.println("4. Filter by Age Range");
+                        System.out.println("5. No Filter (View All)");
+                        System.out.println("0. Cancel");
+                        System.out.print("Choose a filter option: ");
+                        int choice = sc.nextInt();
+                        sc.nextLine(); // clear buffer
+                
+                        List<Application> filtered = new ArrayList<>(allBooked);
+                
+                        if (choice == 0) return;
+                
+                        switch (choice) {
+                            case 1 -> {
+                                System.out.println("Select Marital Status:");
+                                System.out.println("1. SINGLE");
+                                System.out.println("2. MARRIED");
+                                System.out.print("Choose option: ");
+                                int msOpt = sc.nextInt();
+                                sc.nextLine();
+                                if (msOpt == 1) {
+                                    filtered = ReportFilter.filterByMaritalStatus(allBooked, MaritalStatus.SINGLE);
+                                } else if (msOpt == 2) {
+                                    filtered = ReportFilter.filterByMaritalStatus(allBooked, MaritalStatus.MARRIED);
+                                } else {
+                                    System.out.println("Invalid marital status option. Returning to filter menu.\n");
+                                    continue;
+                                }
+                            }
+                
+                            case 2 -> {
+                                System.out.println("Select Flat Type:");
+                                System.out.println("1. TWO_ROOM");
+                                System.out.println("2. THREE_ROOM");
+                                System.out.print("Choose option: ");
+                                int ftOpt = sc.nextInt();
+                                sc.nextLine();
+                                if (ftOpt == 1) {
+                                    filtered = ReportFilter.filterByFlatType(allBooked, FlatType.TWO_ROOM);
+                                } else if (ftOpt == 2) {
+                                    filtered = ReportFilter.filterByFlatType(allBooked, FlatType.THREE_ROOM);
+                                } else {
+                                    System.out.println("Invalid flat type option. Returning to filter menu.\n");
+                                    continue;
+                                }
+                            }
+                
+                            case 3 -> {
+                                System.out.println("Available Projects:");
+                                List<String> projectNames = Database.getProjects().stream()
+                                        .map(BTOProject::getProjectName).distinct().toList();
+                                for (String name : projectNames) System.out.println("- " + name);
+                
+                                System.out.print("Enter project name exactly as shown: ");
+                                String inputName = sc.nextLine();
+                                if (!projectNames.contains(inputName)) {
+                                    System.out.println("Invalid project name. Returning to filter menu.\n");
+                                    continue;
+                                }
+                                filtered = ReportFilter.filterByProjectName(allBooked, inputName);
+                            }
+                
+                            case 4 -> {
+                                try {
+                                    System.out.print("Enter minimum age: ");
+                                    int min = sc.nextInt();
+                                    System.out.print("Enter maximum age: ");
+                                    int max = sc.nextInt();
+                                    sc.nextLine(); // clear
+                                    if (min < 0 || max < min) {
+                                        System.out.println("Invalid age range. Returning to filter menu.\n");
+                                        continue;
+                                    }
+                                    filtered = ReportFilter.filterByAgeRange(allBooked, min, max);
+                                } catch (InputMismatchException e) {
+                                    System.out.println("Invalid input. Returning to filter menu.\n");
+                                    sc.nextLine(); // clear garbage
+                                    continue;
+                                }
+                            }
+                
+                            case 5 -> {
+                                // no filtering, already copied allBooked
+                            }
+                
+                            default -> {
+                                System.out.println("Invalid filter choice. Try again.\n");
+                                continue;
+                            }
+                        }
+                
+                        // Step 3: Print results
+                        if (filtered.isEmpty()) {
+                            System.out.println("No results match the selected filter.");
+                        } else {
+                            System.out.println("\n===== Filtered Report =====");
+                            for (Application app : filtered) {
+                                System.out.printf("NRIC: %s | Name: %s | Age: %d | Marital Status: %s | Flat Type: %s | Project: %s\n",
+                                        app.getApplicant().getNRIC(),
+                                        app.getApplicant().getName(),
+                                        app.getApplicant().getAge(),
+                                        app.getApplicant().getMaritalStatus(),
+                                        app.getFlatType(),
+                                        app.getProject().getProjectName());
+                            }
+                        }
+                        break; // exit filter loop after valid result
+                    }
+                }
+            
+            
+            
+            else if (opt == 9) { // Logout
                 logoutMenu.displayLogoutMenu(mgr);
                 break;
             } else {
