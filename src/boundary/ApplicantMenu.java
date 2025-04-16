@@ -5,12 +5,12 @@ import enums.FlatType;
 import enums.MaritalStatus;
 import java.util.*;
 
-public class BTOMenu {
+public class ApplicantMenu {
     private Scanner sc = new Scanner(System.in);
 
     public int showApplicantOptions(User user) {
         user.displayMenu();
-        System.out.println("1. View BTO Projects\n2. Apply for BTO Projects\n3. View Application\n4. Submit/View/Edit/Delete Enquiries\n5. Withdraw Application\n 6.Logout");
+        System.out.println("1. View BTO Projects\n2. Apply for BTO Projects\n3. View Application\n4. Submit/View/Edit/Delete Enquiries\n5. Withdraw Application\n6.Logout");
         System.out.print("Choose option: ");
         int opt = sc.nextInt();
         sc.nextLine(); // FIX: consume the leftover newline

@@ -78,11 +78,6 @@ public class Database {
         }
 
 
-        for (User u : users.values()) {
-            if (u instanceof Applicant a) {
-                System.out.println("[DEBUG] Applicant " + a.getNRIC() + " has " + a.getEnquiries().size() + " enquiries loaded.");
-            }
-        }
         
     }
 
@@ -301,8 +296,6 @@ public class Database {
                             int eid = Integer.parseInt(id.trim());
                             if (enquiryMap.containsKey(eid)) {
                                 a.getEnquiries().add(enquiryMap.get(eid));
-                                System.out.println("Trying to add enquiry: " + eid + " to applicant: " + nric);
-                                System.out.println("[DEBUG] Total enquiries for applicant " + nric + ": " + a.getEnquiries().size());
 
                             }
                         } catch (NumberFormatException e) {
@@ -337,32 +330,44 @@ public class Database {
 
     private static void loadSavedApplications() {
         try (BufferedReader reader = new BufferedReader(new FileReader(SAVED_APPLICATION_CSV))) {
-            reader.readLine();
+            reader.readLine(); // Skip header
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] t = line.split(",");
-                int id = Integer.parseInt(t[0]);
-                String nric = t[1];
-                String projectName = t[2];
-                FlatType type = FlatType.valueOf(t[3]);
-                ApplicationStatus status = ApplicationStatus.valueOf(t[4]);
-                String receiptId = t.length > 5 ? t[5] : "";
-
-                if (users.get(nric) instanceof Applicant a && getProjectByName(projectName) != null) {
-                    Application app = new Application(a, getProjectByName(projectName), type);
-                    app.setStatus(status);
-                    app.setApplicationId(id);
-                    if (!receiptId.isBlank() && receiptMap.containsKey(receiptId)) {
-                        app.setReceiptId(receiptId);
-                        app.setReceipt(receiptMap.get(receiptId));
+                String[] t = line.split(",", -1); // -1 to preserve empty fields
+    
+                // Skip malformed or empty ID lines
+                if (t.length < 5 || t[0].isBlank()) {
+                    System.out.println("[WARN] Skipped malformed line: " + Arrays.toString(t));
+                    continue;
+                }
+    
+                try {
+                    int id = Integer.parseInt(t[0]);
+                    String nric = t[1];
+                    String projectName = t[2];
+                    FlatType type = FlatType.valueOf(t[3]);
+                    ApplicationStatus status = ApplicationStatus.valueOf(t[4]);
+                    String receiptId = t.length > 5 ? t[5] : "";
+    
+                    if (users.get(nric) instanceof Applicant a && getProjectByName(projectName) != null) {
+                        Application app = new Application(a, getProjectByName(projectName), type);
+                        app.setStatus(status);
+                        app.setApplicationId(id);
+                        if (!receiptId.isBlank() && receiptMap.containsKey(receiptId)) {
+                            app.setReceiptId(receiptId);
+                            app.setReceipt(receiptMap.get(receiptId));
+                        }
+                        applicationMap.put(id, app);
                     }
-                    applicationMap.put(id, app);
+                } catch (NumberFormatException e) {
+                    System.out.println("[ERROR] Invalid application ID: " + t[0]);
                 }
             }
         } catch (IOException e) {
             System.out.println("Error loading SavedApplicationList: " + e.getMessage());
         }
     }
+    
 
     public static void saveSavedApplications() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_APPLICATION_CSV))) {
@@ -398,7 +403,6 @@ public class Database {
                     e.setReply(reply);
                     e.setEnquiryID(id);
                     enquiryMap.put(id, e);
-                    System.out.println("Loaded enquiry: " + id + " for " + nric);
                 }
             }
         } catch (IOException e) {
@@ -406,7 +410,7 @@ public class Database {
         }
     }
 
-    private static void saveSavedEnquiries() {
+    public static void saveSavedEnquiries() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_ENQUIRY_CSV))) {
             writer.write("EnquiryID,ApplicantNRIC,ProjectName,Message,Reply\n");
             for (User u : users.values()) {
