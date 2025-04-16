@@ -308,31 +308,38 @@ public class ManagerController {
                 }
             }
             else if (opt == 10)
-            {// Generate filtered report
+            {
+                List<Application> allBooked = new ArrayList<>();
 
-                    // CHECK ME//////////////////////////////////
-                    // filter report
-                    // whether can combine attribute
-                    // like single/married and flat type 2 room / 3 room
-
-                    // whether need to save
-
-                    // whether its for the project the manager is handling and whether the filter applies for which application status for the corresponding application from the applicants
-                    List<Application> allBooked = new ArrayList<>();
-
-                    // Step 1: Get all booked applications
-                    for (User u : Database.getUsers().values()) {
-                        if (u instanceof Applicant a) {
-                            Application app = a.getApplication();
-                            if (app != null && app.getStatus() == ApplicationStatus.BOOKED) {
+                // Get the projects managed by this manager
+                List<BTOProject> managerProjects = Database.getProjects().stream()
+                        .filter(p -> p.getManagerInCharge() != null && p.getManagerInCharge().equals(mgr))
+                        .toList();
+                
+                // If manager is not handling any project, show message and return
+                if (managerProjects.isEmpty()) {
+                    System.out.println("You are not handling any projects. No application reports available.");
+                    continue;
+                }
+                
+                // Filter only applications belonging to manager's projects
+                for (User u : Database.getUsers().values()) {
+                    if (u instanceof Applicant a) {
+                        Application app = a.getApplication();
+                        if (app != null && managerProjects.contains(app.getProject())) {
+                            ApplicationStatus status = app.getStatus();
+                            if (status == ApplicationStatus.PENDING || status == ApplicationStatus.SUCCESSFUL || status == ApplicationStatus.BOOKED) {
                                 allBooked.add(app);
                             }
                         }
                     }
+                }
+                
+                    
 
                     if (allBooked.isEmpty()) {
                         System.out.println("No booked applications found.");
-                        return;
+                        continue;
                     }
 
                     // Step 2: Prompt filter option
