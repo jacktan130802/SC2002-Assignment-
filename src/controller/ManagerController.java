@@ -26,7 +26,9 @@ public class ManagerController {
     public static void run(HDBManager mgr, ManagerMenu menu, LogoutMenu logoutMenu,ApplicationController appCtrl, EnquiryController enqCtrl, OfficerRegistrationController regCtrl, Scanner sc) {
         while (true) {
             int opt = menu.showManagerOptions();
-            if (opt == 1) { // Create Project
+            if (opt == 1) { // View All Projects with Filters
+                menu.displayProjectsWithFilters(mgr);
+            } else if (opt == 2) { // Create Project
                 String name = menu.promptProjectName();
                 String hood = menu.promptNeighborhood();
                 int two = menu.promptUnitCount("2-Room");
@@ -35,8 +37,8 @@ public class ManagerController {
                 LocalDate close = LocalDate.parse(menu.promptDate("Closing"));
                 BTOProject p = new BTOProject(name, hood, two, 350000, three, 450000, open, close, mgr, 10);
                 mgr.createProject(p);
-            } else if (opt == 2) { // Edit/Delete Project
-                List<BTOProject> managedProjects = mgr.getCreatedProjects(); // Retrieve all projects managed by the current manager
+            } else if (opt == 3) { // Edit/Delete Project
+                List<BTOProject> managedProjects = mgr.getCreatedProjects();
 
                 if (managedProjects.isEmpty()) {
                     System.out.println("You are not managing any projects.");
@@ -72,13 +74,8 @@ public class ManagerController {
                     System.out.println("Invalid input. Please enter a valid number.");
                     sc.nextLine(); // Clear invalid input
                 }
-            }
-
-            else if (opt == 3) { // Toggle Project Visibility for Manager's Current Projects
-                // Retrieve all projects from the database
+            } else if (opt == 4) { // Toggle Project Visibility for Manager's Current Projects
                 List<BTOProject> allProjects = Database.getProjects();
-
-                // Use the filter to get projects managed by the current manager
                 List<BTOProject> managedProjects = Filter.filterByManager(allProjects, mgr);
 
                 if (managedProjects.isEmpty()) {
@@ -115,82 +112,65 @@ public class ManagerController {
                     System.out.println("Invalid input. Please enter a valid number.");
                     sc.nextLine(); // Clear invalid input
                 }
-            } else if (opt == 4) { // Approve Officer Registration
-                    List<RegisteredProject> pendingList = Database.getRegisteredMap().values().stream()
+            } else if (opt == 5) { // Approve Officer Registration
+                List<RegisteredProject> pendingList = Database.getRegisteredMap().values().stream()
                         .filter(rp -> rp.getStatus() == OfficerRegistrationStatus.PENDING)
                         .toList();
 
-                    if (pendingList.isEmpty()) {
-                        System.out.println("No officer registrations pending approval.");
-                    } else {
-                        System.out.println("Pending Officer Registrations:");
-                        for (int i = 0; i < pendingList.size(); i++) {
-                            RegisteredProject rp = pendingList.get(i);
-                            System.out.printf("[%d] Officer: %s (%s) | Project: %s\n",
+                if (pendingList.isEmpty()) {
+                    System.out.println("No officer registrations pending approval.");
+                } else {
+                    System.out.println("Pending Officer Registrations:");
+                    for (int i = 0; i < pendingList.size(); i++) {
+                        RegisteredProject rp = pendingList.get(i);
+                        System.out.printf("[%d] Officer: %s (%s) | Project: %s\n",
                                 i + 1, rp.getOfficer().getName(), rp.getOfficer().getNRIC(), rp.getProject().getProjectName());
-                        }
-
-
-                        System.out.print("Select officer registration to review (1-" + pendingList.size() + "): ");
-                        int choice = sc.nextInt();
-                        sc.nextLine(); // consume newline
-
-
-                        if (choice < 1 || choice > pendingList.size()) {
-                            System.out.println("Invalid selection.");
-                        } else {
-                            RegisteredProject selected = pendingList.get(choice - 1);
-
-                            String decision = "";
-                            while (!(decision.equals("A") || decision.equals("R"))) {
-                                System.out.print("Approve this officer? (A = Approve / R = Reject): ");
-                                decision = sc.nextLine().trim().toUpperCase();
-                                if (!(decision.equals("A") || decision.equals("R"))) {
-                                    System.out.println("Invalid input. Please enter 'A' for Approve or 'R' for Reject.");
-                                }
-                            }
-
-                            if (decision.equals("A")) {
-                                selected.setStatus(OfficerRegistrationStatus.APPROVED);
-                                ApprovedProject ap = new ApprovedProject(UUID.randomUUID().toString(),
-                                    selected.getProject(), selected.getOfficer());
-
-                                selected.getOfficer().getApprovedProjects().add(ap);
-                                Database.getApprovedProjectMap().put(ap.getId(), ap);
-                                System.out.println("Officer approved.");
-                            } else {
-                                selected.setStatus(OfficerRegistrationStatus.REJECTED);
-                                System.out.println("Officer rejected.");
-                            }
-
-                            // Save immediately
-                            Database.saveSavedRegisteredProjects();
-                            Database.saveSavedApprovedProjects();
-                            Database.saveSavedOfficers();
-                        }
                     }
-                
 
-            } else if (opt == 5) { // Approve/Reject Applications or Withdrawals
+                    System.out.print("Select officer registration to review (1-" + pendingList.size() + "): ");
+                    int choice = sc.nextInt();
+                    sc.nextLine(); // consume newline
+
+                    if (choice < 1 || choice > pendingList.size()) {
+                        System.out.println("Invalid selection.");
+                    } else {
+                        RegisteredProject selected = pendingList.get(choice - 1);
+
+                        String decision = "";
+                        while (!(decision.equals("A") || decision.equals("R"))) {
+                            System.out.print("Approve this officer? (A = Approve / R = Reject): ");
+                            decision = sc.nextLine().trim().toUpperCase();
+                            if (!(decision.equals("A") || decision.equals("R"))) {
+                                System.out.println("Invalid input. Please enter A or R.");
+                            }
+                        }
+
+                        if (decision.equals("A")) {
+                            selected.setStatus(OfficerRegistrationStatus.APPROVED);
+                            System.out.println("Officer approved.");
+                        } else {
+                            selected.setStatus(OfficerRegistrationStatus.REJECTED);
+                            System.out.println("Officer rejected.");
+                        }
+
+                        Database.saveSavedRegisteredProjects();
+                        Database.saveSavedApprovedProjects();
+                        Database.saveSavedOfficers();
+                    }
+                }
+            } else if (opt == 6) { // Approve/Reject Applications or Withdrawals
                 System.out.println("1. Approve/Reject Applications");
-                System.out.println("2. Approve Withdrawal Requests"); // New option
+                System.out.println("2. Approve Withdrawal Requests");
                 int subOpt = sc.nextInt();
-                
+
                 if (subOpt == 1) {
                     appCtrl.reviewApplications();
-
-
                 } else if (subOpt == 2) {
                     appCtrl.processWithdrawalRequests();
-                    
                 } else {
                     System.out.println("Invalid Option");
-
                 }
-
-            }   
-            else if (opt == 6) { // View & Reply to Enquiry //not done yet
-                // 1. Show all enquiries (view-only)
+            } else if (opt == 7) { // View & Reply to Enquiry
                 List<Enquiry> allEnquiries = new ArrayList<>();
                 List<Enquiry> replyEligibleEnquiries = new ArrayList<>();
 
@@ -205,7 +185,6 @@ public class ManagerController {
                     }
                 }
 
-                // Section 1: View All Enquiries
                 System.out.println("=== All Enquiries (View Only) ===");
                 if (allEnquiries.isEmpty()) {
                     System.out.println("No enquiries found.");
@@ -213,12 +192,11 @@ public class ManagerController {
                     for (int i = 0; i < allEnquiries.size(); i++) {
                         Enquiry e = allEnquiries.get(i);
                         System.out.printf("[%d] Project: %s | Applicant: %s | Message: %s | Replied: %s\n",
-                            i + 1, e.getProject().getProjectName(), e.getApplicant().getNRIC(),
-                            e.getMessage(), e.isReplied() ? "Yes" : "No");
+                                i + 1, e.getProject().getProjectName(), e.getApplicant().getNRIC(),
+                                e.getMessage(), e.isReplied() ? "Yes" : "No");
                     }
                 }
 
-                // Section 2: Enquiries Manager Can Reply To
                 System.out.println("\n=== Enquiries You Can Reply To ===");
                 if (replyEligibleEnquiries.isEmpty()) {
                     System.out.println("No enquiries available for you to reply.");
@@ -226,7 +204,7 @@ public class ManagerController {
                     for (int i = 0; i < replyEligibleEnquiries.size(); i++) {
                         Enquiry e = replyEligibleEnquiries.get(i);
                         System.out.printf("[%d] Project: %s | Applicant: %s | Message: %s\n",
-                            i + 1, e.getProject().getProjectName(), e.getApplicant().getNRIC(), e.getMessage());
+                                i + 1, e.getProject().getProjectName(), e.getApplicant().getNRIC(), e.getMessage());
                     }
 
                     System.out.print("Enter enquiry number to reply (0 to cancel): ");
@@ -244,20 +222,13 @@ public class ManagerController {
                         Database.saveSavedEnquiries();
                     }
                 }
-
-            }
-            else if (opt == 8){ // Logout
+            } else if (opt == 9) { // Logout
                 logoutMenu.displayLogoutMenu(mgr);
                 break;
-            }
-            else if (opt == 9) { // View All Projects with Filters
-                menu.displayProjectsWithFilters(mgr);
-            }
-
-            else{
+            } else {
                 System.out.println("Invalid option");
             }
      }
-    
+
     }
 }
