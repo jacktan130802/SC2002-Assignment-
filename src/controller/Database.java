@@ -12,6 +12,7 @@ import enums.ApplicationStatus;
 import enums.FlatType;
 import enums.MaritalStatus;
 import enums.OfficerRegistrationStatus;
+import utility.Filter.FilterSettings;
 
 import java.io.*;
 import java.time.LocalDate;
@@ -77,7 +78,10 @@ public class Database {
         loadSavedOfficers(); // Link IDs to projects via map
         }
 
+        if (new File(SAVED_FILTER_CSV).exists()) {
+            loadFilterSettings(); // ✅ This ensures the filter is loaded on startup
 
+        }
         
     }
 
@@ -567,5 +571,40 @@ public static void loadSavedReceipts() {
         System.out.println("Error loading receipts: " + e.getMessage());
     }
 }
+
+private static final String SAVED_FILTER_CSV = BASE_PATH + "SavedFilterSettings.csv";
+
+public static void saveFilterSettings(FilterSettings settings) {
+    File file = new File(SAVED_FILTER_CSV);
+
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+        // Always write header + data for this case
+        writer.write("Neighborhood,FlatType,MinPrice,MaxPrice\n");
+        writer.write(settings.toCSVLine() + "\n");
+    } catch (IOException e) {
+        System.out.println("Error saving filter settings: " + e.getMessage());
+    }
+}
+
+public static FilterSettings loadFilterSettings() {
+    File file = new File(SAVED_FILTER_CSV);
+    if (!file.exists()) return null;
+
+    try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+        String header = br.readLine(); // Skip header
+        String line = br.readLine();   // Actual data
+
+        if (line != null) {
+            System.out.println("[DEBUG] Loaded filter line: " + line);
+            return FilterSettings.fromCSVLine(line);
+        } else {
+            System.out.println("[DEBUG] Filter file is empty after header.");
+        }
+    } catch (IOException e) {
+        System.out.println("Error loading filter settings: " + e.getMessage());
+    }
+    return null;
+}
+
 
 }
