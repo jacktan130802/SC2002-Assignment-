@@ -29,9 +29,90 @@ public class ManagerController {
     public static void run(HDBManager mgr, ManagerMenu menu, LogoutMenu logoutMenu,ApplicationController appCtrl, EnquiryController enqCtrl, OfficerRegistrationController regCtrl, Scanner sc) {
         while (true) {
             int opt = menu.showManagerOptions();
-            if (opt == 1) { // View All Projects with Filters
-                menu.displayProjectsWithFilters(mgr);
-            } else if (opt == 2) { // Create Project
+            if (opt == 1) {
+                // Show All Projects
+                List<BTOProject> allProjects = Database.getProjects();
+                if (allProjects.isEmpty()) {
+                    System.out.println("No projects available.");
+                } else {
+                    System.out.println("=== All Projects ===");
+                    for (BTOProject project : allProjects) {
+                        System.out.printf("Project: %s | Neighborhood: %s | Visibility: %s\n",
+                                project.getProjectName(), project.getNeighborhood(), project.isVisible() ? "ON" : "OFF");
+                    }
+                }
+            } else if (opt == 2) { // Show My Projects
+                List<BTOProject> managedProjects = Database.getProjects();
+                List<BTOProject> myProjects = Filter.filterByManager(managedProjects, mgr);
+                if (myProjects.isEmpty()) {
+                    System.out.println("You are not managing any projects.");
+                } else {
+                    System.out.println("=== My Projects ===");
+                    for (BTOProject project : myProjects) {
+                        System.out.printf("Project: %s | Neighborhood: %s | Visibility: %s\n",
+                                project.getProjectName(), project.getNeighborhood(), project.isVisible() ? "ON" : "OFF");
+                    }
+                }
+            } else if (opt == 3) { // View All Projects with Filters
+                //invoke the filter method
+                System.out.println("Welcome to the BTO Project Filter!");
+
+                // Prompt for filter criteria
+                System.out.print("Enter neighborhood to filter by (or leave blank for any): ");
+                sc.nextLine(); // Clear buffer
+                String neighborhood = sc.nextLine().trim();
+
+                System.out.print("Enter flat type to filter by (2-Room, 3-Room, or leave blank for any): ");
+                String flatTypeInput = sc.nextLine().trim();
+                FlatType flatType = null;
+                if (!flatTypeInput.isEmpty()) {
+                    try {
+                        flatType = FlatType.valueOf(flatTypeInput.toUpperCase().replace("-", "_"));
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Invalid flat type. Please enter '2-Room' or '3-Room'.");
+                        return;
+                    }
+                }
+
+                Double minPrice = null;
+                Double maxPrice = null;
+
+                try {
+                    System.out.print("Enter minimum price (or leave blank for no minimum): ");
+                    String minPriceInput = sc.nextLine().trim();
+                    if (!minPriceInput.isEmpty()) {
+                        minPrice = Double.parseDouble(minPriceInput);
+                    }
+
+                    System.out.print("Enter maximum price (or leave blank for no maximum): ");
+                    String maxPriceInput = sc.nextLine().trim();
+                    if (!maxPriceInput.isEmpty()) {
+                        maxPrice = Double.parseDouble(maxPriceInput);
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid price input. Please enter valid numbers for price.");
+                    return;
+                }
+
+                // Retrieve all projects and apply the dynamic filter
+                List<BTOProject> allProjects = Database.getProjects();
+                List<BTOProject> filteredProjects = Filter.dynamicFilter(allProjects, neighborhood, flatType, minPrice, maxPrice);
+
+                // Display the filtered projects
+                System.out.println("\n--- Filtered Projects ---");
+                if (filteredProjects.isEmpty()) {
+                    System.out.println("No projects match your criteria.");
+                } else {
+                    for (BTOProject project : filteredProjects) {
+                        System.out.printf("Project: %s | Neighborhood: %s | 2-Room Price: %.2f | 3-Room Price: %.2f\n",
+                                project.getProjectName(),
+                                project.getNeighborhood(),
+                                project.getPriceTwoRoom(),
+                                project.getPriceThreeRoom());
+                    }
+                }
+            }
+        else if (opt == 4) { // Create Project
                 String name = menu.promptProjectName();
                 String hood = menu.promptNeighborhood();
                 int two = menu.promptUnitCount("2-Room");
@@ -40,7 +121,7 @@ public class ManagerController {
                 LocalDate close = LocalDate.parse(menu.promptDate("Closing"));
                 BTOProject p = new BTOProject(name, hood, two, 350000, three, 450000, open, close, mgr, 10);
                 mgr.createProject(p);
-            } else if (opt == 3) { // Edit/Delete Project
+            } else if (opt == 5) { // Edit/Delete Project
                 List<BTOProject> managedProjects = mgr.getCreatedProjects();
 
                 if (managedProjects.isEmpty()) {
@@ -77,7 +158,7 @@ public class ManagerController {
                     System.out.println("Invalid input. Please enter a valid number.");
                     sc.nextLine(); // Clear invalid input
                 }
-            } else if (opt == 4) { // Toggle Project Visibility for Manager's Current Projects
+            } else if (opt == 6) { // Toggle Project Visibility for Manager's Current Projects
                 List<BTOProject> allProjects = Database.getProjects();
                 List<BTOProject> managedProjects = Filter.filterByManager(allProjects, mgr);
 
@@ -115,7 +196,7 @@ public class ManagerController {
                     System.out.println("Invalid input. Please enter a valid number.");
                     sc.nextLine(); // Clear invalid input
                 }
-            } else if (opt == 5) { // Approve Officer Registration
+            } else if (opt == 7) { // Approve Officer Registration
                 List<RegisteredProject> pendingList = Database.getRegisteredMap().values().stream()
                         .filter(rp -> rp.getStatus() == OfficerRegistrationStatus.PENDING)
                         .toList();
@@ -161,7 +242,7 @@ public class ManagerController {
                         Database.saveSavedOfficers();
                     }
                 }
-            } else if (opt == 6) { // Approve/Reject Applications or Withdrawals
+            } else if (opt == 8) { // Approve/Reject Applications or Withdrawals
                 System.out.println("1. Approve/Reject Applications");
                 System.out.println("2. Approve Withdrawal Requests");
                 int subOpt = sc.nextInt();
@@ -173,7 +254,7 @@ public class ManagerController {
                 } else {
                     System.out.println("Invalid Option");
                 }
-            } else if (opt == 7) { // View & Reply to Enquiry
+            } else if (opt == 9) { // View & Reply to Enquiry
                 List<Enquiry> allEnquiries = new ArrayList<>();
                 List<Enquiry> replyEligibleEnquiries = new ArrayList<>();
 
@@ -225,20 +306,20 @@ public class ManagerController {
                         Database.saveSavedEnquiries();
                     }
                 }
-            } 
-            else if (opt == 8)
+            }
+            else if (opt == 10)
             {// Generate filtered report
 
                     // CHECK ME//////////////////////////////////
                     // filter report
-                    // whether can combine attribute 
+                    // whether can combine attribute
                     // like single/married and flat type 2 room / 3 room
-    
-                    // whether need to save 
-    
+
+                    // whether need to save
+
                     // whether its for the project the manager is handling and whether the filter applies for which application status for the corresponding application from the applicants
                     List<Application> allBooked = new ArrayList<>();
-                
+
                     // Step 1: Get all booked applications
                     for (User u : Database.getUsers().values()) {
                         if (u instanceof Applicant a) {
@@ -248,12 +329,12 @@ public class ManagerController {
                             }
                         }
                     }
-                
+
                     if (allBooked.isEmpty()) {
                         System.out.println("No booked applications found.");
                         return;
                     }
-                
+
                     // Step 2: Prompt filter option
                     while (true) {
                         System.out.println("=== Filter Options ===");
@@ -266,11 +347,11 @@ public class ManagerController {
                         System.out.print("Choose a filter option: ");
                         int choice = sc.nextInt();
                         sc.nextLine(); // clear buffer
-                
+
                         List<Application> filtered = new ArrayList<>(allBooked);
-                
+
                         if (choice == 0) return;
-                
+
                         switch (choice) {
                             case 1 -> {
                                 System.out.println("Select Marital Status:");
@@ -288,7 +369,7 @@ public class ManagerController {
                                     continue;
                                 }
                             }
-                
+
                             case 2 -> {
                                 System.out.println("Select Flat Type:");
                                 System.out.println("1. TWO_ROOM");
@@ -305,13 +386,13 @@ public class ManagerController {
                                     continue;
                                 }
                             }
-                
+
                             case 3 -> {
                                 System.out.println("Available Projects:");
                                 List<String> projectNames = Database.getProjects().stream()
                                         .map(BTOProject::getProjectName).distinct().toList();
                                 for (String name : projectNames) System.out.println("- " + name);
-                
+
                                 System.out.print("Enter project name exactly as shown: ");
                                 String inputName = sc.nextLine();
                                 if (!projectNames.contains(inputName)) {
@@ -320,7 +401,7 @@ public class ManagerController {
                                 }
                                 filtered = ReportFilter.filterByProjectName(allBooked, inputName);
                             }
-                
+
                             case 4 -> {
                                 try {
                                     System.out.print("Enter minimum age: ");
@@ -339,17 +420,17 @@ public class ManagerController {
                                     continue;
                                 }
                             }
-                
+
                             case 5 -> {
                                 // no filtering, already copied allBooked
                             }
-                
+
                             default -> {
                                 System.out.println("Invalid filter choice. Try again.\n");
                                 continue;
                             }
                         }
-                
+
                         // Step 3: Print results
                         if (filtered.isEmpty()) {
                             System.out.println("No results match the selected filter.");
@@ -368,10 +449,10 @@ public class ManagerController {
                         break; // exit filter loop after valid result
                     }
                 }
-            
-            
-            
-            else if (opt == 9) { // Logout
+
+
+
+            else if (opt == 11) { // Logout
                 logoutMenu.displayLogoutMenu(mgr);
                 break;
             } else {
