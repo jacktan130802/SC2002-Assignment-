@@ -23,6 +23,7 @@ public class BTOProject {
     private boolean visibility;
     private int maxOfficerSlots;
     private int officerSlot;
+    private String status;
 
     private List<HDBOfficer> registeredOfficers = new ArrayList<>();
     private List<HDBOfficer> approvedOfficers = new ArrayList<>();
@@ -187,4 +188,11 @@ public void updateFlatCount(FlatType flatType) {
         return threeRoomUnits > 0;
     }
 
+public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }
