@@ -216,58 +216,9 @@ public class ManagerController {
                 break;
             }
             else if (opt == 9) { // View All Projects with Filters
-            System.out.println("=== View All Projects with Filters ===");
-            System.out.println("1. Filter by Manager");
-            System.out.println("2. Filter by Neighborhood");
-            System.out.println("3. Filter by Visibility");
-            System.out.println("4. Filter by Status");
-            System.out.println("5. Combine Filters");
-            System.out.println("6. View All Projects");
-            System.out.print("Choose an option: ");
-            int filterOption = sc.nextInt();
-            sc.nextLine(); // Consume newline
-
-            List<BTOProject> allProjects = Database.getProjects();
-            List<BTOProject> filteredProjects = new ArrayList<>();
-
-            switch (filterOption) {
-                case 1 -> filteredProjects = Filter.filterByManager(allProjects, mgr);
-                case 2 -> {
-                    System.out.print("Enter Neighborhood: ");
-                    String neighborhood = sc.nextLine();
-                    filteredProjects = Filter.filterByNeighborhood(allProjects, neighborhood);
-                }
-                case 3 -> {
-                    System.out.print("Enter Visibility (true/false): ");
-                    boolean isVisible = sc.nextBoolean();
-                    sc.nextLine(); // Consume newline
-                    filteredProjects = Filter.filterByVisibility(allProjects, isVisible);
-                }
-                case 4 -> {
-                    System.out.print("Enter Status: ");
-                    String status = sc.nextLine();
-                    filteredProjects = Filter.filterByStatus(allProjects, status);
-                }
-                case 5 -> {
-                    System.out.print("Enter Visibility (true/false): ");
-                    boolean isVisible = sc.nextBoolean();
-                    sc.nextLine(); // Consume newline
-                    filteredProjects = Filter.filterByManagerAndVisibility(allProjects, mgr, isVisible);
-                }
-                case 6 -> filteredProjects = allProjects;
-                default -> System.out.println("Invalid option.");
+                menu.displayProjectsWithFilters(mgr);
             }
 
-            if (filteredProjects.isEmpty()) {
-                System.out.println("No projects found with the selected filters.");
-            } else {
-                System.out.println("Filtered Projects:");
-                for (BTOProject project : filteredProjects) {
-                    System.out.printf("Project: %s | Neighborhood: %s | Visibility: %s%n",
-                            project.getProjectName(), project.getNeighborhood(), project.isVisible() ? "ON" : "OFF");
-                }
-            }
-        }
             else{
                 System.out.println("Invalid option");
             }
