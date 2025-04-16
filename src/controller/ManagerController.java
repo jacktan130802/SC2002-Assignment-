@@ -34,7 +34,13 @@ public class ManagerController {
                 LocalDate open = LocalDate.parse(menu.promptDate("Opening"));
                 LocalDate close = LocalDate.parse(menu.promptDate("Closing"));
                 BTOProject p = new BTOProject(name, hood, two, 350000, three, 450000, open, close, mgr, 10);
-                mgr.createProject(p);
+                
+                if (mgr.createProject(p)){
+                    System.out.println("Project Created Successfully");
+                }
+                else{
+                    System.out.println("Unsuccessful");
+                }
             } else if (opt == 2) { // Edit/Delete Project
                 List<BTOProject> managedProjects = mgr.getCreatedProjects(); // Retrieve all projects managed by the current manager
 
@@ -46,13 +52,12 @@ public class ManagerController {
                 System.out.println("\nYour Managed Projects:");
                 for (int i = 0; i < managedProjects.size(); i++) {
                     BTOProject project = managedProjects.get(i);
-                    System.out.printf("%d. %s (Visibility: %s)%n",
+                    System.out.printf("%d. %s",
                             i + 1,
-                            project.getProjectName(),
-                            project.isVisible() ? "ON" : "OFF");
+                            project.getProjectName());
                 }
 
-                System.out.print("Select a project to toggle visibility (1-" + managedProjects.size() + "): ");
+                System.out.print("Select a project to edit/delete (1-" + managedProjects.size() + "): ");
                 try {
                     int choice = sc.nextInt();
                     sc.nextLine(); // Consume newline
@@ -61,6 +66,34 @@ public class ManagerController {
                         System.out.println("Invalid selection.");
                         return;
                     }
+
+                    System.out.println("Select option");
+                    System.out.println(" 1. Edit");
+                    System.out.println(" 2. Delete");
+                    int option = sc.nextInt();
+
+                    if (option == 1) {//Edit
+                        System.out.println("Edit project details");
+                        String name = menu.promptProjectName();
+                        String hood = menu.promptNeighborhood();
+                        int two = menu.promptUnitCount("2-Room");
+                        int three = menu.promptUnitCount("3-Room");
+                        mgr.editProject(null, name, hood, two, three);
+
+                    }
+                    else if (option == 2){//Delete
+                        mgr.deleteProject(managedProjects.get(choice - 1));
+                        System.out.println("Deleted successfully");
+
+                    }
+                    else{
+                        System.out.println("Invalid selection.");
+                        return;
+                    }
+
+                    Database.saveAll(); // Save changes to the database
+
+
 
                     BTOProject selectedProject = managedProjects.get(choice - 1);
                     boolean newVisibility = !selectedProject.isVisible();
