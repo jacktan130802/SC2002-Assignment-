@@ -53,23 +53,31 @@ public class ManagerController {
                                 project.getProjectName(), project.getNeighborhood(), project.isVisible() ? "ON" : "OFF");
                     }
                 }
-            } else if (opt == 3) { // View All Projects with Filters
-                //invoke the filter method
+            }
+            else if (opt == 3) { // View All Projects with Filters
                 System.out.println("Welcome to the BTO Project Filter!");
 
                 // Prompt for filter criteria
                 System.out.print("Enter neighborhood to filter by (or leave blank for any): ");
-                sc.nextLine(); // Clear buffer
+                //sc.nextLine(); // Clear buffer
                 String neighborhood = sc.nextLine().trim();
 
-                System.out.print("Enter flat type to filter by (2-Room, 3-Room, or leave blank for any): ");
+                System.out.print("Enter flat type to filter by (2 for 2-Room, 3 for 3-Room, or leave blank for any): ");
                 String flatTypeInput = sc.nextLine().trim();
                 FlatType flatType = null;
                 if (!flatTypeInput.isEmpty()) {
                     try {
-                        flatType = FlatType.valueOf(flatTypeInput.toUpperCase().replace("-", "_"));
+                        // Handle numeric inputs
+                        if (flatTypeInput.equals("2")) {
+                            flatType = FlatType.TWO_ROOM;
+                        } else if (flatTypeInput.equals("3")) {
+                            flatType = FlatType.THREE_ROOM;
+                        } else {
+                            // Normalize input for textual formats
+                            flatType = FlatType.valueOf(flatTypeInput.toUpperCase().replace("-", "_"));
+                        }
                     } catch (IllegalArgumentException e) {
-                        System.out.println("Invalid flat type. Please enter '2-Room' or '3-Room'.");
+                        System.out.println("Invalid flat type. Please enter '2' for 2-Room or '3' for 3-Room.");
                         return;
                     }
                 }

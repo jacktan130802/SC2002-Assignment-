@@ -9,13 +9,14 @@ import java.util.stream.Collectors;
 
 public class Filter {
 
+
     public static List<BTOProject> dynamicFilter(List<BTOProject> projects, String neighborhood, FlatType flatType, Double minPrice, Double maxPrice) {
         if (projects == null) {
             throw new IllegalArgumentException("Projects list cannot be null.");
         }
 
         return projects.stream()
-                .filter(p -> (neighborhood == null || neighborhood.isEmpty() || p.getNeighborhood().equalsIgnoreCase(neighborhood)))
+                .filter(p -> neighborhood == null || neighborhood.isEmpty() || p.getNeighborhood().equalsIgnoreCase(neighborhood))
                 .filter(p -> {
                     if (flatType == null) {
                         return true; // No flat type filter
