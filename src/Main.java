@@ -200,18 +200,29 @@ public class Main {
             else if (opt == 3) { // View Application
                 Application app = user.getApplication();
                 if (app == null) {
-                    System.out.println("No application found.");
-                    System.out.println("");
-                }
-                 else {
+                    System.out.println("No application found.\n");
+                } else {
                     System.out.println("===== Application =====");
-                    String projectName = app.getProject().getProjectName();
-                    System.out.println("Project Name: " + projectName);
+                    System.out.println("Project Name: " + app.getProject().getProjectName());
                     System.out.println("Flat Type: " + app.getFlatType());
                     System.out.println("Status: " + app.getStatus());
-                    System.out.println("");
+                    // Show receipt if application is BOOKED
+                    if (app.getStatus() == ApplicationStatus.BOOKED && app.getReceipt() != null) {
+                        System.out.println("\n--- Booking Receipt ---");
+                        Receipt r = app.getReceipt();
+                        System.out.println("Name: " + r.getApplicantName());
+                        System.out.println("NRIC: " + r.getNric());
+                        System.out.println("Age: " + r.getAge());
+                        System.out.println("Marital Status: " + r.getMaritalStatus());
+                        System.out.println("Flat Type: " + r.getFlatType());
+                        System.out.println("Project Name: " + r.getProjectName());
+                        System.out.println("Neighborhood: " + r.getNeighborhood());
+                    }
+            
+                    System.out.println();
                 }
             }
+            
 
             else if (opt == 4) { // Enquiry
                 while (true) {
@@ -239,19 +250,25 @@ public class Main {
                         }
                     }
 
-                    else if (choice == 2) { // View Enquuiry
+                    else if (choice == 2) { // View Enquiry
                         List<Enquiry> list = user.getEnquiries();
                         if (list.isEmpty()) {
                             System.out.println("No enquiries found.");
                         } else {
                             for (int i = 0; i < list.size(); i++) {
                                 Enquiry e = list.get(i);
-                                System.out.printf("[%d] Project: %s | Message: %s | Replied: %s\n",
-                                    i + 1, e.getProject().getProjectName(), e.getMessage(), e.isReplied() ? "Yes" : "No");
+                                System.out.printf("[%d] Project: %s\n", i + 1, e.getProject().getProjectName());
+                                System.out.println("Message: " + e.getMessage());
+                                if (e.isReplied()) {
+                                    System.out.println("Replied: Yes");
+                                    System.out.println("Reply: " + e.getReply());
+                                } else {
+                                    System.out.println("Replied: No");
+                                }
                             }
                         }
-
                     }
+                    
 
                      else if (choice == 3) { // Edit Enquiry
                         List<Enquiry> list = user.getEnquiries();
@@ -653,38 +670,94 @@ public class Main {
                             // Officer books the flat
                             user.bookFlatForApplicant(selectedApp, flatType);
 
-                            // Update and save changes to project and application CSVs
+                            // Update flat count
                             project.updateFlatCount(selectedApp.getFlatType());
-   
+
+                            // Step 5: Generate and save receipt
+                            String receiptId = UUID.randomUUID().toString();
+                            Receipt receipt = new Receipt(receiptId, selectedApp);
+                            selectedApp.setReceiptId(receiptId);
+                            selectedApp.setReceipt(receipt);
+                            Database.getReceiptMap().put(receiptId, receipt);
+                            System.out.printf("Receipt generated. Applicant %s can now view their receipt via 'View Application'\n", selectedApp.getApplicant().getNRIC());
+                            // Save everything immediately
+                            Database.saveProjects(Database.getProjects());
+                            Database.saveSavedApplications();
+                            Database.saveSavedReceipts();
                             Database.saveAll();
-                            Database.saveProjects(Database.getProjects());       // Save updated project list
-
-
+                            
                         }
                     }
                 }
             
             
-            } else if (opt == 11) { // Reply to Enquiry
+            }
+            else if (opt == 11) { // Officer: Reply to Enquiry
+                List<Enquiry> allViewable = new ArrayList<>();
+                List<Enquiry> replyEligible = new ArrayList<>();
 
-                for (BTOProject p : projCtrl.getVisibleProjectsFor(user)) {
-                    if (user.isHandlingProject(p)) {
-                        for (Enquiry e : user.getEnquiries()) {
-                            if (e.getProject().equals(p)) {
-                                e.view();
-                                String reply = menu.promptEnquiryReply();
-                                enqCtrl.replyToEnquiry(e, reply);
-                                Database.saveAll();
+                // Get projects the officer is approved to handle
+                List<BTOProject> officerProjects = user.getApprovedProjects().stream()
+                    .map(ApprovedProject::getProject)
+                    .toList();
+
+                // Collect all relevant enquiries
+                for (User u : Database.getUsers().values()) {
+                    if (u instanceof Applicant a) {
+                        for (Enquiry e : a.getEnquiries()) {
+                            if (officerProjects.contains(e.getProject())) {
+                                allViewable.add(e); // View all enquiries from handled projects
+                                if (!e.isReplied()) {
+                                    replyEligible.add(e); // Only unreplied ones are eligible for reply
+                                }
                             }
                         }
                     }
                 }
-            } else if (opt == 12) { // Generate Receipt
-                String nric = menu.promptApplicantNRIC();
-                User u = Database.getUsers().get(nric);
-                if (u instanceof Applicant appUser) receiptCtrl.generateReceipt(appUser.getApplication());
 
-            }  else if (opt == 13) { // View Flat Availability
+                System.out.println("=== Enquiries for Projects You're Handling ===");
+                if (allViewable.isEmpty()) {
+                    System.out.println("No enquiries for your handled projects.");
+                } else {
+                    for (int i = 0; i < allViewable.size(); i++) {
+                        Enquiry e = allViewable.get(i);
+                        System.out.printf("[%d] Project: %s | Message: %s | Replied: %s\n",
+                            i + 1, e.getProject().getProjectName(), e.getMessage(), e.isReplied() ? "Yes" : "No");
+                        
+                        if (e.isReplied()) {
+                            System.out.println("Reply: " + e.getReply());
+                        }
+                    }
+                    
+                }
+
+                System.out.println("\n=== Enquiries You Can Reply To ===");
+                if (replyEligible.isEmpty()) {
+                    System.out.println("No unreplied enquiries available to respond.");
+                } else {
+                    for (int i = 0; i < replyEligible.size(); i++) {
+                        Enquiry e = replyEligible.get(i);
+                        System.out.printf("[%d] Project: %s | Message: %s\n",
+                            i + 1, e.getProject().getProjectName(), e.getMessage());
+                    }
+
+                    System.out.print("Choose enquiry number to reply: ");
+                    int choice = sc.nextInt();
+                    sc.nextLine(); // clear buffer
+
+                    if (choice < 1 || choice > replyEligible.size()) {
+                        System.out.println("Invalid choice.");
+                    } else {
+                        Enquiry e = replyEligible.get(choice - 1);
+                        String reply = menu.promptEnquiryReply();
+                        enqCtrl.replyToEnquiry(e, reply);
+                        System.out.println("Reply submitted.");
+                        Database.saveAll(); // Save reply immediately
+                    }
+                }
+
+            
+            }  else if (opt == 12) { // View Flat Availability
                 String projectName = menu.promptProjectName();
                 BTOProject p = projCtrl.getProjectByName(projectName);
                 if (p != null) {
@@ -721,6 +794,7 @@ public class Main {
                 if (p != null) mgr.toggleProjectVisibility(p, !p.isVisible());
 
             } else if (opt == 3) { // Toggle Project Visibility
+                // Existing logic for approving applications
                 for (User u : Database.getUsers().values()) {
                     if (u instanceof Applicant app && app.getApplication() != null) {
                         BTOProject p = app.getApplication().getProject();
@@ -729,6 +803,39 @@ public class Main {
                             System.out.println("Approved: " + app.getNRIC());
                         }
                     }
+                }
+
+                // New logic for toggling project visibility
+                List<BTOProject> createdProjects = mgr.getCreatedProjects();
+                if (createdProjects.isEmpty()) {
+                    System.out.println("You have not created any projects.");
+                    return;
+                }
+
+                System.out.println("\nYour Created Projects:");
+                for (int i = 0; i < createdProjects.size(); i++) {
+                    BTOProject p = createdProjects.get(i);
+                    System.out.printf("%d. %s (Visibility: %s)%n",
+                            i + 1,
+                            p.getProjectName(),
+                            p.isVisible() ? "ON" : "OFF");
+                }
+
+                System.out.print("Select a project to toggle visibility (1-" + createdProjects.size() + "): ");
+                try {
+                    int choice = sc.nextInt();
+                    if (choice < 1 || choice > createdProjects.size()) {
+                        System.out.println("Invalid selection.");
+                        return;
+                    }
+
+                    BTOProject selectedProject = createdProjects.get(choice - 1);
+                    boolean newVisibility = !selectedProject.isVisible();
+                    mgr.toggleProjectVisibility(selectedProject, newVisibility);
+                    System.out.println("Project visibility toggled successfully.");
+                } catch (InputMismatchException e) {
+                    System.out.println("Invalid input. Please enter a valid number.");
+                    sc.nextLine(); // Clear invalid input
                 }
             } else if (opt == 4) { // Approve Officer Registration
                     List<RegisteredProject> pendingList = Database.getRegisteredMap().values().stream()
@@ -804,20 +911,63 @@ public class Main {
                 }
 
             }   
-            // else if (opt == 6) { // View & Reply to Enquiry //not done yet
-            //     for (BTOProject p : mgr.getVisibleProjectsFor(mgr)) {
-            //         if (mgr.isHandlingProject(p)) {
-            //             for (Enquiry e : user.getEnquiries()) {
-            //                 if (e.getProject().equals(p)) {
-            //                     e.view();
-            //                     String reply = menu.promptEnquiryReply();
-            //                     enqCtrl.replyToEnquiry(e, reply);
-            //                     Database.saveAll();
-            //                 }
-            //             }
-            //         }
-            //     }
-            // }
+            else if (opt == 6) { // View & Reply to Enquiry //not done yet
+                // 1. Show all enquiries (view-only)
+                List<Enquiry> allEnquiries = new ArrayList<>();
+                List<Enquiry> replyEligibleEnquiries = new ArrayList<>();
+
+                for (User u : Database.getUsers().values()) {
+                    if (u instanceof Applicant a) {
+                        for (Enquiry e : a.getEnquiries()) {
+                            allEnquiries.add(e);
+                            if (e.getProject().getManagerInCharge().equals(mgr) && !e.isReplied()) {
+                                replyEligibleEnquiries.add(e);
+                            }
+                        }
+                    }
+                }
+
+                // Section 1: View All Enquiries
+                System.out.println("=== All Enquiries (View Only) ===");
+                if (allEnquiries.isEmpty()) {
+                    System.out.println("No enquiries found.");
+                } else {
+                    for (int i = 0; i < allEnquiries.size(); i++) {
+                        Enquiry e = allEnquiries.get(i);
+                        System.out.printf("[%d] Project: %s | Applicant: %s | Message: %s | Replied: %s\n",
+                            i + 1, e.getProject().getProjectName(), e.getApplicant().getNRIC(),
+                            e.getMessage(), e.isReplied() ? "Yes" : "No");
+                    }
+                }
+
+                // Section 2: Enquiries Manager Can Reply To
+                System.out.println("\n=== Enquiries You Can Reply To ===");
+                if (replyEligibleEnquiries.isEmpty()) {
+                    System.out.println("No enquiries available for you to reply.");
+                } else {
+                    for (int i = 0; i < replyEligibleEnquiries.size(); i++) {
+                        Enquiry e = replyEligibleEnquiries.get(i);
+                        System.out.printf("[%d] Project: %s | Applicant: %s | Message: %s\n",
+                            i + 1, e.getProject().getProjectName(), e.getApplicant().getNRIC(), e.getMessage());
+                    }
+
+                    System.out.print("Enter enquiry number to reply (0 to cancel): ");
+                    int choice = sc.nextInt();
+                    sc.nextLine(); // consume newline
+
+                    if (choice < 0 || choice > replyEligibleEnquiries.size()) {
+                        System.out.println("Invalid selection.");
+                    } else if (choice != 0) {
+                        Enquiry selected = replyEligibleEnquiries.get(choice - 1);
+                        System.out.print("Enter your reply: ");
+                        String reply = sc.nextLine();
+                        selected.setReply(reply);
+                        System.out.println("Reply sent.");
+                        Database.saveSavedEnquiries();
+                    }
+                }
+
+            }
             else if (opt == 8){ // Logout
                 logoutMenu.displayLogoutMenu(mgr);
                 break;

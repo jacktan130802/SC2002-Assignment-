@@ -22,10 +22,9 @@ public class OfficerMenu {
         System.out.println("7. View Registration Status");
         System.out.println("8. View Assigned Projects");
         System.out.println("9. View Project Details");
-        System.out.println("10. Book Flat for Applicant");
+        System.out.println("10. Book Flat for Applicant, then generate receipt");
         System.out.println("11. Reply to Enquiry");
-        System.out.println("12. Generate Receipt");
-        System.out.println("13. View Flat Availability");
+        System.out.println("12. View Flat Availability");
         System.out.println("===============================");
         System.out.println("14. Logout");
         System.out.print("Choose option: ");

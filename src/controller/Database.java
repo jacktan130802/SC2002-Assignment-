@@ -61,6 +61,10 @@ public class Database {
         loadUsers(users);
         loadProjects(projects, users);
 
+        if (new File(SAVED_RECEIPT_CSV).exists()) {
+            loadSavedReceipts(); 
+        }
+
         if (new File(SAVED_APPLICANT_CSV).exists()) {
             loadSavedApplications();
             loadSavedEnquiries();
@@ -74,11 +78,6 @@ public class Database {
         }
 
 
-        for (User u : users.values()) {
-            if (u instanceof Applicant a) {
-                System.out.println("[DEBUG] Applicant " + a.getNRIC() + " has " + a.getEnquiries().size() + " enquiries loaded.");
-            }
-        }
         
     }
 
@@ -94,6 +93,7 @@ public class Database {
     public static void saveAll() {
         saveUsers(users);
         saveProjects(projects);
+        saveSavedReceipts();
         saveSavedApplications();
         saveSavedEnquiries();
         saveSavedApplicants();
@@ -296,8 +296,6 @@ public class Database {
                             int eid = Integer.parseInt(id.trim());
                             if (enquiryMap.containsKey(eid)) {
                                 a.getEnquiries().add(enquiryMap.get(eid));
-                                System.out.println("Trying to add enquiry: " + eid + " to applicant: " + nric);
-                                System.out.println("[DEBUG] Total enquiries for applicant " + nric + ": " + a.getEnquiries().size());
 
                             }
                         } catch (NumberFormatException e) {
@@ -341,11 +339,16 @@ public class Database {
                 String projectName = t[2];
                 FlatType type = FlatType.valueOf(t[3]);
                 ApplicationStatus status = ApplicationStatus.valueOf(t[4]);
+                String receiptId = t.length > 5 ? t[5] : "";
 
                 if (users.get(nric) instanceof Applicant a && getProjectByName(projectName) != null) {
                     Application app = new Application(a, getProjectByName(projectName), type);
                     app.setStatus(status);
                     app.setApplicationId(id);
+                    if (!receiptId.isBlank() && receiptMap.containsKey(receiptId)) {
+                        app.setReceiptId(receiptId);
+                        app.setReceipt(receiptMap.get(receiptId));
+                    }
                     applicationMap.put(id, app);
                 }
             }
@@ -354,14 +357,14 @@ public class Database {
         }
     }
 
-    private static void saveSavedApplications() {
+    public static void saveSavedApplications() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_APPLICATION_CSV))) {
             writer.write("ApplicationID,ApplicantNRIC,ProjectName,FlatType,Status,ReceiptID\n");
             for (User u : users.values()) {
                 if (u instanceof Applicant a && a.getApplication() != null) {
                     Application app = a.getApplication();
                     String rid = app.getReceiptId() != null ? app.getReceiptId() : "";
-                    writer.write(String.format("%d,%s,%s,%s,%s\n",
+                    writer.write(String.format("%d,%s,%s,%s,%s,%s\n",
                         app.getApplicationId(), app.getApplicant().getNRIC(),
                         app.getProject().getProjectName(), app.getFlatType(), app.getStatus(), rid));
                 }
@@ -388,7 +391,6 @@ public class Database {
                     e.setReply(reply);
                     e.setEnquiryID(id);
                     enquiryMap.put(id, e);
-                    System.out.println("Loaded enquiry: " + id + " for " + nric);
                 }
             }
         } catch (IOException e) {
@@ -396,7 +398,7 @@ public class Database {
         }
     }
 
-    private static void saveSavedEnquiries() {
+    public static void saveSavedEnquiries() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_ENQUIRY_CSV))) {
             writer.write("EnquiryID,ApplicantNRIC,ProjectName,Message,Reply\n");
             for (User u : users.values()) {

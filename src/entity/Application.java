@@ -27,6 +27,10 @@ public class Application implements Serializable {
     public Receipt getReceipt() {
         return receipt;
     }
+    public void setReceiptId(String receiptId) {
+        this.receiptId = receiptId;
+    }
+    
 
     public String getReceiptId() {
         return receiptId;
