@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class HDBManager extends User {
     private List<BTOProject> createdProjects = new ArrayList<>();
@@ -66,6 +67,13 @@ public class HDBManager extends User {
         } else {
             System.out.println("Cannot delete project during application period.");
         }
+    }
+    private List<BTOProject> allProjects; // Assume this is populated with all projects
+
+    public List<BTOProject> getCurrentProjects() {
+        return allProjects.stream()
+                .filter(project -> project.getManagerInCharge().equals(this))
+                .collect(Collectors.toList());
     }
 
     public void toggleProjectVisibilityForAllProjects(Scanner sc) {

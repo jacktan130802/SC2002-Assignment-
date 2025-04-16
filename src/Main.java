@@ -749,32 +749,35 @@ public class Main {
                 } else {
                     System.out.println("Project not found.");
                 }
-            } else if (opt == 3) { // Toggle Project Visibility for All Projects
-                List<BTOProject> createdProjects = mgr.getCreatedProjects();
+            }
+          else if (opt == 3) { // Toggle Project Visibility for Manager's Current Projects
+                List<BTOProject> currentProjects = mgr.getCurrentProjects(); // Retrieve current projects assigned to the manager
 
-                if (createdProjects.isEmpty()) {
-                    System.out.println("You have not created any projects.");
+                if (currentProjects.isEmpty()) {
+                    System.out.println("You are not managing any projects currently.");
                     return;
                 }
 
-                System.out.println("\nYour Created Projects:");
-                for (int i = 0; i < createdProjects.size(); i++) {
-                    BTOProject project = createdProjects.get(i);
+                System.out.println("\nYour Current Projects:");
+                for (int i = 0; i < currentProjects.size(); i++) {
+                    BTOProject project = currentProjects.get(i);
                     System.out.printf("%d. %s (Visibility: %s)%n",
                             i + 1,
                             project.getProjectName(),
                             project.isVisible() ? "ON" : "OFF");
                 }
 
-                System.out.print("Select a project to toggle visibility (1-" + createdProjects.size() + "): ");
+                System.out.print("Select a project to toggle visibility (1-" + currentProjects.size() + "): ");
                 try {
                     int choice = sc.nextInt();
-                    if (choice < 1 || choice > createdProjects.size()) {
+                    sc.nextLine(); // Consume newline
+
+                    if (choice < 1 || choice > currentProjects.size()) {
                         System.out.println("Invalid selection.");
                         return;
                     }
 
-                    BTOProject selectedProject = createdProjects.get(choice - 1);
+                    BTOProject selectedProject = currentProjects.get(choice - 1);
                     boolean newVisibility = !selectedProject.isVisible();
                     selectedProject.setVisibility(newVisibility);
                     System.out.println("Visibility for project \"" + selectedProject.getProjectName() + "\" toggled to: " + (newVisibility ? "ON" : "OFF"));
@@ -784,9 +787,9 @@ public class Main {
                     System.out.println("Invalid input. Please enter a valid number.");
                     sc.nextLine(); // Clear invalid input
                 }
+            }
 
-
-            } else if (opt == 4) { // Approve Officer Registration
+             else if (opt == 4) { // Approve Officer Registration
                     List<RegisteredProject> pendingList = Database.getRegisteredMap().values().stream()
                         .filter(rp -> rp.getStatus() == OfficerRegistrationStatus.PENDING)
                         .toList();
