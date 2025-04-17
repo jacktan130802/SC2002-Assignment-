@@ -25,9 +25,6 @@ public class BTOProject {
     private int officerSlot;
     private String status;
 
-    //enum flat types
-
-
 
     private List<HDBOfficer> registeredOfficers = new ArrayList<>();
     private List<HDBOfficer> approvedOfficers = new ArrayList<>();
@@ -200,4 +197,21 @@ public String getStatus() {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public void setPriceTwoRoom(double priceTwoRoom) {
+        this.priceTwoRoom = priceTwoRoom;
+    }
+    
+    public void setPriceThreeRoom(double priceThreeRoom) {
+        this.priceThreeRoom = priceThreeRoom;
+    }
+    
+    public void setOpeningDate(LocalDate openingDate) {
+        this.openingDate = openingDate;
+    }
+    
+    public void setClosingDate(LocalDate closingDate) {
+        this.closingDate = closingDate;
+    }
+    
 }
