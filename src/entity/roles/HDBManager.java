@@ -30,15 +30,33 @@ public class HDBManager extends User {
         return true;
     }
 
-    public void createProject(BTOProject project) {
+    public boolean createProject(BTOProject project) {
         if (canCreateProject(project)) {
             createdProjects.add(project);
             System.out.println("Project created: " + project.getProjectName());
+            return true;
         } else {
             System.out.println("Cannot create project: already managing one during this application period with visibility ON.");
+            return false;
         }
     }
 
+    // public void editProject(BTOProject project, String newName, String newNeighborhood, int newTwoRoomUnits, int newThreeRoomUnits) {
+    //     if (!createdProjects.contains(project)) {
+    //         System.out.println("Project not found in your list.");
+    //         return;
+    //     }
+    //     if (!project.isWithinApplicationPeriod(java.time.LocalDate.now())) {
+    //         project.setVisibility(false); // optional lock
+    //         project.setProjectName(newName);
+    //         project.setNeighborhood(newNeighborhood);
+    //         project.setTwoRoomUnits(newTwoRoomUnits);
+    //         project.setThreeRoomUnits(newThreeRoomUnits);
+    //         System.out.println("Project edited successfully.");
+    //     } else {
+    //         System.out.println("Cannot edit project during application period.");
+    //     }
+    // }
     public void editProject(BTOProject project, String newName, String newNeighborhood, int newTwoRoomUnits, int newThreeRoomUnits) {
         if (!createdProjects.contains(project)) {
             System.out.println("Project not found in your list.");
@@ -55,6 +73,7 @@ public class HDBManager extends User {
             System.out.println("Cannot edit project during application period.");
         }
     }
+
 
     public void deleteProject(BTOProject project) {
         if (!createdProjects.contains(project)) {

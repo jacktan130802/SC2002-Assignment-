@@ -48,6 +48,7 @@ public class BTOProject {
         this.visibility = false; // default
     }
 
+
     // getters
     public String getProjectName() {
         return projectName;

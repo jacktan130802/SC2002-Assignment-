@@ -7,7 +7,6 @@ import entity.roles.Applicant;
 import enums.*;
 import entity.enquiry.Enquiry;
 import utility.Filter;
-import utility.Filter.FilterSettings;
 
 import java.util.List;
 import java.util.Scanner;
@@ -44,49 +43,65 @@ public class ApplicantController {
                 
 
             }
-            else if (opt == 2) {
-                FilterSettings saved = Database.loadFilterSettings();
-                FilterSettings settings;
-            
-                if (saved != null) {
-                    System.out.print("Use previous filter settings? (yes/no): ");
-                    String reuse = sc.nextLine().trim().toLowerCase();
-            
-                    if (reuse.equals("yes")) {
-                        settings = saved;
-                    } else {
-                        // Prompt for new filter settings
-                        settings = Filter.promptAndSaveFilterSettings(sc);
-                    }
-                } else {
-                    System.out.println("No previous filter found. Using new filter settings.");
-                    settings = Filter.promptAndSaveFilterSettings(sc);  // First-time use
-                }
-            
+            if (opt == 2) {  // view filtered projects
                 List<BTOProject> viewable = projectCtrl.getVisibleProjectsFor(user);
-                System.out.println("\n--- All Visible Projects ---");
+
+                System.out.println("Visible Projects (" + viewable.size() + "):");
                 for (BTOProject p : viewable) {
-                    System.out.println("- " + p.getProjectName() + " @ " + p.getNeighborhood());
-                    System.out.println("  2-Room: " + p.getTwoRoomUnits() + " units | $" + p.getPriceTwoRoom());
-                    System.out.println("  3-Room: " + p.getThreeRoomUnits() + " units | $" + p.getPriceThreeRoom());
+                    System.out.println("- " + p.getProjectName());
+
+                    if (user.getMaritalStatus().toString().equalsIgnoreCase("SINGLE") && user.getAge() >= 35) {
+                        System.out.println("  Eligible Flat Type: 2-Room (" + p.getTwoRoomUnits() + " units left)");
+                    } else if (user.getMaritalStatus().toString().equalsIgnoreCase("MARRIED") && user.getAge() >= 21) {
+                        if (p.hasTwoRoom())
+                            System.out.println("  2-Room: " + p.getTwoRoomUnits() + " units");
+                        if (p.hasThreeRoom())
+                            System.out.println("  3-Room: " + p.getThreeRoomUnits() + " units");
+                    } else {
+                        System.out.println("  [Not eligible for any flat type]");
+                    }
                 }
 
-                List<BTOProject> filtered = Filter.dynamicFilter(viewable,
-                        settings.getNeighborhood(), settings.getFlatType(),
-                        settings.getMinPrice(), settings.getMaxPrice());
-            
-                System.out.println("\nFiltered Projects (" + filtered.size() + "):");
-                for (BTOProject p : filtered) {
-                    System.out.println("- " + p.getProjectName());
-                    if (settings.getFlatType() == FlatType.TWO_ROOM) {
-                        System.out.println("  2-Room Price: " + p.getPriceTwoRoom());
-                    } else if (settings.getFlatType() == FlatType.THREE_ROOM) {
-                        System.out.println("  3-Room Price: " + p.getPriceThreeRoom());
+                System.out.println("\nWould you like to filter the projects? (yes/no): ");
+                String filterChoice = sc.nextLine().trim().toLowerCase();
+                if (filterChoice.equals("yes")) {
+                    System.out.print("Enter neighborhood to filter by (or leave blank for any): ");
+                    String neighborhood = sc.nextLine().trim();
+
+                    System.out.print("Enter flat type to filter by (2 for 2-Room, 3 for 3-Room, or leave blank for any): ");
+                    String flatTypeInput = sc.nextLine().trim();
+                    FlatType flatType = null;
+                    if (!flatTypeInput.isEmpty()) {
+                        if (flatTypeInput.equals("2")) {
+                            flatType = FlatType.TWO_ROOM;
+                        } else if (flatTypeInput.equals("3")) {
+                            flatType = FlatType.THREE_ROOM;
+                        }
+                    }
+
+                    System.out.print("Enter minimum price (or leave blank for no minimum): ");
+                    String minPriceInput = sc.nextLine().trim();
+                    Double minPrice = minPriceInput.isEmpty() ? null : Double.parseDouble(minPriceInput);
+
+                    System.out.print("Enter maximum price (or leave blank for no maximum): ");
+                    String maxPriceInput = sc.nextLine().trim();
+                    Double maxPrice = maxPriceInput.isEmpty() ? null : Double.parseDouble(maxPriceInput);
+
+                    // Apply filters
+                    List<BTOProject> filteredProjects = Filter.dynamicFilter(viewable, neighborhood, flatType, minPrice, maxPrice);
+
+                    System.out.println("\nFiltered Projects (" + filteredProjects.size() + "):");
+                    for (BTOProject p : filteredProjects) {
+                        System.out.println("- " + p.getProjectName());
+                        if (flatType == FlatType.TWO_ROOM) {
+                            System.out.println("  2-Room Price: " + p.getPriceTwoRoom());
+                        } else if (flatType == FlatType.THREE_ROOM) {
+                            System.out.println("  3-Room Price: " + p.getPriceThreeRoom());
+
+                        }
                     }
                 }
-            }
-            
-                else if (opt == 3) { // Apply for BTO Projects
+                } else if (opt == 3) { // Apply for BTO Projects
                     String name = menu.promptProjectName();
                     BTOProject p = projectCtrl.getProjectByName(name);
 
