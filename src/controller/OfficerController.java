@@ -18,8 +18,6 @@ import entity.roles.HDBOfficer;
 import entity.roles.User;
 import enums.ApplicationStatus;
 import enums.FlatType;
-import utility.Filter;
-import utility.Filter.FilterSettings;
 
 public class OfficerController {
     public static void run(HDBOfficer user, BTOProjectController projCtrl, EnquiryController enqCtrl, ReceiptController receiptCtrl, OfficerMenu menu, LogoutMenu logoutMenu, Scanner sc, ApplicationController appCtrl)
@@ -59,13 +57,13 @@ public class OfficerController {
 
         System.out.println("===============================\n");
             int opt = menu.showOfficerOptions();
-if (opt == 1) {
+                        if (opt == 1) {
                 List<BTOProject> viewable = projCtrl.getVisibleProjectsFor(user);
 
                 System.out.println("Visible Projects (" + viewable.size() + "):");
                 for (BTOProject p : viewable) {
                     System.out.println("- " + p.getProjectName());
-                
+
                     if (user.getMaritalStatus().toString().equalsIgnoreCase("SINGLE") && user.getAge() >= 35) {
                         System.out.println("  Eligible Flat Type: 2-Room (" + p.getTwoRoomUnits() + " units left)");
                     } else if (user.getMaritalStatus().toString().equalsIgnoreCase("MARRIED") && user.getAge() >= 21) {
@@ -79,51 +77,10 @@ if (opt == 1) {
                 }
 
                 System.out.println();
-                
+
 
             }
             else if (opt == 2) {
-                FilterSettings saved = Database.loadFilterSettings();
-                FilterSettings settings;
-            
-                if (saved != null) {
-                    System.out.print("Use previous filter settings? (yes/no): ");
-                    String reuse = sc.nextLine().trim().toLowerCase();
-            
-                    if (reuse.equals("yes")) {
-                        settings = saved;
-                    } else {
-                        // Prompt for new filter settings
-                        settings = Filter.promptAndSaveFilterSettings(sc);
-                    }
-                } else {
-                    System.out.println("No previous filter found. Using new filter settings.");
-                    settings = Filter.promptAndSaveFilterSettings(sc);  // First-time use
-                }
-            
-                List<BTOProject> viewable = projCtrl.getVisibleProjectsFor(user);
-                System.out.println("\n--- All Visible Projects ---");
-            for (BTOProject p : viewable) {
-                System.out.println("- " + p.getProjectName() + " @ " + p.getNeighborhood());
-                System.out.println("  2-Room: " + p.getTwoRoomUnits() + " units | $" + p.getPriceTwoRoom());
-                System.out.println("  3-Room: " + p.getThreeRoomUnits() + " units | $" + p.getPriceThreeRoom());
-            }
-
-                List<BTOProject> filtered = Filter.dynamicFilter(viewable,
-                        settings.getNeighborhood(), settings.getFlatType(),
-                        settings.getMinPrice(), settings.getMaxPrice());
-            
-                System.out.println("\nFiltered Projects (" + filtered.size() + "):");
-                for (BTOProject p : filtered) {
-                    System.out.println("- " + p.getProjectName());
-                    if (settings.getFlatType() == FlatType.TWO_ROOM) {
-                        System.out.println("  2-Room Price: " + p.getPriceTwoRoom());
-                    } else if (settings.getFlatType() == FlatType.THREE_ROOM) {
-                        System.out.println("  3-Room Price: " + p.getPriceThreeRoom());
-                    }
-                }
-            }
-            else if (opt == 3) {
                 String name = menu.promptProjectName();
                 BTOProject p = projCtrl.getProjectByName(name);
 
@@ -181,7 +138,7 @@ if (opt == 1) {
                 }
             }
 
-            else if (opt == 4) {
+            else if (opt == 3) {
                 Application app = user.getApplication();
                 if (app == null) {
                     System.out.println("No application found.");
@@ -197,7 +154,7 @@ if (opt == 1) {
                 }
             }
 
-            else if (opt == 5) {
+            else if (opt == 4) {
                 while (true) {
                     System.out.println("--- Enquiry Menu ---");
                     System.out.println("1. Submit New Enquiry");
@@ -284,14 +241,14 @@ if (opt == 1) {
                     }
                 }
             }
-            else if (opt == 6) {
+            else if (opt == 5) {
                 appCtrl.requestWithdrawal(user);
             }
 
 
 
 
-            else if (opt == 7) { // Register to Handle Project
+            else if (opt == 6) { // Register to Handle Project
                 String projectName = menu.promptProjectName();
                 BTOProject p = projCtrl.getProjectByName(projectName);
                 if (p == null) {
@@ -301,14 +258,14 @@ if (opt == 1) {
                     Database.saveAll();
                 }
             }
-            else if (opt == 8) { // View Registration Status
+            else if (opt == 7) { // View Registration Status
                 for (RegisteredProject rp : user.getRegisteredProjects()) {
                     BTOProject p = rp.getProject();
                     System.out.println("Registration Status for " + p.getProjectName() + ": " + rp.getStatus());
                 }
             }
 
-            else if (opt == 9) { // View Assigned Projects
+            else if (opt == 8) { // View Assigned Projects
                 for (BTOProject p : projCtrl.getVisibleProjectsFor(user)) {
                     if (user.isHandlingProject(p)) {
                         System.out.println("Handling: " + p.getProjectName());
@@ -344,7 +301,7 @@ if (opt == 1) {
             //         System.out.println("Project not found");
             //     }
             
-            } else if (opt == 10) { // View Project Details
+            } else if (opt == 9) { // View Project Details
                 if (!(user instanceof HDBOfficer)) {
                     System.out.println("Access denied: Officer privileges required");
                     return;
@@ -354,7 +311,7 @@ if (opt == 1) {
             
             
 
-            } else if (opt == 11) { // Book flat for applicant
+            } else if (opt == 10) { // Book flat for applicant
                 List<ApprovedProject> officerApprovedProjects = user.getApprovedProjects();
             
                 if (officerApprovedProjects.isEmpty()) {
@@ -420,7 +377,7 @@ if (opt == 1) {
             
             
             }
-            else if (opt == 12) { // Officer: Reply to Enquiry
+            else if (opt == 11) { // Officer: Reply to Enquiry
                 List<Enquiry> allViewable = new ArrayList<>();
                 List<Enquiry> replyEligible = new ArrayList<>();
 
@@ -485,7 +442,7 @@ if (opt == 1) {
                 }
 
             
-            }  else if (opt == 13) { // View Flat Availability
+            }  else if (opt == 12) { // View Flat Availability
                 String projectName = menu.promptProjectName();
                 BTOProject p = projCtrl.getProjectByName(projectName);
                 if (p != null) {

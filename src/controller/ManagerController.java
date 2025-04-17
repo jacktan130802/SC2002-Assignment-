@@ -23,7 +23,6 @@ import enums.MaritalStatus;
 import enums.OfficerRegistrationStatus;
 import utility.ReportFilter;
 import utility.Filter;
-import utility.Filter.FilterSettings;
 
 
 public class ManagerController {
@@ -31,7 +30,7 @@ public class ManagerController {
         while (true) {
             int opt = menu.showManagerOptions();
             if (opt == 1) {
-                // Show All Projects ////////////////// FIX ME///////////// is this needed? manager can view all projects? i tot only projects manager created
+                // Show All Projects
                 List<BTOProject> allProjects = Database.getProjects();
                 if (allProjects.isEmpty()) {
                     System.out.println("No projects available.");
@@ -55,62 +54,72 @@ public class ManagerController {
                     }
                 }
             }
-            else if (opt == 3) { // Replace X with the appropriate menu option number
-    List<BTOProject> allProjects = Database.getProjects();
-    List<BTOProject> myProjects = Filter.filterByManager(allProjects, mgr);
+            else if (opt == 3) { // View All Projects with Filters
+                System.out.println("Welcome to the BTO Project Filter!");
 
-    if (myProjects.isEmpty()) {
-        System.out.println("You are not managing any projects.");
-        return;
-    }
+                // Prompt for filter criteria
+                System.out.print("Enter neighborhood to filter by (or leave blank for any): ");
+                //sc.nextLine(); // Clear buffer
+                String neighborhood = sc.nextLine().trim();
 
-    // Load or prompt filter settings
-    FilterSettings saved = Database.loadFilterSettings();
-    FilterSettings settings;
+                System.out.print("Enter flat type to filter by (2 for 2-Room, 3 for 3-Room, or leave blank for any): ");
+                String flatTypeInput = sc.nextLine().trim();
+                FlatType flatType = null;
+                if (!flatTypeInput.isEmpty()) {
+                    try {
+                        // Handle numeric inputs
+                        if (flatTypeInput.equals("2")) {
+                            flatType = FlatType.TWO_ROOM;
+                        } else if (flatTypeInput.equals("3")) {
+                            flatType = FlatType.THREE_ROOM;
+                        } else {
+                            // Normalize input for textual formats
+                            flatType = FlatType.valueOf(flatTypeInput.toUpperCase().replace("-", "_"));
+                        }
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Invalid flat type. Please enter '2' for 2-Room or '3' for 3-Room.");
+                        return;
+                    }
+                }
 
-    if (saved != null) {
-        System.out.print("Use previous filter settings? (yes/no): ");
-        String reuse = sc.nextLine().trim().toLowerCase();
+                Double minPrice = null;
+                Double maxPrice = null;
 
-        if (reuse.equals("yes")) {
-            settings = saved;
-        } else {
-            settings = Filter.promptAndSaveFilterSettings(sc); // saves immediately
-        }
-    } else {
-        System.out.println("No previous filter found. Using new filter settings.");
-        settings = Filter.promptAndSaveFilterSettings(sc);  // first-time use
-    }
+                try {
+                    System.out.print("Enter minimum price (or leave blank for no minimum): ");
+                    String minPriceInput = sc.nextLine().trim();
+                    if (!minPriceInput.isEmpty()) {
+                        minPrice = Double.parseDouble(minPriceInput);
+                    }
 
-    // Filter the manager's own projects
-    List<BTOProject> filtered = Filter.dynamicFilter(
-        myProjects,
-        settings.getNeighborhood(),
-        settings.getFlatType(),
-        settings.getMinPrice(),
-        settings.getMaxPrice()
-    );
+                    System.out.print("Enter maximum price (or leave blank for no maximum): ");
+                    String maxPriceInput = sc.nextLine().trim();
+                    if (!maxPriceInput.isEmpty()) {
+                        maxPrice = Double.parseDouble(maxPriceInput);
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid price input. Please enter valid numbers for price.");
+                    return;
+                }
 
-    // Display filtered projects
-    if (filtered.isEmpty()) {
-        System.out.println("No projects matched your filter.");
-    } else {
-        System.out.println("=== My Filtered Projects ===");
-        for (BTOProject p : filtered) {
-            System.out.printf("- %s @ %s\n", p.getProjectName(), p.getNeighborhood());
+                // Retrieve all projects and apply the dynamic filter
+                List<BTOProject> allProjects = Database.getProjects();
+                List<BTOProject> filteredProjects = Filter.dynamicFilter(allProjects, neighborhood, flatType, minPrice, maxPrice);
 
-            if (settings.getFlatType() == null || settings.getFlatType() == FlatType.TWO_ROOM) {
-                System.out.printf("  2-Room: %d units | $%.2f\n", p.getTwoRoomUnits(), p.getPriceTwoRoom());
+                // Display the filtered projects
+                System.out.println("\n--- Filtered Projects ---");
+                if (filteredProjects.isEmpty()) {
+                    System.out.println("No projects match your criteria.");
+                } else {
+                    for (BTOProject project : filteredProjects) {
+                        System.out.printf("Project: %s | Neighborhood: %s | 2-Room Price: %.2f | 3-Room Price: %.2f\n",
+                                project.getProjectName(),
+                                project.getNeighborhood(),
+                                project.getPriceTwoRoom(),
+                                project.getPriceThreeRoom());
+                    }
+                }
             }
-            if (settings.getFlatType() == null || settings.getFlatType() == FlatType.THREE_ROOM) {
-                System.out.printf("  3-Room: %d units | $%.2f\n", p.getThreeRoomUnits(), p.getPriceThreeRoom());
-            }
-
-            System.out.printf("  Visibility: %s\n", p.isVisible() ? "ON" : "OFF");
-        }
-    }
-}
-
         else if (opt == 4) { // Create Project
                 String name = menu.promptProjectName();
                 String hood = menu.promptNeighborhood();
@@ -119,9 +128,21 @@ public class ManagerController {
                 LocalDate open = LocalDate.parse(menu.promptDate("Opening"));
                 LocalDate close = LocalDate.parse(menu.promptDate("Closing"));
                 BTOProject p = new BTOProject(name, hood, two, 350000, three, 450000, open, close, mgr, 10);
+<<<<<<< HEAD
+                
+                if (mgr.createProject(p)){
+                    System.out.println("Project Created Successfully");
+                }
+                else{
+                    System.out.println("Unsuccessful");
+                }
+            } else if (opt == 2) { // Edit/Delete Project
+                List<BTOProject> managedProjects = mgr.getCreatedProjects(); // Retrieve all projects managed by the current manager
+=======
                 mgr.createProject(p);
             } else if (opt == 5) { // Edit/Delete Project
                 List<BTOProject> managedProjects = mgr.getCreatedProjects();
+>>>>>>> main
 
                 if (managedProjects.isEmpty()) {
                     System.out.println("You are not managing any projects.");
@@ -131,13 +152,12 @@ public class ManagerController {
                 System.out.println("\nYour Managed Projects:");
                 for (int i = 0; i < managedProjects.size(); i++) {
                     BTOProject project = managedProjects.get(i);
-                    System.out.printf("%d. %s (Visibility: %s)%n",
+                    System.out.printf("%d. %s",
                             i + 1,
-                            project.getProjectName(),
-                            project.isVisible() ? "ON" : "OFF");
+                            project.getProjectName());
                 }
 
-                System.out.print("Select a project to toggle visibility (1-" + managedProjects.size() + "): ");
+                System.out.print("Select a project to edit/delete (1-" + managedProjects.size() + "): ");
                 try {
                     int choice = sc.nextInt();
                     sc.nextLine(); // Consume newline
@@ -146,6 +166,34 @@ public class ManagerController {
                         System.out.println("Invalid selection.");
                         return;
                     }
+
+                    System.out.println("Select option");
+                    System.out.println(" 1. Edit");
+                    System.out.println(" 2. Delete");
+                    int option = sc.nextInt();
+
+                    if (option == 1) {//Edit
+                        System.out.println("Edit project details");
+                        String name = menu.promptProjectName();
+                        String hood = menu.promptNeighborhood();
+                        int two = menu.promptUnitCount("2-Room");
+                        int three = menu.promptUnitCount("3-Room");
+                        mgr.editProject(null, name, hood, two, three);
+
+                    }
+                    else if (option == 2){//Delete
+                        mgr.deleteProject(managedProjects.get(choice - 1));
+                        System.out.println("Deleted successfully");
+
+                    }
+                    else{
+                        System.out.println("Invalid selection.");
+                        return;
+                    }
+
+                    Database.saveAll(); // Save changes to the database
+
+
 
                     BTOProject selectedProject = managedProjects.get(choice - 1);
                     boolean newVisibility = !selectedProject.isVisible();

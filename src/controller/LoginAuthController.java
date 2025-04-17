@@ -2,9 +2,8 @@ package controller;
 
 
 import entity.roles.*;
-
-
 import java.util.*;
+import utility.NRICValidator;
 
 
 public class LoginAuthController{
@@ -15,8 +14,19 @@ public class LoginAuthController{
     }
 
     public User verifyLogin(String NRIC, String password) {
+        // Validate NRIC format first 
+        if (!NRICValidator.isValidNRIC(NRIC)) {
+            return null; // Exit immediately for invalid format
+        }
+        
+        // NRIC lookup (only if format is valid)
         User user = userMap.get(NRIC);
-        return (user != null && user.authenticate(password)) ? user : null;
+        if (user == null) {
+            return null; 
+        }
+        
+        // 3. Password check (only if NRIC exists)
+        return user.authenticate(password) ? user : null;
     }
 
     public void changePassword(User user, String newPassword) {
