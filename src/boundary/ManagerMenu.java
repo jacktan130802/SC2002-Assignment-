@@ -39,13 +39,17 @@ public class ManagerMenu {
     }
 
     public String promptDate(String label) {
-        sc.nextLine();
         System.out.print("Enter " + label + " date (YYYY-MM-DD): ");
         return sc.nextLine();
     }
 
 
-
+    public double promptPrice(String flatType) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter selling price for " + flatType + ": ");
+        return sc.nextDouble();
+    }
+    
 
 }
 

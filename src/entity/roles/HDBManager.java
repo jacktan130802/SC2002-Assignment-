@@ -8,6 +8,7 @@ import enums.ApplicationStatus;
 import enums.MaritalStatus;
 import enums.FlatType;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
@@ -235,6 +236,20 @@ public class HDBManager extends User {
     public List<BTOProject> getCreatedProjects() {
         return createdProjects;
     }
+
+    public boolean isApplicationPeriodOverlapping(LocalDate newStart, LocalDate newEnd, BTOProject toExclude) {
+    for (BTOProject p : getCreatedProjects()) {
+        if (p == toExclude) continue;  // Skip the project being edited
+
+        LocalDate existingStart = p.getOpeningDate();
+        LocalDate existingEnd = p.getClosingDate();
+
+        boolean overlaps = !newEnd.isBefore(existingStart) && !newStart.isAfter(existingEnd);
+        if (overlaps) return true;
+    }
+    return false;
+}
+
 
     @Override
     public void displayMenu() {

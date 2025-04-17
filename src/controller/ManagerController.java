@@ -1,12 +1,12 @@
 package controller;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
-
-
+import java.util.stream.Collectors;
 
 import boundary.LogoutMenu;
 import boundary.ManagerMenu;
@@ -120,92 +120,181 @@ public class ManagerController {
                     }
                 }
             }
-        else if (opt == 4) { // Create Project
-                String name = menu.promptProjectName();
-                String hood = menu.promptNeighborhood();
-                int two = menu.promptUnitCount("2-Room");
-                int three = menu.promptUnitCount("3-Room");
-                LocalDate open = LocalDate.parse(menu.promptDate("Opening"));
-                LocalDate close = LocalDate.parse(menu.promptDate("Closing"));
-                BTOProject p = new BTOProject(name, hood, two, 350000, three, 450000, open, close, mgr, 10);
-<<<<<<< HEAD
-                
-                if (mgr.createProject(p)){
-                    System.out.println("Project Created Successfully");
-                }
-                else{
-                    System.out.println("Unsuccessful");
-                }
-            } else if (opt == 2) { // Edit/Delete Project
-                List<BTOProject> managedProjects = mgr.getCreatedProjects(); // Retrieve all projects managed by the current manager
-=======
-                mgr.createProject(p);
-            } else if (opt == 5) { // Edit/Delete Project
-                List<BTOProject> managedProjects = mgr.getCreatedProjects();
->>>>>>> main
+            else if (opt == 4) { // Create Project
+                while (true) {
+                    System.out.println("\n=== Create New Project ===");
+                    System.out.println("You will be prompted for the following fields:");
+                    System.out.println("Project Name, Neighborhood, 2-Room units & price, 3-Room units & price,");
+                    System.out.println("Application Opening Date, Application Closing Date, Visibility");
+                    System.out.println("Example format:");
+                    System.out.println("Acacia Breeze,Yishun,2-Room,1,350000.00,3-Room,1,450000.00,2025-02-15,2025-03-20,Jessica,0,\"\",true\n");
+            
+                    String name = menu.promptProjectName();
+                    String hood = menu.promptNeighborhood();
+            
+                    int twoUnits = menu.promptUnitCount("2-Room");
+                    double twoPrice = menu.promptPrice("2-Room");
+            
+                    int threeUnits = menu.promptUnitCount("3-Room");
+                    double threePrice = menu.promptPrice("3-Room");
+            
+                    System.out.print("Enter Opening Date (YYYY-MM-DD): ");
+                    String openInput = sc.nextLine();
+                    System.out.print("Enter Closing Date (YYYY-MM-DD): ");
+                    String closeInput = sc.nextLine();
 
-                if (managedProjects.isEmpty()) {
-                    System.out.println("You are not managing any projects.");
+                    LocalDate openDate, closeDate;
+                    try {
+                        openDate = LocalDate.parse(openInput);
+                        closeDate = LocalDate.parse(closeInput);
+                    } catch (DateTimeParseException e) {
+                        System.out.println("Invalid date format. Please try again.");
+                        continue; // stay in loop
+                    }
+
+            
+                    // Validate application period does not overlap with manager's other projects
+                    boolean overlap = Database.getProjects().stream()
+                        .filter(p -> p.getManagerInCharge() != null && p.getManagerInCharge().equals(mgr))
+                        .anyMatch(p -> !(closeDate.isBefore(p.getOpeningDate()) || openDate.isAfter(p.getClosingDate())));
+            
+                    if (overlap) {
+                        System.out.println("You are already managing a project within this application period. Please adjust the dates.");
+                        continue;
+                    }
+            
+                    System.out.print("Should this project be visible to applicants? (true/false): ");
+                    String visInput = sc.nextLine().trim().toLowerCase();
+                    boolean isVisible;
+                    if (visInput.equals("true")) {
+                        isVisible = true;
+                    } else if (visInput.equals("false")) {
+                        isVisible = false;
+                    } else {
+                        System.out.println("Invalid input for visibility. Please enter 'true' or 'false'.");
+                        continue;
+                    }
+            
+                    boolean duplicate = Database.getProjects().stream()
+                            .anyMatch(p -> p.getProjectName().equalsIgnoreCase(name));
+                    if (duplicate) {
+                        System.out.println("Project with this name already exists. Please choose another name.");
+                        continue;
+                    }
+            
+                    BTOProject newProject = new BTOProject(name, hood, twoUnits, twoPrice, threeUnits, threePrice, openDate, closeDate, mgr, 10);
+                    newProject.setVisibility(isVisible);
+            
+                    mgr.createProject(newProject);
+                    Database.getProjects().add(newProject);
+                    Database.saveProjects(Database.getProjects());
+            
+                    System.out.println("Project created and saved successfully.");
+                    break;
+                }
+            }
+            
+                
+            
+            
+            
+            else if (opt == 5) { // Edit or Delete Project Listings
+                List<BTOProject> myProjects = Database.getProjects().stream()
+                    .filter(p -> p.getManagerInCharge() != null && p.getManagerInCharge().equals(mgr))
+                    .collect(Collectors.toList());
+            
+                if (myProjects.isEmpty()) {
+                    System.out.println("You are not currently handling any projects.");
                     return;
                 }
-
-                System.out.println("\nYour Managed Projects:");
-                for (int i = 0; i < managedProjects.size(); i++) {
-                    BTOProject project = managedProjects.get(i);
-                    System.out.printf("%d. %s",
-                            i + 1,
-                            project.getProjectName());
+            
+                System.out.println("=== Your Projects ===");
+                for (int i = 0; i < myProjects.size(); i++) {
+                    System.out.printf("[%d] %s (%s)\n", i + 1, myProjects.get(i).getProjectName(), myProjects.get(i).getNeighborhood());
                 }
-
-                System.out.print("Select a project to edit/delete (1-" + managedProjects.size() + "): ");
-                try {
-                    int choice = sc.nextInt();
-                    sc.nextLine(); // Consume newline
-
-                    if (choice < 1 || choice > managedProjects.size()) {
-                        System.out.println("Invalid selection.");
-                        return;
-                    }
-
-                    System.out.println("Select option");
-                    System.out.println(" 1. Edit");
-                    System.out.println(" 2. Delete");
-                    int option = sc.nextInt();
-
-                    if (option == 1) {//Edit
-                        System.out.println("Edit project details");
-                        String name = menu.promptProjectName();
-                        String hood = menu.promptNeighborhood();
-                        int two = menu.promptUnitCount("2-Room");
-                        int three = menu.promptUnitCount("3-Room");
-                        mgr.editProject(null, name, hood, two, three);
-
-                    }
-                    else if (option == 2){//Delete
-                        mgr.deleteProject(managedProjects.get(choice - 1));
-                        System.out.println("Deleted successfully");
-
-                    }
-                    else{
-                        System.out.println("Invalid selection.");
-                        return;
-                    }
-
-                    Database.saveAll(); // Save changes to the database
-
-
-
-                    BTOProject selectedProject = managedProjects.get(choice - 1);
-                    boolean newVisibility = !selectedProject.isVisible();
-                    selectedProject.setVisibility(newVisibility);
-                    System.out.println("Visibility for project \"" + selectedProject.getProjectName() + "\" toggled to: " + (newVisibility ? "ON" : "OFF"));
-
-                    Database.saveAll(); // Save changes to the database
-                } catch (InputMismatchException e) {
-                    System.out.println("Invalid input. Please enter a valid number.");
-                    sc.nextLine(); // Clear invalid input
+            
+                System.out.print("Enter project number to edit/delete (0 to cancel): ");
+                int choice = sc.nextInt();
+                sc.nextLine();
+            
+                if (choice == 0) return;
+                if (choice < 1 || choice > myProjects.size()) {
+                    System.out.println("Invalid choice.");
+                    return;
                 }
-            } else if (opt == 6) { // Toggle Project Visibility for Manager's Current Projects
+            
+                BTOProject selected = myProjects.get(choice - 1);
+            
+                System.out.print("Do you want to (E)dit or (D)elete this project? ");
+                String action = sc.nextLine().trim().toUpperCase();
+            
+                if (action.equals("D")) {
+                    Database.getProjects().remove(selected);
+                    mgr.getCreatedProjects().remove(selected); // optional: keep in sync
+                    System.out.println("Project deleted.");
+                } else if (action.equals("E")) {
+                    try {
+                        System.out.println("Current Project Name: " + selected.getProjectName());
+                        System.out.print("Enter new project name (press enter to keep current): ");
+                        String newName = sc.nextLine().trim();
+                        if (!newName.isEmpty()) selected.setProjectName(newName);
+            
+                        System.out.print("Enter new neighborhood: ");
+                        String hood = sc.nextLine();
+            
+                        System.out.print("Enter number of 2-Room units: ");
+                        int two = sc.nextInt();
+                        System.out.print("Enter selling price for 2-Room: ");
+                        double priceTwo = sc.nextDouble();
+            
+                        System.out.print("Enter number of 3-Room units: ");
+                        int three = sc.nextInt();
+                        System.out.print("Enter selling price for 3-Room: ");
+                        double priceThree = sc.nextDouble();
+                        sc.nextLine(); // clear buffer
+            
+                        System.out.print("Enter Opening Date (yyyy-MM-dd): ");
+                        LocalDate open = LocalDate.parse(sc.nextLine());
+            
+                        System.out.print("Enter Closing Date (yyyy-MM-dd): ");
+                        LocalDate close = LocalDate.parse(sc.nextLine());
+            
+                        // Check for overlapping with other projects by same manager
+                        boolean conflict = Database.getProjects().stream()
+                            .filter(p -> p != selected && p.getManagerInCharge() != null && p.getManagerInCharge().equals(mgr))
+                            .anyMatch(p -> !p.getClosingDate().isBefore(open) && !p.getOpeningDate().isAfter(close));
+            
+                        if (conflict) {
+                            System.out.println("Edit aborted. Another project you manage has an overlapping application period.");
+                            return;
+                        }
+            
+                        System.out.print("Should this project be visible to applicants? (true/false): ");
+                        boolean visible = Boolean.parseBoolean(sc.nextLine());
+            
+                        // Apply updates
+                        selected.setNeighborhood(hood);
+                        selected.setTwoRoomUnits(two);
+                        selected.setPriceTwoRoom(priceTwo);
+                        selected.setThreeRoomUnits(three);
+                        selected.setPriceThreeRoom(priceThree);
+                        selected.setOpeningDate(open);
+                        selected.setClosingDate(close);
+                        selected.setVisibility(visible);
+            
+                        System.out.println("Project updated.");
+                    } catch (Exception e) {
+                        System.out.println("Invalid input. Edit aborted.");
+                    }
+                } else {
+                    System.out.println("Invalid action.");
+                }
+            
+                Database.saveProjects(Database.getProjects());
+            }
+            
+
+                 else if (opt == 6) { // Toggle Project Visibility for Manager's Current Projects
                 List<BTOProject> allProjects = Database.getProjects();
                 List<BTOProject> managedProjects = Filter.filterByManager(allProjects, mgr);
 
@@ -230,7 +319,7 @@ public class ManagerController {
 
                     if (choice < 1 || choice > managedProjects.size()) {
                         System.out.println("Invalid selection.");
-                        return;
+                        continue;
                     }
 
                     BTOProject selectedProject = managedProjects.get(choice - 1);
