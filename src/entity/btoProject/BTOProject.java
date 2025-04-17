@@ -25,9 +25,6 @@ public class BTOProject {
     private int officerSlot;
     private String status;
 
-    //enum flat types
-
-
 
     private List<HDBOfficer> registeredOfficers = new ArrayList<>();
     private List<HDBOfficer> approvedOfficers = new ArrayList<>();
