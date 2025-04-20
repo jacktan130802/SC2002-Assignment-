@@ -1,5 +1,5 @@
 // Updated Database.java with SavedApplicantList, SavedApplicationList, SavedEnquiryList full implementation
-package controller;
+package database;
 
 import entity.Application;
 import entity.Receipt;

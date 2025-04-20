@@ -1,6 +1,5 @@
 package entity.roles;
 
-import controller.Database;
 import entity.Application;
 import entity.btoProject.BTOProject;
 import entity.enquiry.Enquiry;
@@ -14,6 +13,8 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
+
+import database.Database;
 
 public class HDBManager extends User {
     private List<BTOProject> createdProjects = new ArrayList<>();

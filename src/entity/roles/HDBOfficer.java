@@ -7,7 +7,8 @@ import enums.ApplicationStatus;
 import enums.MaritalStatus;
 import enums.OfficerRegistrationStatus;
 import java.util.*;
-import controller.Database;
+
+import database.Database;
 
 public class HDBOfficer extends Applicant {
     private List<RegisteredProject> registeredProjects = new ArrayList<>();
