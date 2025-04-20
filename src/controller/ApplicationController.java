@@ -9,6 +9,8 @@ import enums.MaritalStatus;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import database.*;
+
 public class ApplicationController {
     Scanner sc = new Scanner(System.in);
     public boolean apply(Applicant applicant, BTOProject project, FlatType type) {
@@ -26,7 +28,7 @@ public class ApplicationController {
         Application app = new Application(applicant, project, type);
         applicant.setApplication(app);
 
-        controller.Database.saveAll();
+        database.Database.saveAll();
         System.out.println("Application submitted successfully.");
         return true;
     }
@@ -39,7 +41,7 @@ public class ApplicationController {
         }
         app.setStatus(ApplicationStatus.UNSUCCESSFUL);
         applicant.setApplication(null);
-        controller.Database.saveAll();
+        database.Database.saveAll();
         System.out.println("Application withdrawn successfully.");
     }
 
@@ -49,7 +51,7 @@ public class ApplicationController {
             throw new IllegalStateException("No application found.");
         }
         app.setWithdrawalRequested(true); // Flag the application
-        controller.Database.saveAll();
+        database.Database.saveAll();
         System.out.println("Withdrawal requested. Awaiting approval.");
     }
 
@@ -191,12 +193,12 @@ private List<Application> getPendingApplications() {
         
         // Update application status
         app.setStatus(ApplicationStatus.SUCCESSFUL);
-        controller.Database.saveAll();
+        database.Database.saveAll();
     }
 
     // Reject an application
     public void rejectApplication(Application app) {
         app.setStatus(ApplicationStatus.UNSUCCESSFUL);
-        controller.Database.saveAll();
+        database.Database.saveAll();
     }
 }

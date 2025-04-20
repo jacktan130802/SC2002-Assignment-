@@ -1,5 +1,6 @@
 import boundary.*;
 import controller.*;
+import database.Database;
 import entity.roles.*;
 import java.util.*;
 import utility.NRICValidator;

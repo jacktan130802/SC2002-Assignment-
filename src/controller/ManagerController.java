@@ -6,11 +6,14 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import boundary.LogoutMenu;
 import boundary.ManagerMenu;
+import database.*;
 import entity.Application;
+import entity.btoProject.ApprovedProject;
 import entity.btoProject.BTOProject;
 import entity.btoProject.RegisteredProject;
 import entity.enquiry.Enquiry;
@@ -368,6 +371,14 @@ public class ManagerController {
                         if (decision.equals("A")) {
                             selected.setStatus(OfficerRegistrationStatus.APPROVED);
                             System.out.println("Officer approved.");
+
+                            // Create and add ApprovedProject
+                            ApprovedProject approved = new ApprovedProject(UUID.randomUUID().toString(), selected.getProject(), selected.getOfficer());
+                            Database.getApprovedProjectMap().put(approved.getId(), approved);
+
+                            // Also reflect it in officer’s list
+                            selected.getOfficer().getApprovedProjects().add(approved);
+
                         } else {
                             selected.setStatus(OfficerRegistrationStatus.REJECTED);
                             System.out.println("Officer rejected.");

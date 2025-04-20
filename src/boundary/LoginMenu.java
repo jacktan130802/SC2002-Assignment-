@@ -1,6 +1,7 @@
 package boundary;
-import controller.Database;
 import java.util.*;
+
+import database.Database;
 import utility.NRICValidator;
 
 public class LoginMenu {

@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
+import utility.IReceiptGenerator;
+import utility.StandardReceiptGenerator;
 
 import boundary.LogoutMenu;
 import boundary.OfficerMenu;
+import database.*;
 import entity.Application;
 import entity.Receipt;
 import entity.btoProject.ApprovedProject;
@@ -151,6 +154,20 @@ public class OfficerController {
                     System.out.println("Flat Type: " + app.getFlatType());
                     System.out.println("Status: " + app.getStatus());
                     System.out.println("");
+
+                    if (app.getStatus() == ApplicationStatus.BOOKED && app.getReceipt() != null) {
+                            System.out.println("\n--- Booking Receipt ---");
+                            Receipt r = app.getReceipt();
+                            System.out.println("Name: " + r.getApplicantName());
+                            System.out.println("NRIC: " + r.getNric());
+                            System.out.println("Age: " + r.getAge());
+                            System.out.println("Marital Status: " + r.getMaritalStatus());
+                            System.out.println("Flat Type: " + r.getFlatType());
+                            System.out.println("Project Name: " + r.getProjectName());
+                            System.out.println("Neighborhood: " + r.getNeighborhood());
+                        }
+
+                        System.out.println();
                 }
             }
 
@@ -359,11 +376,10 @@ public class OfficerController {
                             project.updateFlatCount(selectedApp.getFlatType());
 
                             // Step 5: Generate and save receipt
-                            String receiptId = UUID.randomUUID().toString();
-                            Receipt receipt = new Receipt(receiptId, selectedApp);
-                            selectedApp.setReceiptId(receiptId);
-                            selectedApp.setReceipt(receipt);
-                            Database.getReceiptMap().put(receiptId, receipt);
+                            IReceiptGenerator generator = new StandardReceiptGenerator();
+                            Receipt receipt = generator.generate(selectedApp);
+
+                            Database.getReceiptMap().put(receipt.getReceiptId(), receipt);
                             System.out.printf("Receipt generated. Applicant %s can now view their receipt via 'View Application'\n", selectedApp.getApplicant().getNRIC());
                             // Save everything immediately
                             Database.saveProjects(Database.getProjects());

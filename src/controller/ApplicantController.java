@@ -1,6 +1,7 @@
 package controller;
 
 import boundary.*;
+import database.*;
 import entity.*;
 import entity.btoProject.BTOProject;
 import entity.roles.Applicant;
@@ -40,6 +41,7 @@ public class ApplicantController {
                 }
 
                 System.out.println();
+                continue;
                 
 
             }
