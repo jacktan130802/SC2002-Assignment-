@@ -1,35 +1,44 @@
 package controller;
 
-
 import entity.roles.*;
+import interfaces.IPasswordManagement;
+import interfaces.IUserVerification;
 import java.util.*;
 import utility.NRICValidator;
 
-
-public class LoginAuthController{
+public class LoginAuthController implements IUserVerification, IPasswordManagement {
     private Map<String, User> userMap;
 
     public LoginAuthController(Map<String, User> userMap) {
         this.userMap = userMap;
     }
 
-    public User verifyLogin(String NRIC, String password) {
-        // Validate NRIC format first 
-        if (!NRICValidator.isValidNRIC(NRIC)) {
-            return null; // Exit immediately for invalid format
+    @Override
+    public User verifyLogin(String nric, String password) {
+        if (!NRICValidator.isValidNRIC(nric)) {
+            return null;
         }
         
-        // NRIC lookup (only if format is valid)
-        User user = userMap.get(NRIC);
+        User user = userMap.get(nric);
         if (user == null) {
-            return null; 
+            return null;
         }
         
-        // 3. Password check (only if NRIC exists)
         return user.authenticate(password) ? user : null;
     }
 
-    public void changePassword(User user, String newPassword) {
-        user.changePassword(newPassword);
+    @Override
+    public boolean changePassword(String nric, String oldPassword, String newPassword) {
+        if (!NRICValidator.isValidNRIC(nric)) {
+            return false;
+        }
+
+        User user = userMap.get(nric);
+        if (user != null && user.authenticate(oldPassword)) {
+            user.changePassword(newPassword);
+            userMap.put(user.getNRIC(), user);
+            return true;
+        }
+        return false;
     }
 }
