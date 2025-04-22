@@ -6,6 +6,7 @@ import enums.MaritalStatus;
 import java.util.*;
 
 public class ApplicantMenu {
+
     private Scanner sc = new Scanner(System.in);
 
     public int showApplicantOptions(User user) {

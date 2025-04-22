@@ -12,7 +12,24 @@ import utility.NRICValidator;
 
 
 
+
+
 public class Main {
+    /**
+     * Main method to run the BTO Management System.
+     * It initializes the system, loads data, and handles user interactions.
+     *
+     * <p>Steps:</p>
+     * <ol>
+     *   <li>Load data from the database.</li>
+     *   <li>Initialize controllers and boundary menus.</li>
+     *   <li>Display the main menu and handle user input.</li>
+     *   <li>Perform actions based on user role and input.</li>
+     *   <li>Save data and exit the application.</li>
+     * </ol>
+     *
+     * @param args Command line arguments (not used).
+     */
     public static void main(String[] args) {
         // Load data
         Database.loadAll();

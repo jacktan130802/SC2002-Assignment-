@@ -5,9 +5,30 @@ import database.Database;
 import utility.NRICValidator;
 
 public class LoginMenu {
+    /**
+     * Boundary class for handling login-related user interactions.
+     * This class provides methods to prompt the user for login credentials
+     * and to change their password.
+     *
+     * <p>Features include:</p>
+     * <ul>
+     *   <li>Prompting the user for NRIC and password during login.</li>
+     *   <li>Validating NRIC format and checking if the NRIC exists in the database.</li>
+     *   <li>Prompting the user to change their password.</li>
+     * </ul>
+     *
+     * @version 1.0
+     * @since 2025-04-22
+     */
     private Scanner sc = new Scanner(System.in);
 
     public String[] displayLoginPrompt() {
+        /**
+         * Prompts the user to enter their NRIC and password for login.
+         * Validates the NRIC format and checks if the NRIC exists in the database.
+         *
+         * @return A string array containing the NRIC and password, or null if validation fails.
+         */
         System.out.print("Enter NRIC (E.g S1234567D): ");
         String nric = sc.nextLine();
 
@@ -29,6 +50,11 @@ public class LoginMenu {
     }
 
     public String[] promptChangePassword() {
+        /**
+         * Prompts the user to enter their current password and a new password.
+         *
+         * @return A string array containing the current password and the new password.
+         */
         System.out.print("Enter current password: ");
         String oldPwd = sc.nextLine();
         System.out.print("Enter new password: ");
