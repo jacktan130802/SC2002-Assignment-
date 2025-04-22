@@ -1,2 +1,4 @@
 ReceiptID,Name,NRIC,Age,MaritalStatus,FlatType,ProjectName,Neighborhood
+d423f426-e8ea-452c-bd50-b4f2b7a62d47,John,S1234567A,35,SINGLE,TWO_ROOM,Maple View,Tampines
 f8ffeff3-3073-410f-8b68-10f41aeccc3c,Sarah,T7654321B,40,MARRIED,THREE_ROOM,Acacia Breeze,Yishun
+e71114ac-979a-4b0d-91b1-5995b5fd2dde,Daniel,T2109876H,36,SINGLE,TWO_ROOM,Acacia Breeze,Yishun
