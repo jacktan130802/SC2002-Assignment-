@@ -1,12 +1,5 @@
 package controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.UUID;
-import utility.IReceiptGenerator;
-import utility.StandardReceiptGenerator;
-
 import boundary.LogoutMenu;
 import boundary.OfficerMenu;
 import database.*;
@@ -21,6 +14,11 @@ import entity.roles.HDBOfficer;
 import entity.roles.User;
 import enums.ApplicationStatus;
 import enums.FlatType;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import utility.IReceiptGenerator;
+import utility.StandardReceiptGenerator;
 
 public class OfficerController {
     public static void run(HDBOfficer user, BTOProjectController projCtrl, EnquiryController enqCtrl, ReceiptController receiptCtrl, OfficerMenu menu, LogoutMenu logoutMenu, Scanner sc, ApplicationController appCtrl)
@@ -283,11 +281,19 @@ public class OfficerController {
             }
 
             else if (opt == 8) { // View Assigned Projects
-                for (BTOProject p : projCtrl.getVisibleProjectsFor(user)) {
-                    if (user.isHandlingProject(p)) {
-                        System.out.println("Handling: " + p.getProjectName());
-                    }
+                boolean foundProjects = false;
+                
+                // Print out the approved project details
+                for (ApprovedProject ap : approvedProjects) {
+                    System.out.println("");
+                    System.out.println("Assigned Project: " + ap.getProject().getProjectName());
+                    foundProjects = true;
                 }
+                
+                if (!foundProjects) {
+                    System.out.println("You are not currently handling any projects.");
+                }
+            
 
 
             // CAN BE USED FOR MANAGER TO SEE ALL DETAILS OF ALL PROJECTS
