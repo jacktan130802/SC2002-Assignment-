@@ -1,5 +1,16 @@
 package enums;
 
+/**
+ * Represents the marital status of a user.
+ */
 public enum MaritalStatus {
-    SINGLE, MARRIED;
+    /**
+     * The user is single.
+     */
+    SINGLE,
+
+    /**
+     * The user is married.
+     */
+    MARRIED;
 }

@@ -27,9 +27,25 @@ import enums.OfficerRegistrationStatus;
 import utility.ReportFilter;
 import utility.Filter;
 
-
+/**
+ * Controller class for managing HDB Manager operations.
+ * This class handles various functionalities such as viewing, creating, editing, and deleting BTO projects,
+ * approving officer registrations, managing applications, and replying to enquiries.
+ */
 public class ManagerController {
-    public static void run(HDBManager mgr, ManagerMenu menu, LogoutMenu logoutMenu,ApplicationController appCtrl, EnquiryController enqCtrl, OfficerRegistrationController regCtrl, Scanner sc) {
+
+    /**
+     * Runs the main menu for the HDB Manager.
+     *
+     * @param mgr         The HDB Manager user.
+     * @param menu        The ManagerMenu boundary object.
+     * @param logoutMenu  The LogoutMenu boundary object.
+     * @param appCtrl     The ApplicationController for managing applications.
+     * @param enqCtrl     The EnquiryController for managing enquiries.
+     * @param regCtrl     The OfficerRegistrationController for managing officer registrations.
+     * @param sc          The Scanner object for user input.
+     */
+    public static void run(HDBManager mgr, ManagerMenu menu, LogoutMenu logoutMenu, ApplicationController appCtrl, EnquiryController enqCtrl, OfficerRegistrationController regCtrl, Scanner sc) {
         while (true) {
             int opt = menu.showManagerOptions();
             if (opt == 1) {
@@ -616,3 +632,4 @@ public class ManagerController {
 
     }
 }
+

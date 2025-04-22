@@ -6,6 +6,9 @@ import interfaces.IUserVerification;
 import java.util.*;
 import utility.NRICValidator;
 
+/**
+ * Handles login authentication and password management for users.
+ */
 public class LoginAuthController implements IUserVerification, IPasswordManagement {
     private Map<String, User> userMap;
 
@@ -13,17 +16,23 @@ public class LoginAuthController implements IUserVerification, IPasswordManageme
         this.userMap = userMap;
     }
 
+    /**
+     * Verifies the login credentials of a user.
+     * @param nric The NRIC of the user.
+     * @param password The password of the user.
+     * @return The authenticated user, or null if authentication fails.
+     */
     @Override
     public User verifyLogin(String nric, String password) {
         if (!NRICValidator.isValidNRIC(nric)) {
             return null;
         }
-        
+
         User user = userMap.get(nric);
         if (user == null) {
             return null;
         }
-        
+
         return user.authenticate(password) ? user : null;
     }
 

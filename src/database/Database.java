@@ -18,6 +18,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+/**
+ * Handles the persistence and retrieval of data for the application.
+ */
 public class Database {
     private static final String BASE_PATH = System.getProperty("user.dir") + File.separator + "src" + File.separator + "data" + File.separator;
 
@@ -57,6 +60,9 @@ public class Database {
         return approvedMap;
     }
 
+    /**
+     * Loads all data from persistent storage.
+     */
     public static void loadAll() {
         loadUsers(users);
         loadProjects(projects, users);
@@ -90,6 +96,9 @@ public class Database {
 
 
 
+    /**
+     * Saves all data to persistent storage.
+     */
     public static void saveAll() {
         saveUsers(users);
         saveProjects(projects);
@@ -226,7 +235,7 @@ public class Database {
                 }
                 
                 if (m == null) {
-                    System.out.println("⚠️ Manager with name '" + managerName + "' not found.");
+                    System.out.println("Manager with name '" + managerName + "' not found.");
                 }
                 
 

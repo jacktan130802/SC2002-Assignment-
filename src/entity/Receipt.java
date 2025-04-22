@@ -3,6 +3,9 @@ package entity;
 import enums.FlatType;
 import java.io.Serializable;
 
+/**
+ * Represents a receipt generated for a successful flat booking.
+ */
 public class Receipt implements Serializable {
     private String receiptId;
     
@@ -14,6 +17,11 @@ public class Receipt implements Serializable {
     private String projectName;
     private String neighborhood;
 
+    /**
+     * Constructs a Receipt object using an application.
+     * @param receiptId The unique ID of the receipt.
+     * @param app The application associated with the receipt.
+     */
     public Receipt(String receiptId, Application app) {
         this.receiptId = receiptId;
         this.applicantName = app.getApplicant().getName();

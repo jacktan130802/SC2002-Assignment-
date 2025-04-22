@@ -1,8 +1,5 @@
 package entity.btoProject;
 
-
-
-
 import enums.FlatType;
 import entity.roles.HDBManager;
 import entity.roles.HDBOfficer;
@@ -10,6 +7,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a Build-To-Order (BTO) project with details about flats, officers, and application periods.
+ */
 public class BTOProject {
     private String projectName;
     private String neighborhood;
@@ -25,10 +25,23 @@ public class BTOProject {
     private int officerSlot;
     private String status;
 
-
     private List<HDBOfficer> registeredOfficers = new ArrayList<>();
     private List<HDBOfficer> approvedOfficers = new ArrayList<>();
 
+    /**
+     * Constructs a BTOProject instance.
+     *
+     * @param projectName      The name of the project.
+     * @param neighborhood     The neighborhood where the project is located.
+     * @param twoRoomUnits     The number of 2-room units available.
+     * @param priceTwoRoom     The price of a 2-room unit.
+     * @param threeRoomUnits   The number of 3-room units available.
+     * @param priceThreeRoom   The price of a 3-room unit.
+     * @param openingDate      The application opening date.
+     * @param closingDate      The application closing date.
+     * @param managerInCharge  The manager in charge of the project.
+     * @param maxOfficerSlots  The maximum number of officer slots.
+     */
     public BTOProject(String projectName, String neighborhood, int twoRoomUnits, double priceTwoRoom,
                       int threeRoomUnits, double priceThreeRoom, LocalDate openingDate, LocalDate closingDate,
                       HDBManager managerInCharge, int maxOfficerSlots) {
@@ -44,7 +57,6 @@ public class BTOProject {
         this.maxOfficerSlots = maxOfficerSlots;
         this.visibility = false; // default
     }
-
 
     // getters
     public String getProjectName() {
@@ -98,6 +110,7 @@ public class BTOProject {
         }
         return officerNRICs;
     }
+
     public List<String> getApprovedOfficersNRICs() {
         List<String> nrics = new ArrayList<>();
         for (HDBOfficer officer : approvedOfficers) {
@@ -105,7 +118,6 @@ public class BTOProject {
         }
         return nrics;
     }
-    
 
     // setters 
     public void setVisibility(boolean visibility) {
@@ -115,20 +127,25 @@ public class BTOProject {
     public void setProjectName(String projectName) {
         this.projectName = projectName;
     }
-    
+
     public void setNeighborhood(String neighborhood) {
         this.neighborhood = neighborhood;
     }
-    
+
     public void setTwoRoomUnits(int twoRoomUnits) {
         this.twoRoomUnits = twoRoomUnits;
     }
-    
+
     public void setThreeRoomUnits(int threeRoomUnits) {
         this.threeRoomUnits = threeRoomUnits;
     }
-    
 
+    /**
+     * Checks if the given date is within the application's opening and closing period.
+     *
+     * @param date The date to check.
+     * @return True if the date is within the application period, false otherwise.
+     */
     public boolean isWithinApplicationPeriod(LocalDate date) {
         return !(date.isBefore(openingDate) || date.isAfter(closingDate));
     }
@@ -144,17 +161,16 @@ public class BTOProject {
     public boolean registerOfficer(HDBOfficer officer) {
         System.out.println("Attempting to register officer: " + officer.getNRIC());
         System.out.println("Current registered count: " + registeredOfficers.size() + "/" + officerSlot);
-        
-    
+
         if (registeredOfficers.contains(officer)) {
             System.out.println("Officer already registered (duplicate NRIC).");
             return false;
         }
-    
+
         registeredOfficers.add(officer);
         return true;
     }
-    
+
     public boolean approveOfficer(HDBOfficer officer) {
         if (registeredOfficers.contains(officer) && !approvedOfficers.contains(officer)) {
             if (approvedOfficers.size() < maxOfficerSlots) {
@@ -169,28 +185,42 @@ public class BTOProject {
         return approvedOfficers.contains(officer);
     }
 
-public void updateFlatCount(FlatType flatType) {
-    if (flatType == FlatType.TWO_ROOM) {
-        twoRoomUnits--;
-        System.out.println("[DEBUG] 2-Room units decremented. Remaining: " + twoRoomUnits);
-    } else if (flatType == FlatType.THREE_ROOM) {
-        threeRoomUnits--;
-        System.out.println("[DEBUG] 3-Room units decremented. Remaining: " + threeRoomUnits);
-    } else {
-        System.out.println("[DEBUG] Unknown flat type passed to updateFlatCount: " + flatType);
+    /**
+     * Updates the flat count for the specified flat type.
+     *
+     * @param flatType The type of flat to update.
+     */
+    public void updateFlatCount(FlatType flatType) {
+        if (flatType == FlatType.TWO_ROOM) {
+            twoRoomUnits--;
+            System.out.println("[DEBUG] 2-Room units decremented. Remaining: " + twoRoomUnits);
+        } else if (flatType == FlatType.THREE_ROOM) {
+            threeRoomUnits--;
+            System.out.println("[DEBUG] 3-Room units decremented. Remaining: " + threeRoomUnits);
+        } else {
+            System.out.println("[DEBUG] Unknown flat type passed to updateFlatCount: " + flatType);
+        }
     }
-}
 
-
+    /**
+     * Checks if there are available 2-room units.
+     *
+     * @return True if there are 2-room units available, false otherwise.
+     */
     public boolean hasTwoRoom() {
         return twoRoomUnits > 0;
     }
 
+    /**
+     * Checks if there are available 3-room units.
+     *
+     * @return True if there are 3-room units available, false otherwise.
+     */
     public boolean hasThreeRoom() {
         return threeRoomUnits > 0;
     }
 
-public String getStatus() {
+    public String getStatus() {
         return status;
     }
 
@@ -201,17 +231,16 @@ public String getStatus() {
     public void setPriceTwoRoom(double priceTwoRoom) {
         this.priceTwoRoom = priceTwoRoom;
     }
-    
+
     public void setPriceThreeRoom(double priceThreeRoom) {
         this.priceThreeRoom = priceThreeRoom;
     }
-    
+
     public void setOpeningDate(LocalDate openingDate) {
         this.openingDate = openingDate;
     }
-    
+
     public void setClosingDate(LocalDate closingDate) {
         this.closingDate = closingDate;
     }
-    
 }

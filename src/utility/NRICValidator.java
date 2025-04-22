@@ -1,6 +1,16 @@
 package utility;
 
+/**
+ * Provides utility methods for validating NRIC numbers.
+ */
 public class NRICValidator {
+
+    /**
+     * Validates an NRIC number.
+     *
+     * @param nric The NRIC number to validate.
+     * @return {@code true} if the NRIC is valid, {@code false} otherwise.
+     */
     public static boolean isValidNRIC(String nric) {
         // Null and length check (exactly 9 chars)
         if (nric == null || nric.length() != 9) {

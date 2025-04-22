@@ -4,8 +4,14 @@ import entity.Application;
 
 import enums.*;
 
-
+/**
+ * Handles the generation of receipts for successful flat bookings.
+ */
 public class ReceiptController {
+    /**
+     * Generates and displays a receipt for a booked application.
+     * @param app The application for which the receipt is generated.
+     */
     public void generateReceipt(Application app) {
         if (app.getStatus() == ApplicationStatus.BOOKED) {
             System.out.println("--- Receipt ---");

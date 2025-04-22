@@ -4,6 +4,9 @@ import entity.btoProject.BTOProject;
 import entity.roles.Applicant;
 import java.io.Serializable;
 
+/**
+ * Represents an enquiry submitted by an applicant regarding a BTO project.
+ */
 public class Enquiry implements Serializable {
     private static int idCounter = 1;
     private int enquiryID;
@@ -12,6 +15,12 @@ public class Enquiry implements Serializable {
     private String message;
     private String reply;
 
+    /**
+     * Constructs an Enquiry object.
+     * @param applicant The applicant submitting the enquiry.
+     * @param project The BTO project related to the enquiry.
+     * @param message The enquiry message.
+     */
     public Enquiry(Applicant applicant, BTOProject project, String message) {
         this.enquiryID = idCounter++;
         this.applicant = applicant;
@@ -61,7 +70,9 @@ public class Enquiry implements Serializable {
         }
     }
     
-
+    /**
+     * Displays the details of the enquiry.
+     */
     public void view() {
         System.out.println("--- Enquiry Details ---");
         System.out.println("ID: " + enquiryID);
@@ -74,6 +85,10 @@ public class Enquiry implements Serializable {
         }
     }
 
+    /**
+     * Replies to the enquiry with a message.
+     * @param replyMessage The reply message.
+     */
     public void reply(String replyMessage) {
         this.reply = replyMessage;
         System.out.println("Successfully replied to the enquiry.");

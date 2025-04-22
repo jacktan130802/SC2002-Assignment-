@@ -4,9 +4,16 @@ import enums.FlatType;
 import enums.MaritalStatus;
 import java.util.*;
 
+/**
+ * Represents the menu interface for officers to interact with the system.
+ */
 public class OfficerMenu {
     private Scanner sc = new Scanner(System.in);
 
+    /**
+     * Displays the officer menu options and prompts for a choice.
+     * @return The selected menu option.
+     */
     public int showOfficerOptions() {
         System.out.println("As an applicant");
         System.out.println("===============================");
