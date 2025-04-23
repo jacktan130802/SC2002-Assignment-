@@ -1,14 +1,5 @@
 package controller;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Scanner;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 import boundary.LogoutMenu;
 import boundary.ManagerMenu;
 import database.*;
@@ -24,8 +15,16 @@ import enums.ApplicationStatus;
 import enums.FlatType;
 import enums.MaritalStatus;
 import enums.OfficerRegistrationStatus;
-import utility.ReportFilter;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.List;
+import java.util.Scanner;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import utility.Filter;
+import utility.ReportFilter;
 
 /**
  * Controller class for managing HDB Manager operations.
@@ -257,26 +256,41 @@ public class ManagerController {
                         System.out.print("Enter new project name (press enter to keep current): ");
                         String newName = sc.nextLine().trim();
                         if (!newName.isEmpty()) selected.setProjectName(newName);
-            
-                        System.out.print("Enter new neighborhood: ");
-                        String hood = sc.nextLine();
-            
-                        System.out.print("Enter number of 2-Room units: ");
-                        int two = sc.nextInt();
-                        System.out.print("Enter selling price for 2-Room: ");
-                        double priceTwo = sc.nextDouble();
-            
-                        System.out.print("Enter number of 3-Room units: ");
-                        int three = sc.nextInt();
-                        System.out.print("Enter selling price for 3-Room: ");
-                        double priceThree = sc.nextDouble();
-                        sc.nextLine(); // clear buffer
-            
-                        System.out.print("Enter Opening Date (yyyy-MM-dd): ");
-                        LocalDate open = LocalDate.parse(sc.nextLine());
-            
-                        System.out.print("Enter Closing Date (yyyy-MM-dd): ");
-                        LocalDate close = LocalDate.parse(sc.nextLine());
+
+                        System.out.println("Current neighborhood: " + selected.getNeighborhood());
+                        System.out.print("Enter new neighborhood (press enter to keep current): ");
+                        String hood = sc.nextLine().trim();
+                        if (hood.isEmpty()) hood = selected.getNeighborhood();
+
+                        System.out.println("Current 2-Room units: " + selected.getTwoRoomUnits());
+                        System.out.print("Enter number of 2-Room units (press enter to keep current): ");
+                        String twoRoomInput = sc.nextLine().trim();
+                        int two = twoRoomInput.isEmpty() ? selected.getTwoRoomUnits() : Integer.parseInt(twoRoomInput);
+
+                        System.out.println("Current 2-Room price: " + selected.getPriceTwoRoom());
+                        System.out.print("Enter selling price for 2-Room (press enter to keep current): ");
+                        String priceTwoInput = sc.nextLine().trim();
+                        double priceTwo = priceTwoInput.isEmpty() ? selected.getPriceTwoRoom() : Double.parseDouble(priceTwoInput);
+
+                        System.out.println("Current 3-Room units: " + selected.getThreeRoomUnits());
+                        System.out.print("Enter number of 3-Room units (press enter to keep current): ");
+                        String threeRoomInput = sc.nextLine().trim();
+                        int three = threeRoomInput.isEmpty() ? selected.getThreeRoomUnits() : Integer.parseInt(threeRoomInput);
+
+                        System.out.println("Current 3-Room price: " + selected.getPriceThreeRoom());
+                        System.out.print("Enter selling price for 3-Room (press enter to keep current): ");
+                        String priceThreeInput = sc.nextLine().trim();
+                        double priceThree = priceThreeInput.isEmpty() ? selected.getPriceThreeRoom() : Double.parseDouble(priceThreeInput);
+
+                        System.out.println("Current Opening Date: " + selected.getOpeningDate());
+                        System.out.print("Enter Opening Date (yyyy-MM-dd) (press enter to keep current): ");
+                        String openDateInput = sc.nextLine().trim();
+                        LocalDate open = openDateInput.isEmpty() ? selected.getOpeningDate() : LocalDate.parse(openDateInput);
+
+                        System.out.println("Current Closing Date: " + selected.getClosingDate());
+                        System.out.print("Enter Closing Date (yyyy-MM-dd) (press enter to keep current): ");
+                        String closeDateInput = sc.nextLine().trim();
+                        LocalDate close = closeDateInput.isEmpty() ? selected.getClosingDate() : LocalDate.parse(closeDateInput);
             
                         // Check for overlapping with other projects by same manager
                         boolean conflict = Database.getProjects().stream()
