@@ -10,6 +10,7 @@ import entity.btoProject.RegisteredProject;
 import entity.enquiry.Enquiry;
 import entity.roles.Applicant;
 import entity.roles.HDBManager;
+import entity.roles.HDBOfficer;
 import entity.roles.User;
 import enums.ApplicationStatus;
 import enums.FlatType;
@@ -137,8 +138,71 @@ public class ManagerController {
                                 project.getPriceThreeRoom());
                     }
                 }
+            } 
+            else if (opt == 4) { // View Full Project Details (add this number based on your menu)
+                List<BTOProject> myProjects = Database.getProjects().stream()
+                    .filter(p -> p.getManagerInCharge() != null && p.getManagerInCharge().equals(mgr))
+                    .collect(Collectors.toList());
+                
+                if (myProjects.isEmpty()) {
+                    System.out.println("You are not currently managing any projects.");
+                    return;
+                }
+                
+                System.out.println("=== Your Projects ===");
+                for (int i = 0; i < myProjects.size(); i++) {
+                    System.out.printf("[%d] %s (%s)\n", i + 1, myProjects.get(i).getProjectName(), myProjects.get(i).getNeighborhood());
+                }
+                
+                System.out.print("Enter project number to view details (0 to cancel): ");
+                int choice = sc.nextInt();
+                sc.nextLine(); // Clear buffer
+                
+                if (choice == 0) return;
+                if (choice < 1 || choice > myProjects.size()) {
+                    System.out.println("Invalid choice.");
+                    return;
+                }
+                
+                BTOProject selected = myProjects.get(choice - 1);
+                
+                // Display full project details
+                System.out.println("\n=== FULL PROJECT DETAILS ===");
+                System.out.println("Project Name: " + selected.getProjectName());
+                System.out.println("Neighborhood: " + selected.getNeighborhood());
+                System.out.println("Manager: " + selected.getManagerInCharge().getName());
+                System.out.println("Visibility: " + (selected.isVisible() ? "Visible" : "Hidden"));
+                
+                System.out.println("\nFlat Information:");
+                System.out.println("2-Room units: " + selected.getTwoRoomUnits());
+                System.out.println("2-Room price: $" + selected.getPriceTwoRoom());
+                System.out.println("3-Room units: " + selected.getThreeRoomUnits());
+                System.out.println("3-Room price: $" + selected.getPriceThreeRoom());
+                
+                System.out.println("\nApplication Period:");
+                System.out.println("Opening Date: " + selected.getOpeningDate());
+                System.out.println("Closing Date: " + selected.getClosingDate());
+                
+                System.out.println("\nAssigned Officers:");
+
+                // Try a different approach using project name matching instead of object equality
+                List<HDBOfficer> assignedOfficers = Database.getRegisteredMap().values().stream()
+                    .filter(rp -> rp.getProject().getProjectName().equals(selected.getProjectName()))
+                    .filter(rp -> rp.getStatus() == OfficerRegistrationStatus.APPROVED)
+                    .map(RegisteredProject::getOfficer)
+                    .collect(Collectors.toList());
+
+                System.out.println("Officers assigned for this Project: " + assignedOfficers.size());
+
+                if (assignedOfficers.isEmpty()) {
+                    System.out.println("No officers currently assigned");
+                } else {
+                    for (HDBOfficer officer : assignedOfficers) {
+                        System.out.println("- " + officer.getName() + " (" + officer.getNRIC() + ")");
+                    }
+                }
             }
-            else if (opt == 4) { // Create Project
+            else if (opt == 5) { // Create Project
                 while (true) {
                     System.out.println("\n=== Create New Project ===");
                     System.out.println("You will be prompted for the following fields:");
@@ -216,7 +280,7 @@ public class ManagerController {
             
             
             
-            else if (opt == 5) { // Edit or Delete Project Listings
+            else if (opt == 6) { // Edit or Delete Project Listings
                 List<BTOProject> myProjects = Database.getProjects().stream()
                     .filter(p -> p.getManagerInCharge() != null && p.getManagerInCharge().equals(mgr))
                     .collect(Collectors.toList());
@@ -327,7 +391,7 @@ public class ManagerController {
             }
             
 
-                 else if (opt == 6) { // Toggle Project Visibility for Manager's Current Projects
+                 else if (opt == 7) { // Toggle Project Visibility for Manager's Current Projects
                 List<BTOProject> allProjects = Database.getProjects();
                 List<BTOProject> managedProjects = Filter.filterByManager(allProjects, mgr);
 
@@ -365,7 +429,7 @@ public class ManagerController {
                     System.out.println("Invalid input. Please enter a valid number.");
                     sc.nextLine(); // Clear invalid input
                 }
-            } else if (opt == 7) { // Approve Officer Registration
+            } else if (opt == 8) { // Approve Officer Registration
                 List<RegisteredProject> pendingList = Database.getRegisteredMap().values().stream()
                         .filter(rp -> rp.getStatus() == OfficerRegistrationStatus.PENDING)
                         .toList();
@@ -419,7 +483,7 @@ public class ManagerController {
                         Database.saveSavedOfficers();
                     }
                 }
-            } else if (opt == 8) { // Approve/Reject Applications or Withdrawals
+            } else if (opt == 9) { // Approve/Reject Applications or Withdrawals
                 System.out.println("1. Approve/Reject Applications");
                 System.out.println("2. Approve Withdrawal Requests");
                 int subOpt = sc.nextInt();
@@ -431,7 +495,7 @@ public class ManagerController {
                 } else {
                     System.out.println("Invalid Option");
                 }
-            } else if (opt == 9) { // View & Reply to Enquiry
+            } else if (opt == 10) { // View & Reply to Enquiry
                 List<Enquiry> allEnquiries = new ArrayList<>();
                 List<Enquiry> replyEligibleEnquiries = new ArrayList<>();
 
@@ -484,7 +548,7 @@ public class ManagerController {
                     }
                 }
             }
-            else if (opt == 10)
+            else if (opt == 11)
             {
                 List<Application> allBooked = new ArrayList<>();
 
@@ -636,7 +700,7 @@ public class ManagerController {
 
 
 
-            else if (opt == 11) { // Logout
+            else if (opt == 12) { // Logout
                 logoutMenu.displayLogoutMenu(mgr);
                 break;
             } else {

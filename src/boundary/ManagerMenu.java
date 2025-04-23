@@ -19,14 +19,15 @@ public class ManagerMenu {
         System.out.println("1. Show All Projects");
         System.out.println("2. Show My Projects");
         System.out.println("3. View Projects with Filters");
-        System.out.println("4. Create Project");
-        System.out.println("5. Edit/Delete Project");
-        System.out.println("6. Toggle Project Visibility");
-        System.out.println("7. Approve Officer Registration");
-        System.out.println("8. Approve/Reject Applications/Withdrawals");
-        System.out.println("9. View & Reply Enquiries");
-        System.out.println("10. Generate Report");
-        System.out.println("11. Logout");
+        System.out.println("4. View Project Details");
+        System.out.println("5. Create Project");
+        System.out.println("6. Edit/Delete Project");
+        System.out.println("7. Toggle Project Visibility");
+        System.out.println("8. Approve Officer Registration");
+        System.out.println("9. Approve/Reject Applications/Withdrawals");
+        System.out.println("10. View & Reply Enquiries");
+        System.out.println("11. Generate Report");
+        System.out.println("12. Logout");
         System.out.print("Enter your choice: ");
         return sc.nextInt();
     }
