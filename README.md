@@ -1,8 +1,6 @@
 # SC2002-Assignment-
-
-
-## Lab: FCS1
-## Group: 3 
+Lab: FCS1
+Group: 3 
 
 ### Group Members:
 - Cher Yue Yang
