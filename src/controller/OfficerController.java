@@ -300,7 +300,6 @@ public class OfficerController {
                         }
                     }
                     else {
-                        System.out.println("Invalid input");
                         break;
                     }
                 }
