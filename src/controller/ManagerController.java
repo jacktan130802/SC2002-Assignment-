@@ -301,8 +301,14 @@ public class ManagerController {
                 }
             
                 System.out.print("Enter project number to edit/delete (0 to cancel): ");
-                int choice = sc.nextInt();
-                sc.nextLine();
+                int choice;
+                try {
+                    choice = Integer.parseInt(sc.nextLine());
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input. Please enter a number.");
+                    continue;
+                }
+                
             
                 if (choice == 0) return;
                 if (choice < 1 || choice > myProjects.size()) {
@@ -450,8 +456,14 @@ public class ManagerController {
                     }
 
                     System.out.print("Select officer registration to review (1-" + pendingList.size() + "): ");
-                    int choice = sc.nextInt();
-                    sc.nextLine(); // consume newline
+                    int choice;
+                    try {
+                        choice = Integer.parseInt(sc.nextLine());
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid input. Please enter a number.");
+                        continue;
+                    }
+                    
 
                     if (choice < 1 || choice > pendingList.size()) {
                         System.out.println("Invalid selection.");
@@ -491,7 +503,14 @@ public class ManagerController {
             } else if (opt == 9) { // Approve/Reject Applications or Withdrawals
                 System.out.println("1. Approve/Reject Applications");
                 System.out.println("2. Approve Withdrawal Requests");
-                int subOpt = sc.nextInt();
+                int subOpt;
+                try {
+                    subOpt = Integer.parseInt(sc.nextLine());
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input. Please enter a number.");
+                    continue;
+                }
+                
 
                 if (subOpt == 1) {
                     appCtrl.reviewApplications();
@@ -538,8 +557,14 @@ public class ManagerController {
                     }
 
                     System.out.print("Enter enquiry number to reply (0 to cancel): ");
-                    int choice = sc.nextInt();
-                    sc.nextLine(); // consume newline
+                    int choice;
+                    try {
+                        choice = Integer.parseInt(sc.nextLine());
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid input. Please enter a number.");
+                        continue;
+                    }
+                    
 
                     if (choice < 0 || choice > replyEligibleEnquiries.size()) {
                         System.out.println("Invalid selection.");
@@ -598,12 +623,18 @@ public class ManagerController {
                         System.out.println("5. No Filter (View All)");
                         System.out.println("0. Cancel");
                         System.out.print("Choose a filter option: ");
-                        int choice = sc.nextInt();
-                        sc.nextLine(); // clear buffer
+                        int choice;
+                        try {
+                            choice = Integer.parseInt(sc.nextLine());
+                        } catch (NumberFormatException e) {
+                            System.out.println("Invalid input. Please enter a number.");
+                            continue;
+                        }
+                        
 
                         List<Application> filtered = new ArrayList<>(allBooked);
 
-                        if (choice == 0) continue;
+                        if (choice == 0) break;
 
                         switch (choice) {
                             case 1 -> {
