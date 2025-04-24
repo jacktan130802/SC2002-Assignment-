@@ -5,10 +5,10 @@
 ## Group: 3 
 
 ### Group Members:
-Cher Yue Yang
-Goh Jia Hui 
-Jack Tan Xin Jie
-Tan Wei Song Russell Bryan
+1. Cher Yue Yang
+2. Goh Jia Hui 
+3. Jack Tan Xin Jie
+4. Tan Wei Song Russell Bryan
 
 ---
 
@@ -16,5 +16,5 @@ Tan Wei Song Russell Bryan
 Run the `Main.java` file located at `src/Main.java` to start the application.
 
 ### Java Doc 
-Run the `index.html` file located at `javaDoc` folder to start the application.
+Run the `index.html` file located at `javaDoc` folder 
 
