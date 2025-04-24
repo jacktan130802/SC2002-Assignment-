@@ -305,9 +305,13 @@ public class OfficerController {
                 }
             }
             else if (opt == 5) {
-                appCtrl.requestWithdrawal(user);
+                try {
+                    appCtrl.requestWithdrawal(user);
+                } catch (IllegalStateException e) {
+                    System.out.println("You do not have an existing application to withdraw.");
+                }
             }
-
+            
 
 
 
