@@ -5,11 +5,16 @@
 ## Group: 3 
 
 ### Group Members:
-| Number | Name                          |
-|--------|-------------------------------|
-
+Cher Yue Yang
+Goh Jia Hui 
+Jack Tan Xin Jie
+Tan Wei Song Russell Bryan
 
 ---
 
 ## How to Run the Application:
-3. Run the `Main.java` file located at `src/Main.java` to start the application.
+Run the `Main.java` file located at `src/Main.java` to start the application.
+
+### Java Doc 
+Run the `index.html` file located at `javaDoc` folder to start the application.
+
