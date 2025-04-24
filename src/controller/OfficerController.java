@@ -244,6 +244,17 @@ public class OfficerController {
                         int index = sc.nextInt() - 1;
                         sc.nextLine();
 
+                        System.out.println("Your Enquiries:");
+                        for (int i = 0; i < list.size(); i++) {
+                            Enquiry e = list.get(i);
+                            System.out.printf("[%d] Project: %s\nMessage: %s\nReplied: %s\n\n",
+                                i + 1,
+                                e.getProject().getProjectName(),
+                                e.getMessage(),
+                                e.isReplied() ? "Yes" : "No"
+                            );
+                        }
+
                         if (index < 0 || index >= list.size()) {
                             System.out.println("Invalid index.");
                         } else if (list.get(index).isReplied()) {
@@ -262,6 +273,18 @@ public class OfficerController {
                             System.out.println("No enquiries to delete.");
                             continue;
                         }
+
+                        System.out.println("Your Enquiries:");
+                        for (int i = 0; i < list.size(); i++) {
+                            Enquiry e = list.get(i);
+                            System.out.printf("[%d] Project: %s\nMessage: %s\nReplied: %s\n\n",
+                                i + 1,
+                                e.getProject().getProjectName(),
+                                e.getMessage(),
+                                e.isReplied() ? "Yes" : "No"
+                            );
+                        }
+
                         System.out.print("Enter enquiry number to delete: ");
                         int index = sc.nextInt() - 1;
                         sc.nextLine();
@@ -278,6 +301,7 @@ public class OfficerController {
                     }
                     else {
                         System.out.println("Invalid input");
+                        break;
                     }
                 }
             }

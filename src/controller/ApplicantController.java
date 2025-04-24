@@ -235,10 +235,22 @@ public class ApplicantController {
                                 System.out.println("No enquiries to edit.");
                                 continue;
                             }
+                        
+                            System.out.println("Your Enquiries:");
+                            for (int i = 0; i < list.size(); i++) {
+                                Enquiry e = list.get(i);
+                                System.out.printf("[%d] Project: %s\nMessage: %s\nReplied: %s\n\n",
+                                    i + 1,
+                                    e.getProject().getProjectName(),
+                                    e.getMessage(),
+                                    e.isReplied() ? "Yes" : "No"
+                                );
+                            }
+                        
                             System.out.print("Enter enquiry number to edit: ");
                             int index = sc.nextInt() - 1;
                             sc.nextLine();
-
+                        
                             if (index < 0 || index >= list.size()) {
                                 System.out.println("Invalid index.");
                             } else if (list.get(index).isReplied()) {
@@ -250,12 +262,24 @@ public class ApplicantController {
                                 System.out.println("Enquiry updated.");
                                 Database.saveAll(); // Save immediately
                             }
-
-                        } else if (choice == 4) { // Delete Enquiry
+                        }
+                        
+                         else if (choice == 4) { // Delete Enquiry
                             List<Enquiry> list = user.getEnquiries();
                             if (list.isEmpty()) {
                                 System.out.println("No enquiries to delete.");
                                 continue;
+                            }
+
+                            System.out.println("Your Enquiries:");
+                            for (int i = 0; i < list.size(); i++) {
+                                Enquiry e = list.get(i);
+                                System.out.printf("[%d] Project: %s\nMessage: %s\nReplied: %s\n\n",
+                                    i + 1,
+                                    e.getProject().getProjectName(),
+                                    e.getMessage(),
+                                    e.isReplied() ? "Yes" : "No"
+                                );
                             }
                             System.out.print("Enter enquiry number to delete: ");
                             int index = sc.nextInt() - 1;
@@ -272,6 +296,7 @@ public class ApplicantController {
                             }
                         } else {
                             System.out.println("Invalid option");
+                            break;
                         }
                     }
                 } else if (opt == 6) { // Withdraw Application
