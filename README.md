@@ -8,7 +8,6 @@ Group: 3
 - Jack Tan Xin Jie
 - Tan Wei Song Russell Bryan
 
----
 # Features
 
 For Applicants
