@@ -5,10 +5,10 @@
 ## Group: 3 
 
 ### Group Members:
-1. Cher Yue Yang
-2. Goh Jia Hui 
-3. Jack Tan Xin Jie
-4. Tan Wei Song Russell Bryan
+- Cher Yue Yang
+- Goh Jia Hui
+- Jack Tan Xin Jie
+- Tan Wei Song Russell Bryan
 
 ---
 
