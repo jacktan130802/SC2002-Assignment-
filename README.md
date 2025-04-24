@@ -10,7 +10,8 @@ Group: 3
 
 ---
 # Features
-For Applicants 
+
+For Applicants
 - View available BTO projects
 - Apply for BTO flats
 - Submit enquiries
