@@ -295,7 +295,6 @@ public class ApplicantController {
                                 Database.saveAll(); // Save immediately
                             }
                         } else {
-                            System.out.println("Invalid option");
                             break;
                         }
                     }
