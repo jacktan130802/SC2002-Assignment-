@@ -69,7 +69,6 @@ public class HDBOfficer extends Applicant {
             }
         }
         boolean success = project.registerOfficer(this);
-        System.out.println("in registerToProject");
         if (success) 
         {
             RegisteredProject newRP = new RegisteredProject(UUID.randomUUID().toString(), project, this, OfficerRegistrationStatus.PENDING);
