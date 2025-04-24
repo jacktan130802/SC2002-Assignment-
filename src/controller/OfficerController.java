@@ -178,8 +178,14 @@ public class OfficerController {
                     System.out.println("4. Delete Enquiry");
                     System.out.println("5. Back");
                     System.out.print("Choose option: ");
-                    int choice = sc.nextInt();
-                    sc.nextLine(); // clear buffer
+                    int choice;
+                    try {
+                        choice = Integer.parseInt(sc.nextLine()); // safer than nextInt()
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid input. Please enter a number.");
+                        continue; // back to Enquiry Menu, not Login
+                    }
+                    
 
                     if (choice == 1) { // Submit New Enquiry
                         String msg = menu.promptEnquiryMessage();
@@ -252,7 +258,7 @@ public class OfficerController {
                         }
                     }
                     else {
-                        break;
+                        System.out.println("Invalid input");
                     }
                 }
             }

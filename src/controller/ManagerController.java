@@ -202,46 +202,42 @@ public class ManagerController {
                     }
                 }
             }
-            else if (opt == 5) { // Create Project
-                while (true) {
+            else if (opt == 5) {
+                try {
                     System.out.println("\n=== Create New Project ===");
                     System.out.println("You will be prompted for the following fields:");
                     System.out.println("Project Name, Neighborhood, 2-Room units & price, 3-Room units & price,");
                     System.out.println("Application Opening Date, Application Closing Date, Visibility");
-                    System.out.println("Example format:");
-                    System.out.println("Acacia Breeze,Yishun,2-Room,1,350000.00,3-Room,1,450000.00,2025-02-15,2025-03-20,Jessica,0,\"\",true\n");
             
-                    String name = menu.promptProjectName();
-                    String hood = menu.promptNeighborhood();
+                    String name = menu.promptProjectName(); // custom method, likely safe
+                    String hood = menu.promptNeighborhood(); // custom method, likely safe
             
-                    int twoUnits = menu.promptUnitCount("2-Room");
-                    double twoPrice = menu.promptPrice("2-Room");
+                    // Now, explicitly prompt the rest:
+                    System.out.print("Enter number of 2-Room units: ");
+                    int twoUnits = Integer.parseInt(sc.nextLine().trim());
             
-                    int threeUnits = menu.promptUnitCount("3-Room");
-                    double threePrice = menu.promptPrice("3-Room");
+                    System.out.print("Enter price for 2-Room: ");
+                    double twoPrice = Double.parseDouble(sc.nextLine().trim());
+            
+                    System.out.print("Enter number of 3-Room units: ");
+                    int threeUnits = Integer.parseInt(sc.nextLine().trim());
+            
+                    System.out.print("Enter price for 3-Room: ");
+                    double threePrice = Double.parseDouble(sc.nextLine().trim());
             
                     System.out.print("Enter Opening Date (YYYY-MM-DD): ");
-                    String openInput = sc.nextLine();
-                    System.out.print("Enter Closing Date (YYYY-MM-DD): ");
-                    String closeInput = sc.nextLine();
-
-                    LocalDate openDate, closeDate;
-                    try {
-                        openDate = LocalDate.parse(openInput);
-                        closeDate = LocalDate.parse(closeInput);
-                    } catch (DateTimeParseException e) {
-                        System.out.println("Invalid date format. Please try again.");
-                        continue; // stay in loop
-                    }
-
+                    LocalDate openDate = LocalDate.parse(sc.nextLine().trim());
             
-                    // Validate application period does not overlap with manager's other projects
+                    System.out.print("Enter Closing Date (YYYY-MM-DD): ");
+                    LocalDate closeDate = LocalDate.parse(sc.nextLine().trim());
+            
+                    // Date conflict check
                     boolean overlap = Database.getProjects().stream()
                         .filter(p -> p.getManagerInCharge() != null && p.getManagerInCharge().equals(mgr))
                         .anyMatch(p -> !(closeDate.isBefore(p.getOpeningDate()) || openDate.isAfter(p.getClosingDate())));
             
                     if (overlap) {
-                        System.out.println("You are already managing a project within this application period. Please adjust the dates.");
+                        System.out.println("You are already managing a project within this application period.");
                         continue;
                     }
             
@@ -253,17 +249,19 @@ public class ManagerController {
                     } else if (visInput.equals("false")) {
                         isVisible = false;
                     } else {
-                        System.out.println("Invalid input for visibility. Please enter 'true' or 'false'.");
+                        System.out.println("Invalid visibility input.");
                         continue;
                     }
             
+                    // Check for name duplication
                     boolean duplicate = Database.getProjects().stream()
                             .anyMatch(p -> p.getProjectName().equalsIgnoreCase(name));
                     if (duplicate) {
-                        System.out.println("Project with this name already exists. Please choose another name.");
+                        System.out.println("Project with this name already exists.");
                         continue;
                     }
             
+                    // Project creation
                     BTOProject newProject = new BTOProject(name, hood, twoUnits, twoPrice, threeUnits, threePrice, openDate, closeDate, mgr, 10);
                     newProject.setVisibility(isVisible);
             
@@ -271,10 +269,17 @@ public class ManagerController {
                     Database.getProjects().add(newProject);
                     Database.saveProjects(Database.getProjects());
             
-                    System.out.println("Project created and saved successfully.");
-                    break;
+                    System.out.println("Project created and saved successfully.\n");
+            
+                } catch (NumberFormatException | DateTimeParseException e) {
+                    System.out.println("Invalid input format. Returning to Manager Menu...\n");
+                    continue;
+                } catch (Exception e) {
+                    System.out.println("Unexpected error: " + e.getMessage());
+                    continue;
                 }
             }
+            
             
                 
             
