@@ -8,7 +8,7 @@ import java.util.UUID;
 /**
  * Generates standard receipts for applications.
  */
-public class StandardReceiptGenerator implements IReceiptGenerator {
+public class StandardReceiptGenerator extends ReceiptGenerator {
 
     /**
      * Generates a receipt for the given application.
