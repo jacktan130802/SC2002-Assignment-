@@ -160,7 +160,6 @@ public class BTOProject {
 
     public boolean registerOfficer(HDBOfficer officer) {
         System.out.println("Attempting to register officer: " + officer.getNRIC());
-        System.out.println("Current registered count: " + registeredOfficers.size() + "/" + officerSlot);
 
         if (registeredOfficers.contains(officer)) {
             System.out.println("Officer already registered (duplicate NRIC).");
