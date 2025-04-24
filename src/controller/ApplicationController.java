@@ -11,8 +11,22 @@ import java.util.stream.Collectors;
 
 import database.*;
 
+/**
+ * Controller class for managing applications.
+ * This class handles functionalities such as applying for flats, withdrawing applications,
+ * reviewing applications, and processing withdrawal requests.
+ */
 public class ApplicationController {
     Scanner sc = new Scanner(System.in);
+
+    /**
+     * Submits a new application for the given applicant and project.
+     *
+     * @param applicant The applicant submitting the application.
+     * @param project   The BTO project being applied for.
+     * @param type      The type of flat being applied for.
+     * @return True if the application is successful, false otherwise.
+     */
     public boolean apply(Applicant applicant, BTOProject project, FlatType type) {
         // Check if the applicant already has an application
         if (applicant.getApplication() != null) {
@@ -33,6 +47,11 @@ public class ApplicationController {
         return true;
     }
 
+    /**
+     * Withdraws the current application for the given applicant.
+     *
+     * @param applicant The applicant withdrawing the application.
+     */
     public void withdraw(Applicant applicant) {
         Application app = applicant.getApplication();
         if (app == null) {
@@ -45,6 +64,11 @@ public class ApplicationController {
         System.out.println("Application withdrawn successfully.");
     }
 
+    /**
+     * Requests withdrawal for the current application of the given applicant.
+     *
+     * @param applicant The applicant requesting withdrawal.
+     */
     public void requestWithdrawal(Applicant applicant) {
         Application app = applicant.getApplication();
         if (app == null) {
@@ -55,6 +79,12 @@ public class ApplicationController {
         System.out.println("Withdrawal requested. Awaiting approval.");
     }
 
+    /**
+     * Updates the status of the given application.
+     *
+     * @param app       The application to update.
+     * @param newStatus The new status to set.
+     */
     public void updateStatus(Application app, ApplicationStatus newStatus) {
         app.setStatus(newStatus);
         System.out.println("Application status updated to " + newStatus);
@@ -70,6 +100,9 @@ public class ApplicationController {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Processes pending withdrawal requests.
+     */
     public void processWithdrawalRequests() {
         List<Applicant> requests = getPendingWithdrawalRequests();
         if (requests.isEmpty()) {
@@ -99,6 +132,11 @@ public class ApplicationController {
                 () -> System.out.println("Applicant not found.")
             );
     }
+/**
+ * Retrieves a list of pending applications.
+ *
+ * @return A list of pending applications.
+ */
 
 private List<Application> getPendingApplications() {
     return Database.getUsers().values().stream()
@@ -110,6 +148,9 @@ private List<Application> getPendingApplications() {
         .collect(Collectors.toList());
 }
 
+    /**
+     * Reviews pending applications and allows approval or rejection.
+     */
     public void reviewApplications() {
         List<Application> pendingApps = getPendingApplications();
         if (pendingApps.isEmpty()) {
@@ -140,6 +181,11 @@ private List<Application> getPendingApplications() {
         }
         System.out.println("Applicant not found.");
     }
+
+    /**
+     * Processes the application for approval or rejection.
+     * @param app
+     */
 
     private void processApplication(Application app) {
         System.out.print("Approve (A) or Reject (R)? ");
@@ -177,6 +223,11 @@ private List<Application> getPendingApplications() {
         }
     }
     
+    /**
+     * Approves the given application if conditions are met.
+     *
+     * @param app The application to approve.
+     */
     private void approveApplication(Application app) {
         BTOProject project = app.getProject();
         FlatType flatType = app.getFlatType();
@@ -196,7 +247,11 @@ private List<Application> getPendingApplications() {
         database.Database.saveAll();
     }
 
-    // Reject an application
+    /**
+     * Rejects the given application.
+     *
+     * @param app The application to reject.
+     */
     public void rejectApplication(Application app) {
         app.setStatus(ApplicationStatus.UNSUCCESSFUL);
         database.Database.saveAll();

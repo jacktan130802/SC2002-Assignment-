@@ -11,13 +11,28 @@ import java.util.stream.Collectors;
 
 import database.*;
 
+/**
+ * Controller class for managing BTO (Build-To-Order) projects.
+ * Provides functionality for retrieving, viewing, and managing project details.
+ */
 public class BTOProjectController {
     private List<BTOProject> projects;
 
+    /**
+     * Constructs a BTOProjectController with a list of BTO projects.
+     *
+     * @param projects The list of BTO projects to manage.
+     */
     public BTOProjectController(List<BTOProject> projects) {
         this.projects = projects;
     }
 
+    /**
+     * Retrieves a list of BTO projects visible to a specific applicant based on their eligibility.
+     *
+     * @param applicant The applicant whose eligibility is being checked.
+     * @return A list of BTO projects visible to the applicant.
+     */
     public List<BTOProject> getVisibleProjectsFor(Applicant applicant) {
         List<BTOProject> viewable = new ArrayList<>();
         boolean isSingle = applicant.getMaritalStatus().toString().equalsIgnoreCase("SINGLE");
@@ -36,48 +51,24 @@ public class BTOProjectController {
         return viewable;
     }
 
+    /**
+     * Retrieves a BTO project by its name.
+     *
+     * @param name The name of the project to retrieve.
+     * @return The BTO project with the specified name, or null if not found.
+     */
     public BTOProject getProjectByName(String name) {
         return projects.stream()
                 .filter(p -> p.getProjectName().equalsIgnoreCase(name))
                 .findFirst().orElse(null);
     }
 
-
-    //CAN BE USED FOR MANAGER
-    //
-    // public List<BTOProject> getAllProjects() {
-    //     return new ArrayList<>(Database.getProjects());
-    // }
-
-    // public static void getFullProjectDetails(User user, String projectname) {
-    //     BTOProject project = Database.getProjects().stream()
-    //     .filter(p -> p.getProjectName().equals(projectname))
-    //     .findFirst()
-    //     .orElse(null);
-        
-    //     if (project == null) {
-    //         System.out.println("Project not found");
-    //         return;
-    //     }
-        
-    //     if (!(user instanceof HDBOfficer)) {
-    //         System.out.println("Error: Only HDB officers can access full project details");
-    //         return;
-    //     }
-        
-    //     System.out.println("\n=== FULL PROJECT DETAILS ===");
-    //     System.out.println("Project Name: " + project.getProjectName());
-    //     System.out.println("Neighbourhood: " + project.getNeighborhood()  );
-    //     System.out.println("Number of 2-ROOM units: " + project.getTwoRoomUnits());
-    //     System.out.println("Number of 3-ROOM units: " + project.getThreeRoomUnits());
-    //     System.out.println("2-ROOM Price: $" + project.getPriceTwoRoom());
-    //     System.out.println("3-ROOM Price: $" + project.getPriceThreeRoom());
-    //     System.out.println("Application Open Date: " + project.getOpeningDate());
-    //     System.out.println("Applcation Closing Date: " + project.getClosingDate());
-    //     System.out.println("Manager: " + project.getManagerInCharge());
-    //     System.out.println("Officers: " + project.getOfficerSlot());
-    //     System.out.println("==========================\n");
-    // }
+    /**
+     * Allows an HDB officer to view details of the projects they are approved for.
+     * Displays a list of approved projects and prompts the officer to select one for detailed viewing.
+     *
+     * @param officer The HDB officer viewing their approved projects.
+     */
 
     public void viewOfficerProjectDetails(HDBOfficer officer) {
         List<BTOProject> approvedProjects = officer.getApprovedProjects()
@@ -112,6 +103,12 @@ public class BTOProjectController {
         }
     }
 
+    /**
+     * Prints detailed information about a specific BTO project.
+     * Includes project name, location, manager, assigned officers, unit availability, and application period.
+     *
+     * @param project The BTO project whose details are to be printed.
+     */
     private void printProjectDetails(BTOProject project) {
         System.out.println("\n=== PROJECT DETAILS ===");
         System.out.println("Name: " + project.getProjectName());

@@ -44,6 +44,8 @@ public class Receipt implements Serializable {
     }
     
     // Getters
+
+
     public String getReceiptId() { return receiptId; }
     public String getApplicantName() { return applicantName; }
     public String getNric() { return nric; }

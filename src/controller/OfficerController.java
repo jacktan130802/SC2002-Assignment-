@@ -20,9 +20,28 @@ import java.util.Scanner;
 import utility.IReceiptGenerator;
 import utility.StandardReceiptGenerator;
 
+/**
+ * Controller class for handling HDB Officer operations.
+ * This class manages various functionalities such as viewing projects, applying for flats,
+ * handling enquiries, booking flats for applicants, and managing officer-specific tasks.
+ */
 public class OfficerController {
-    public static void run(HDBOfficer user, BTOProjectController projCtrl, EnquiryController enqCtrl, ReceiptController receiptCtrl, OfficerMenu menu, LogoutMenu logoutMenu, Scanner sc, ApplicationController appCtrl)
-    {
+
+    /**
+     * Main method to run the officer's operations.
+     *
+     * @param user         The HDBOfficer currently logged in.
+     * @param projCtrl     The controller for managing BTO projects.
+     * @param enqCtrl      The controller for handling enquiries.
+     * @param receiptCtrl  The controller for managing receipts.
+     * @param menu         The menu interface for officer operations.
+     * @param logoutMenu   The menu interface for logout operations.
+     * @param sc           The scanner for user input.
+     * @param appCtrl      The controller for managing applications.
+     */
+    public static void run(HDBOfficer user, BTOProjectController projCtrl, EnquiryController enqCtrl,
+                           ReceiptController receiptCtrl, OfficerMenu menu, LogoutMenu logoutMenu,
+                           Scanner sc, ApplicationController appCtrl) {
         while (true) {
             System.out.println("\n=== Officer Overview ===");
 

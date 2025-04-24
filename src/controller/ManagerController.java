@@ -29,17 +29,17 @@ import utility.ReportFilter;
 
 /**
  * Controller class for managing HDB Manager operations.
- * This class handles various functionalities such as viewing, creating, editing, and deleting BTO projects,
- * approving officer registrations, managing applications, and replying to enquiries.
+ * This class handles functionalities such as viewing, creating, editing, and deleting BTO projects,
+ * approving officer registrations, managing applications, replying to enquiries, and generating reports.
  */
 public class ManagerController {
 
     /**
-     * Runs the main menu for the HDB Manager.
+     * Runs the main menu for the HDB Manager and handles user interactions.
      *
      * @param mgr         The HDB Manager user.
-     * @param menu        The ManagerMenu boundary object.
-     * @param logoutMenu  The LogoutMenu boundary object.
+     * @param menu        The ManagerMenu boundary object for displaying menu options.
+     * @param logoutMenu  The LogoutMenu boundary object for handling logout.
      * @param appCtrl     The ApplicationController for managing applications.
      * @param enqCtrl     The EnquiryController for managing enquiries.
      * @param regCtrl     The OfficerRegistrationController for managing officer registrations.

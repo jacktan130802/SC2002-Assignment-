@@ -36,6 +36,13 @@ public class LoginAuthController implements IUserVerification, IPasswordManageme
         return user.authenticate(password) ? user : null;
     }
 
+    /**
+     * Changes the password of a user.
+     * @param nric The NRIC of the user.
+     * @param oldPassword The user's current password.
+     * @param newPassword The new password to be set.
+     * @return
+     */
     @Override
     public boolean changePassword(String nric, String oldPassword, String newPassword) {
         if (!NRICValidator.isValidNRIC(nric)) {

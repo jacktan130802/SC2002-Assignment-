@@ -19,7 +19,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
- * Handles the persistence and retrieval of data for the application.
+ * Data management for the application.
+ * Provides methods to load and save data for users, projects, applications, enquiries, receipts, and officer-related data.
  */
 public class Database {
     private static final String BASE_PATH = System.getProperty("user.dir") + File.separator + "src" + File.separator + "data" + File.separator;
@@ -61,7 +62,8 @@ public class Database {
     }
 
     /**
-     * Loads all data from persistent storage.
+     * Loads all data from persistent storage into memory.
+     * This includes users, projects, applications, enquiries, receipts, and officer-related data.
      */
     public static void loadAll() {
         loadUsers(users);
@@ -86,6 +88,11 @@ public class Database {
 
         
     }
+    /**
+     * Loads user data from CSV files and populates the provided user map.
+     *
+     * @param users The map to populate with user data.
+     */
 
     public static void loadUsers(Map<String, User> users) {
         
@@ -112,6 +119,11 @@ public class Database {
 
     }
 
+    /**
+     * Saves user data to CSV files based on their roles (Applicant, Officer, Manager).
+     *
+     * @param users The map of users to save.
+     */
     private static void saveUsers(Map<String, User> users) {
         Map<String, User> applicants = new HashMap<>();
         Map<String, User> officers = new HashMap<>();
@@ -133,6 +145,13 @@ public class Database {
         saveToCSV(managers, MANAGER_CSV, "Manager");
     }
 
+    /**
+     * Saves a specific type of user data to a CSV file.
+     *
+     * @param users The map of users to save.
+     * @param filepath The file path to save the data to.
+     * @param role The role of the users being saved (e.g., Applicant, Officer, Manager).
+     */
     private static void saveToCSV(Map<String, User> users, String filepath, String role) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath))) {
             writer.write("Name,NRIC,Age,Marital Status,Password\n");
@@ -144,6 +163,12 @@ public class Database {
             System.out.println("Error saving " + role + ": " + e.getMessage());
         }
     }
+
+    /**
+     * Saves project data to a CSV file.
+     *
+     * @param projects The list of projects to save.
+     */
     public static void saveProjects(List<BTOProject> projects) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(PROJECT_CSV))) {
             writer.write("Project Name,Neighborhood,Type 1,Number of units for Type 1,Selling price for Type 1,Type 2,Number of units for Type 2,Selling price for Type 2,Application opening date,Application closing date,Manager,Officer Slot,Officer,Visibility\n");
@@ -172,14 +197,31 @@ public class Database {
         }
     }
     
+    /**
+     * Retrieves the map of all users.
+     *
+     * @return A map of users keyed by their NRIC.
+     */
     public static Map<String, User> getUsers() {
         return users;
     }
 
+    /**
+     * Retrieves the list of all BTO projects.
+     *
+     * @return A list of BTO projects.
+     */
     public static List<BTOProject> getProjects() {
         return projects;
     }
 
+    /**
+     * Reads user data from a CSV file and populates the provided user map.
+     *
+     * @param users The map to populate with user data.
+     * @param filepath The file path to read the data from.
+     * @param role The role of the users being loaded (e.g., Applicant, Officer, Manager).
+     */
     private static void readCSV(Map<String, User> users, String filepath, String role) {
         try (BufferedReader reader = new BufferedReader(new FileReader(filepath))) {
             reader.readLine();
@@ -203,6 +245,12 @@ public class Database {
         }
     }
 
+    /**
+     * Loads project data from a CSV file and populates the provided project list.
+     *
+     * @param projects The list to populate with project data.
+     * @param users The map of users to link managers and officers to projects.
+     */
     public static void loadProjects(List<BTOProject> projects, Map<String, User> users) {
         try (BufferedReader reader = new BufferedReader(new FileReader(PROJECT_CSV))) {
             String header = reader.readLine();
@@ -257,6 +305,12 @@ public class Database {
         }
     }
 
+    /**
+     * Parses a CSV line into a list of tokens, handling quoted fields.
+     *
+     * @param line The CSV line to parse.
+     * @return A list of tokens extracted from the line.
+     */
     private static List<String> parseCSVLine(String line) {
         List<String> tokens = new ArrayList<>();
         boolean inQuotes = false;
@@ -273,6 +327,9 @@ public class Database {
         return tokens;
     }
 
+    /**
+     * Loads saved applicant data from a CSV file and links it to the application and enquiry maps.
+     */
     private static void loadSavedApplicants() {
         try (BufferedReader reader = new BufferedReader(new FileReader(SAVED_APPLICANT_CSV))) {
             reader.readLine(); // skip header
@@ -319,6 +376,9 @@ public class Database {
     }
     
 
+    /**
+     * Saves applicant data to a CSV file, including linked applications and enquiries.
+     */
     private static void saveSavedApplicants() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_APPLICANT_CSV))) {
             writer.write("Name,NRIC,Age,Marital Status,Password,ApplicationID,EnquiryIDs\n");
@@ -337,6 +397,9 @@ public class Database {
         }
     }
 
+    /**
+     * Loads saved application data from a CSV file and populates the application map.
+     */
     private static void loadSavedApplications() {
         try (BufferedReader reader = new BufferedReader(new FileReader(SAVED_APPLICATION_CSV))) {
             reader.readLine(); // Skip header
@@ -378,6 +441,9 @@ public class Database {
     }
     
 
+    /**
+     * Saves application data to a CSV file.
+     */
     public static void saveSavedApplications() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_APPLICATION_CSV))) {
             writer.write("ApplicationID,ApplicantNRIC,ProjectName,FlatType,Status,ReceiptID\n");
@@ -395,6 +461,9 @@ public class Database {
         }
     }
 
+    /**
+     * Loads saved enquiry data from a CSV file and populates the enquiry map.
+     */
     private static void loadSavedEnquiries() {
         try (BufferedReader reader = new BufferedReader(new FileReader(SAVED_ENQUIRY_CSV))) {
             reader.readLine();
@@ -419,6 +488,9 @@ public class Database {
         }
     }
 
+    /**
+     * Saves enquiry data to a CSV file.
+     */
     public static void saveSavedEnquiries() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_ENQUIRY_CSV))) {
             writer.write("EnquiryID,ApplicantNRIC,ProjectName,Message,Reply\n");
@@ -437,11 +509,20 @@ public class Database {
         }
     }
 
+    /**
+     * Retrieves a BTO project by its name.
+     *
+     * @param name The name of the project to retrieve.
+     * @return The BTO project with the specified name, or null if not found.
+     */
     private static BTOProject getProjectByName(String name) {
         for (BTOProject p : projects) if (p.getProjectName().equals(name)) return p;
         return null;
     }
 
+    /**
+     * Loads saved officer data from a CSV file and links it to registered and approved projects.
+     */
     private static void loadSavedOfficers() {
     try (BufferedReader reader = new BufferedReader(new FileReader(SAVED_OFFICER_CSV))) {
         reader.readLine();
@@ -469,7 +550,10 @@ public class Database {
     }
 }
 
-private static void loadSavedRegisteredProjects() {
+    /**
+     * Loads saved registered project data from a CSV file and populates the registered project map.
+     */
+    private static void loadSavedRegisteredProjects() {
     try (BufferedReader reader = new BufferedReader(new FileReader(SAVED_REGISTERED_CSV))) {
         reader.readLine();
         String line;
@@ -487,7 +571,10 @@ private static void loadSavedRegisteredProjects() {
     }
 }
 
-private static void loadSavedApprovedProjects() {
+    /**
+     * Loads saved approved project data from a CSV file and populates the approved project map.
+     */
+    private static void loadSavedApprovedProjects() {
     try (BufferedReader reader = new BufferedReader(new FileReader(SAVED_APPROVED_CSV))) {
         reader.readLine();
         String line;
@@ -505,7 +592,10 @@ private static void loadSavedApprovedProjects() {
     }
 }
 
-public static void saveSavedOfficers() {
+    /**
+     * Saves officer data to a CSV file, including linked registered and approved projects.
+     */
+    public static void saveSavedOfficers() {
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_OFFICER_CSV))) {
         writer.write("Name,NRIC,Age,Marital Status,Password,ApplicationID,EnquiryIDs,RegisteredProjectIDs,ApprovedProjectIDs\n");
         for (User u : users.values()) {
@@ -524,6 +614,9 @@ public static void saveSavedOfficers() {
     }
 }
 
+    /**
+     * Saves registered project data to a CSV file.
+     */
 
 public static void saveSavedRegisteredProjects() {
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_REGISTERED_CSV))) {
@@ -536,6 +629,10 @@ public static void saveSavedRegisteredProjects() {
     }
 }
 
+    /**
+     * Saves approved project data to a CSV file.
+     */
+
 public static void saveSavedApprovedProjects() {
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_APPROVED_CSV))) {
         writer.write("ApprovedProjectID,ProjectName,OfficerNRIC\n");
@@ -546,6 +643,10 @@ public static void saveSavedApprovedProjects() {
         System.out.println("Error saving approved projects: " + e.getMessage());
     }
 }
+
+    /**
+     * Saves receipt data to a CSV file.
+     */
 
 public static void saveSavedReceipts() {
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(SAVED_RECEIPT_CSV))) {
@@ -560,7 +661,10 @@ public static void saveSavedReceipts() {
     }
 }
 
-public static void loadSavedReceipts() {
+    /**
+     * Loads saved receipt data from a CSV file and populates the receipt map.
+     */
+    public static void loadSavedReceipts() {
     try (BufferedReader reader = new BufferedReader(new FileReader(SAVED_RECEIPT_CSV))) {
         reader.readLine(); // Skip header
         String line;
