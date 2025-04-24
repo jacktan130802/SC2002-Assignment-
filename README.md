@@ -9,15 +9,14 @@ Group: 3
 - Tan Wei Song Russell Bryan
 
 ---
-Features
-For Applicants
-
-    View available BTO projects
-    Apply for BTO flats
-    Submit enquiries
-    Track application status
-    Withdraw applications
-    View application history
+# Features
+## For Applicants
+- View available BTO projects
+- Apply for BTO flats
+- Submit enquiries
+- Track application status
+- Withdraw applications
+- View application history
 
 For HDB Officers
 
