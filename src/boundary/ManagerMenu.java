@@ -15,7 +15,7 @@ public class ManagerMenu {
      * @return The selected menu option.
      */
     public int showManagerOptions() {
-        System.out.println("\n--- HDB Manager Menu ---");
+        System.out.println("--- HDB Manager Menu ---");
         System.out.println("1. Show All Projects");
         System.out.println("2. Show My Projects");
         System.out.println("3. View Projects with Filters");
@@ -28,10 +28,18 @@ public class ManagerMenu {
         System.out.println("10. View & Reply Enquiries");
         System.out.println("11. Generate Report");
         System.out.println("12. Logout");
-        System.out.print("Enter your choice: ");
-        return sc.nextInt();
+        
+        int choice = -1;
+        try {
+            System.out.print("Enter your choice: ");
+            choice = sc.nextInt();
+            sc.nextLine(); // Clear buffer
+        } catch (InputMismatchException e) {
+            // Just let it return -1, which will be handled in the controller
+            sc.nextLine(); // Clear invalid input
+        }
+        return choice;
     }
-
     /**
      * Prompts the user to enter the name of a project.
      *
