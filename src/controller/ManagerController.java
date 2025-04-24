@@ -708,9 +708,11 @@ public class ManagerController {
             else if (opt == 12) { // Logout
                 logoutMenu.displayLogoutMenu(mgr);
                 break;
-            } else {
-                System.out.println("Invalid option");
+            }  else {
+                continue;
             }
+            
+            
      }
 
     }
