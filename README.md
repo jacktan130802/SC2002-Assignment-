@@ -16,4 +16,4 @@ Run the `Main.java` file located at `src/Main.java` to start the application.
 ### Java Doc 
 Run the `index.html` file located at `javaDoc` folder 
 
-![Java Documentation](/images/javaDocPage.png)
+<img src = "/images/javaDocPage.png" height="300" width="300" alt="Java Documentation"> 
