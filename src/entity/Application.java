@@ -8,6 +8,14 @@ import java.io.Serializable;
 
 
 public class Application implements Serializable {
+
+    /**
+     * Represents an application for a BTO flat.
+     * Contains details about the applicant, project, flat type, and application status.
+     * Also includes methods for managing the application status and withdrawal requests.
+     *
+     */
+
     private Applicant applicant;
     private BTOProject project;
     private ApplicationStatus status;

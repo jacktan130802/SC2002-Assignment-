@@ -38,18 +38,21 @@ public class OfficerMenu {
         return sc.nextInt();
     }
 
+    /**
+     * Prompts the user to enter a reply message for an enquiry.
+     * @return The reply message entered by the user.
+     */
     public String promptEnquiryReply() {
         sc.nextLine();
         System.out.print("Enter reply message: ");
         return sc.nextLine();
     }
 
-    public String promptApplicantNRIC() {
-        sc.nextLine();
-        System.out.print("Enter applicant NRIC: ");
-        return sc.nextLine();
-    }
-
+    /**
+     * Prompts the user to choose a flat type based on their marital status.
+     * @param status The marital status of the user.
+     * @return The selected flat type as a FlatType enum.
+     */
     public FlatType chooseFlatType(MaritalStatus status) {
         if (status == MaritalStatus.SINGLE) {
             System.out.println("You are eligible for 2-Room flats only.");
@@ -61,11 +64,21 @@ public class OfficerMenu {
         }
     }
 
+    /**
+     * Prompts the user to enter the name of a project.
+     * @return The project name entered by the user as a String.
+     */
     public String promptProjectName() {
     sc.nextLine(); // Clear buffer
     System.out.print("Enter project name: ");
     return sc.nextLine();
 }
+
+    /**
+     * Prompts the user to enter an enquiry message.
+     * @return The enquiry message entered by the user as a String.
+     */
+
     public String promptEnquiryMessage() {
         sc.nextLine(); // Clear buffer
         System.out.print("Enter enquiry message: ");
