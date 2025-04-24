@@ -10,7 +10,7 @@ Group: 3
 
 ---
 # Features
-## For Applicants
+For Applicants 
 - View available BTO projects
 - Apply for BTO flats
 - Submit enquiries
@@ -19,31 +19,28 @@ Group: 3
 - View application history
 
 For HDB Officers
-
-    View assigned projects
-    Process applications
-    Reply to enquiries
-    Manage flat bookings
-    View project details
-    Register for project handling
+- View assigned projects
+- Process applications
+- Reply to enquiries
+- Manage flat bookings
+- View project details
+- Register for project handling
 
 For HDB Managers
-
-    Create and manage BTO projects
-    Assign officers to projects
-    Approve/reject applications
-    Manage project visibility
-    Process withdrawal requests
-    Generate reports
+- Create and manage BTO projects
+- Assign officers to projects
+- Approve/reject applications
+- Manage project visibility
+- Process withdrawal requests
+- Generate reports
 
 System Features
-
-    Secure authentication system
-    Role-based access control
-    Data persistence using CSV files
-    Real-time status updates
-    Comprehensive error handling
-    User-friendly interface
+- Secure authentication system
+- Role-based access control
+- Data persistence using CSV files
+- Real-time status updates
+- Comprehensive error handling
+- User-friendly interface
 
 ## How to Run the Application:
 Run the `Main.java` file located at `src/Main.java` to start the application.
