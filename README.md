@@ -1,4 +1,4 @@
-# Assignment-
+# Assignment
 Lab: FCS1
 Group: 3 
 
