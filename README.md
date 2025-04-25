@@ -1,4 +1,4 @@
-# SC2002-Assignment-
+# Assignment-
 Lab: FCS1
 Group: 3 
 
